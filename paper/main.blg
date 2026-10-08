@@ -5,36 +5,36 @@ The style file: oup-plain.bst
 Database file #1: references.bib
 You've used 28 entries,
             2118 wiz_defined-function locations,
-            684 strings with 10197 characters,
-and the built_in function-call counts, 11704 in all, are:
-= -- 1109
-> -- 754
+            685 strings with 10156 characters,
+and the built_in function-call counts, 11606 in all, are:
+= -- 1101
+> -- 744
 < -- 0
-+ -- 303
-- -- 270
-* -- 1046
-:= -- 2018
++ -- 299
+- -- 266
+* -- 1034
+:= -- 2002
 add.period$ -- 84
 call.type$ -- 28
-change.case$ -- 218
+change.case$ -- 216
 chr.to.int$ -- 0
 cite$ -- 28
 duplicate$ -- 309
-empty$ -- 759
-format.name$ -- 270
-if$ -- 2281
+empty$ -- 755
+format.name$ -- 266
+if$ -- 2263
 int.to.chr$ -- 0
 int.to.str$ -- 28
 missing$ -- 29
 newline$ -- 143
 num.names$ -- 56
-pop$ -- 169
+pop$ -- 167
 preamble$ -- 1
-purify$ -- 191
+purify$ -- 189
 quote$ -- 0
 skip$ -- 201
 stack$ -- 0
-substring$ -- 827
+substring$ -- 815
 swap$ -- 28
 text.length$ -- 0
 text.prefix$ -- 0
