@@ -58,6 +58,11 @@ I~Glais, M~Tribodet, and C~Kerlan.
   {PVY(O)} and {PVY(N)} isolates.
 \newblock {\em Archives of Virology}, 147(2):363--378, 2002.
 
+\bibitem{gonzalez1985clustering}
+Teofilo~F. Gonzalez.
+\newblock Clustering to minimize the maximum intercluster distance.
+\newblock {\em Theoretical Computer Science}, 38:293--306, 1985.
+
 \bibitem{gower1966some}
 J.~C. Gower.
 \newblock Some distance properties of latent root and vector methods used in
