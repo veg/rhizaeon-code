@@ -100,3 +100,58 @@ The root acts as an unpolarized sink.
 Private noise is absorbed without perturbing leaf coordinates.
 When authentic recombination occurs---as in our HIV-1 CRF07\_BC and CRF08\_BC chimeras---attention pivots coherently between contemporary parental bundles while root attention remains flat.
 Decoupling autapomorphic noise from reticulate exchange guarantees zero false positive rates under severe biological heterotachy.
+
+\subsection{Continuous Trajectory Dynamics and Statistical Change-Point Inference}
+\label{subsec:changepoint}
+
+Instantaneous attention weights fluctuate at individual polymorphic sites.
+Mutations produce high-frequency jitter.
+To extract continuous evolutionary trajectories from noisy site-level attention tensors, \RhizAeon integrates attention into continuous cumulative trajectory curves.
+For sequence $i$ and reference bundle $m$, the cumulative attention curve represents the integrated evolutionary affinity up to coordinate $u$:
+\begin{equation}
+C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} A_v(i \to j).
+\label{eq:cumulative_attention}
+\end{equation}
+The dominant lineage across the full chromosome defines the home clade: $m_{\text{home}}(i) = \arg\max_m C_{i, m}(L)$.
+Drift governs the null.
+When sequence $i$ evolves clonally within its parental background, attention to the home clade exceeds attention to any divergent reference at nearly every site.
+Consequently, the differential attention curve $Y_{i, m}(u) = C_{i, m}(u) - C_{i, \text{home}}(u)$ exhibits a monotonic negative slope throughout the genome.
+Home affinity pulls downward.
+Point mutations cause temporary minor dips in slope, but the cumulative trajectory drifts relentlessly toward large negative values.
+
+Recombination breaks linearity.
+When a horizontal exchange incorporates foreign genetic material from donor $m$, sequence affinities invert abruptly across the exchange tract $[u_1, u_2]$.
+Within the converted interval, attention to donor $m$ surges while home attention collapses.
+The derivative reverses sign: $dY_{i, m}/du > 0$.
+The differential curve climbs steeply, tracing a prominent positive excursion that peaks at the terminal exchange boundary before decaying back into negative baseline drift once home sequence resumes.
+Excursions record reticulations.
+Single crossover events generate asymmetric global arches spanning half the chromosome, whereas intercalary cassette insertions trace compact, localized pulses that return cleanly to the clonal baseline on both flanks.
+
+To separate true genetic exchange from neutral coalescent fluctuations, \RhizAeon maps differential attention trajectories into continuous Brownian bridge processes.
+Under the clonal null hypothesis, subtracting the chromosome-wide linear trend yields a centered functional bridge:
+\begin{equation}
+B_{i, m}(u) = Y_{i, m}(u) - \frac{u}{L} Y_{i, m}(L).
+\label{eq:brownian_bridge}
+\end{equation}
+By Donsker's invariance principle, the normalized supremum $\sup_{u} |B_{i, m}(u)| / (\sigma \sqrt{L})$ asymptotically converges to the Kolmogorov distribution.
+Here $\sigma$ represents the empirical diffusion coefficient of the local attention increments.
+Physics bounds the noise.
+To control the family-wise error rate across all pairwise lineage comparisons and coordinate scans, we compute the extreme value boundary crossing threshold via Dunn-Sidak correction:
+\begin{equation}
+K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2M} \right)},
+\label{eq:kolmogorov_bound}
+\end{equation}
+where $M = \binom{N}{2} \max(1, N - 2)$ accounts for all testable donor-recipient reticulation topologies.
+When an observed trajectory exceeds $K_{\text{crit}}$, \RhizAeon rejects the clonal null hypothesis at rigorous confidence.
+
+For short conversion tracts and micro-recombinations, standard bridge tests can dilute localized signals across multi-kilobase chromosomes.
+Cassettes require scale-space filters.
+We therefore convolve the differential attention flux $dY$ with a bank of zero-mean dyadic matched filter wavelets $h_\tau(s)$ evaluated across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$ nucleotides.
+Dyadic filters zoom into tracts.
+Concurrently, \RhizAeon tracks the running drawdown $\text{DD}(u) = \max_{v \le u} Y(v) - Y(u)$, localizing rapid polarity shifts where trajectory momentum collapses.
+Candidate breakpoints undergo physical force field deconvolution.
+We measure dynamic metric velocity reversals along the parental dipole axis: $R = v_{\text{step}} (1 - \cos \theta)$, where $\theta$ denotes the directional deflection angle between flanking segmental force vectors.
+Lineage transitions invert momentum.
+To prevent over-segmentation in highly diverged cohorts, mode peeling halts when the residual singular value falls below the Marchenko-Pastur bulk spectral edge $s_{\text{bulk}} = \sigma \sqrt{L} (1 + \sqrt{N/L})$.
+Random matrix theory halts peeling.
+Finally, a profile maximum likelihood polisher refines candidate changepoints down to single-nucleotide coordinates, reporting the exact informational plateau $[c_{\text{left}}, c_{\text{right}}]$ where flanking parental substitutions cease to provide discriminative phylogenetic information.
