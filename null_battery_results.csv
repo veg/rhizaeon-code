@@ -1,0 +1,251 @@
+global_idx,regime,archetype,num_taxa,length_nt,mean_divergence,num_events,false_positive,runtime_ms,informative_sites
+980,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0008575776779650643,0,0,18.811624999999886,3
+280,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0017426427895436518,0,0,10.894833000000048,3
+700,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0010074485630488968,0,0,18.85758400000004,2
+420,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0013400409400665724,0,0,10.707250000000057,0
+840,clock_null,Strict Neutral Molecular Clock Null,4,600,0.004713931203429661,0,0,18.742792000000065,1
+560,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0026584502356971104,0,0,23.064125000000104,10
+140,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.00275664641486375,0,0,17.847332999999963,11
+0,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0028868728804369408,0,0,11.515916999999876,0
+1120,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0011229094431250656,0,0,89.07970900000018,0
+1400,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.001527955487372167,0,0,89.2187499999999,4
+1820,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0005479951692147865,0,0,92.25120799999998,4
+1680,clock_null,Strict Neutral Molecular Clock Null,4,600,0.003694601327796299,0,0,93.45916600000015,1
+1260,clock_null,Strict Neutral Molecular Clock Null,4,600,0.004241402612524521,0,0,89.07370799999993,3
+2100,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0005315683878830332,0,0,252.06312500000027,0
+1540,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0023273580664461523,0,0,89.14133400000001,4
+2380,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0015257469425611506,0,0,188.16329200000004,2
+2240,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0005669775619221165,0,0,188.15766700000003,2
+1960,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.00228457469959144,0,0,92.81525000000013,2
+2520,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0029669495907947933,0,0,187.8960420000002,1
+2660,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0020308111695514033,0,0,270.99120799999986,11
+2800,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0006455419113804554,0,0,225.87608300000016,0
+2940,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0005627585781723793,0,0,111.48041600000002,0
+3360,clock_null,Strict Neutral Molecular Clock Null,4,600,0.002257901134222443,0,0,193.3956669999999,1
+3220,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0010426174770337355,0,0,193.535083,1
+3080,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0029509475245775357,0,0,275.9933749999997,21
+3500,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0009918353498402069,0,0,225.6627080000002,7
+3640,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0009519140459009385,0,0,204.69737499999985,1
+3780,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0025406019803903236,0,0,181.26520800000011,2
+3920,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0006909055565532478,0,0,181.2279170000002,3
+4060,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0013611562875393678,0,0,160.6131660000001,0
+4760,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0014403176901817592,0,0,36.49574999999983,7
+4900,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0005170283285985647,0,0,36.49533299999996,0
+4620,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0016170826671153952,0,0,97.87729200000017,1
+4200,clock_null,Strict Neutral Molecular Clock Null,4,600,0.004981919818842449,0,0,117.93608400000011,0
+5180,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.003338131448970771,0,0,93.64166700000042,11
+4480,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0006742266944569202,0,0,117.96941699999985,1
+5320,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0006815832497578303,0,0,47.83470799999989,0
+5600,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0007047604476759714,0,0,74.71050000000012,2
+5740,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0011849070025189254,0,0,46.40816599999997,2
+4340,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.004296218954235682,0,0,130.08154199999967,17
+5880,clock_null,Strict Neutral Molecular Clock Null,4,600,0.000740872429298829,0,0,59.4427500000001,1
+6160,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.0006134620428781931,0,0,86.80408300000009,0
+5040,clock_null,Strict Neutral Molecular Clock Null,4,600,0.002358268427425221,0,0,26.08524999999995,2
+5460,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0033908010549688786,0,0,47.88808300000014,1
+6300,clock_null,Strict Neutral Molecular Clock Null,4,600,0.001977720986538853,0,0,86.17079199999989,1
+6020,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0013606024283892247,0,0,141.98462500000008,12
+6580,clock_null,Strict Neutral Molecular Clock Null,4,1800,0.002685448680391333,0,0,87.63366699999997,4
+6860,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.0028278882472706863,0,0,130.81937500000018,9
+7000,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0010654432871541905,0,0,104.81229200000008,0
+7280,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0005408448551110607,0,0,27.15554099999995,2
+7140,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.001700995517640332,0,0,25.9947920000001,0
+6720,clock_null,Strict Neutral Molecular Clock Null,4,600,0.0007019996177864759,0,0,36.58012499999997,0
+6440,clock_null,Strict Neutral Molecular Clock Null,4,6000,0.000588752889162913,0,0,167.15374999999977,4
+7560,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.002386227657006417,0,0,165.8183339999999,1
+7420,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0016611632583160773,0,0,10.783458000000135,3
+7700,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0013610724406637638,0,0,155.1087919999996,9
+7980,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.003694092185234692,0,0,34.96137499999996,0
+8400,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0025358756374442674,0,0,121.43674999999999,1
+8260,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.000507173060052518,0,0,34.99216699999997,0
+8120,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0016043298303186051,0,0,144.5638749999998,10
+7840,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.002883804140853947,0,0,156.77212499999982,10
+8680,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0012910350665932516,0,0,55.345958000000195,3
+8820,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0012081684715121756,0,0,115.8430410000002,1
+8540,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0009172665081759339,0,0,61.43900000000002,0
+9380,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0006690585961036175,0,0,121.51337500000014,2
+9660,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.001496533051027554,0,0,87.86841700000014,2
+8960,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.004333385765828627,0,0,206.62666599999957,20
+9100,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.001434757541541759,0,0,195.85929200000064,3
+9240,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.004975523577981802,0,0,131.25191699999928,1
+9520,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0026174624430202343,0,0,87.85470799999916,4
+9940,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.004361188172302656,0,0,25.788166999999973,1
+9800,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0035532353331289112,0,0,123.84304199999985,12
+10500,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0008282519955921956,0,0,92.77416599999988,0
+10360,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0007341241407655722,0,0,106.11983300000017,0
+10080,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0018468932149608719,0,0,103.96529099999974,2
+10640,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0009243174034034124,0,0,94.86883399999968,6
+10780,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0032819154104479246,0,0,91.87595800000014,4
+10220,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0044411501190057875,0,0,109.65466700000005,20
+11060,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0008343054210939277,0,0,7.0323749999996465,3
+10920,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.002399858137612904,0,0,8.670541999999948,1
+11620,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0006021215973322496,0,0,146.3662079999999,0
+11340,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.001425478581784111,0,0,228.80833299999992,1
+11900,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0005041960042323361,0,0,84.95658300000031,2
+12040,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0007159054255493262,0,0,6.459167000000043,0
+12180,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.004524728183315747,0,0,6.794832999999834,0
+11200,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0015761107869873392,0,0,229.68454099999923,2
+11480,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.002247692495520551,0,0,135.2956659999993,9
+11760,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0009300825183644546,0,0,98.38241700000071,0
+12460,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0005865785464746278,0,0,119.86941700000031,0
+12320,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0006978699667027547,0,0,117.34045799999926,3
+12880,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0006084665352552465,0,0,18.454124999999877,1
+12740,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0009438026975989743,0,0,39.88199999999953,4
+13020,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0021839852782713433,0,0,42.5870830000008,2
+12600,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0038127006005527733,0,0,116.5484999999995,2
+13160,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0010329106669560034,0,0,27.77983300000031,5
+13300,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.00469666334939202,0,0,195.14733300000043,11
+13440,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0007593635190396549,0,0,117.62491600000047,0
+13720,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,1800,0.0007178476038688184,0,0,70.62304200000025,1
+13860,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,600,0.0009561750666846727,0,0,71.17279200000048,0
+14000,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.001282132359459461,0,0,71.14704199999977,4
+14280,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.00380436451344938,0,0,38.75404199999988,3
+14140,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0009403499648688371,0,0,72.26845900000001,2
+13580,gamma_asrv_null,Gamma Rate Heterogeneity Null,4,6000,0.0005334549297066321,0,0,117.7223749999996,2
+14420,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0006837741641201497,0,0,92.92854100000002,2
+15120,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.001157272803916115,0,0,50.82716699999956,0
+14700,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0009295712263524291,0,0,94.97066699999922,0
+15260,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0007672258638102242,0,0,52.4434170000001,2
+15400,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.002271391444148511,0,0,45.380666999999875,2
+14560,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.003550904138751093,0,0,104.55466699999948,4
+15540,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0007930749441271258,0,0,35.69491599999974,0
+14980,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0019662314359145767,0,0,25.12062500000045,4
+15820,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0005960510979055361,0,0,35.714249999999836,1
+14840,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.00240530903105068,0,0,51.62558399999995,14
+16100,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0008191382495369056,0,0,277.6467089999999,5
+15680,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.004446990190959121,0,0,228.71579200000002,28
+15960,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0006574185196241192,0,0,277.85054199999945,0
+16800,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0009106036798055767,0,0,141.9767080000005,3
+16660,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0007697492955110965,0,0,139.46216699999957,1
+16240,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0011901688510829894,0,0,203.76729200000023,2
+17080,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.001847333959391536,0,0,24.695083000000118,1
+16380,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.003737425437117862,0,0,202.2329169999999,1
+17220,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0006188619214589535,0,0,107.88620800000004,0
+16520,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0029574207383080164,0,0,143.73558399999985,14
+16940,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0019891851343671577,0,0,41.59058399999971,12
+17500,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.00302403366604556,0,0,106.49033299999999,3
+17360,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0005774674076578717,0,0,103.89108299999972,1
+17640,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0013175001383202022,0,0,106.49854200000064,0
+17780,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0011417030373940401,0,0,104.38904100000013,4
+18060,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0014994540974314176,0,0,119.12845800000049,1
+17920,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0009629799827212128,0,0,119.06875000000028,2
+18480,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.002680737275795937,0,0,72.76462499999958,0
+18760,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0005944239734155495,0,0,72.78900000000021,0
+18340,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.002136005054820371,0,0,72.71908299999996,1
+18200,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0017930163310008352,0,0,155.3837920000003,4
+18620,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0012873753537814415,0,0,171.74508399999945,6
+19320,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.002123280080962133,0,0,54.29158400000045,1
+19180,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0022676743421905874,0,0,75.9420000000004,2
+18900,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0025954619673173858,0,0,152.57145799999972,1
+19040,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0017862525565114848,0,0,53.269709000000276,5
+19600,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,1800,0.0009261356699524726,0,0,71.75508300000021,0
+19460,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0012387492647414325,0,0,97.89750000000019,10
+19880,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,6000,0.0012477982483207713,0,0,74.2273330000005,7
+20020,heterotachy_darren_null,Darren Trap Coupled Heterotachy,16,1800,0.0009200853286582926,0,0,48.192291999999526,2
+20160,heterotachy_darren_null,Darren Trap Coupled Heterotachy,12,600,0.0019413533974979229,0,0,29.153917000000362,4
+20300,heterotachy_darren_null,Darren Trap Coupled Heterotachy,8,6000,0.004899182039989758,0,0,72.29908399999997,43
+20580,heterotachy_darren_null,Darren Trap Coupled Heterotachy,12,600,0.0010880977847860982,0,0,106.37745799999988,2
+19740,heterotachy_darren_null,Darren Trap Coupled Heterotachy,4,600,0.0007876937893281341,0,0,50.12283300000053,0
+20440,heterotachy_darren_null,Darren Trap Coupled Heterotachy,16,1800,0.0006902481323557077,0,0,50.27170800000036,3
+21000,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0007367932151833247,0,0,222.78087499999975,1
+20720,heterotachy_darren_null,Darren Trap Coupled Heterotachy,8,6000,0.0036837727977783335,0,0,302.1586250000006,32
+20860,heterotachy_darren_null,Darren Trap Coupled Heterotachy,16,1800,0.000507252671599048,0,0,219.95654199999936,4
+21280,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0009447322130748492,0,0,173.40641599999972,7
+21140,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0009277382793062064,0,0,217.20750000000066,7
+21560,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0007023019835361358,0,0,195.06816600000042,3
+21840,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0016651895463330596,0,0,126.36566699999996,3
+21700,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.001069374194654026,0,0,160.22633299999978,5
+21420,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0016712112537193352,0,0,194.8960409999998,4
+21980,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.000579885663298874,0,0,60.66916700000036,7
+22120,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.001167474867638138,0,0,76.84258400000044,6
+22400,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.002648763896614444,0,0,122.23912500000012,26
+22680,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.003223398441754566,0,0,107.24279100000001,6
+22540,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.001007750897376794,0,0,83.83041699999971,4
+23100,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0007586441672640957,0,0,84.43433299999992,1
+22960,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.000546330806903881,0,0,57.255166000000024,1
+22820,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0014800000163170998,0,0,159.30308299999928,16
+22260,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0008551564201005137,0,0,119.79950000000005,0
+23240,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0034938450874941835,0,0,94.05737500000022,31
+23520,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0007249456540928857,0,0,152.81279199999975,2
+23380,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0019284202836167652,0,0,155.46441700000014,15
+23800,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.004467347007166637,0,0,34.7198750000004,18
+24080,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.002686231189041917,0,0,49.40929099999991,31
+24500,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0006016321965488479,0,0,12.735124999999847,3
+24360,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0033658117034344637,0,0,26.100583000000732,4
+24640,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.002046988012771816,0,0,107.26279200000022,15
+23940,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0007625408895868465,0,0,35.14729099999947,1
+23660,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.002229333412129027,0,0,147.95058400000016,18
+24920,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0007545978861140944,0,0,60.15604099999994,5
+25060,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0007321719560056363,0,0,171.75266599999972,3
+25200,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0020556335374951776,0,0,137.7700829999995,4
+24220,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.002562081167094717,0,0,50.47133299999995,17
+25340,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0005659273893090521,0,0,81.14870800000062,5
+24780,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.002742853813797646,0,0,60.09479200000012,5
+25480,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0006535776191296444,0,0,271.46366599999897,8
+26040,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0035023630247484334,0,0,163.43366699999962,3
+25760,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0032054349733317165,0,0,213.44220899999834,35
+25620,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0022892487680694577,0,0,218.51745899999918,4
+25900,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0016236299759903904,0,0,57.28087500000001,16
+26320,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0017073061886715582,0,0,140.25062500000018,10
+26180,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.002948034272032971,0,0,33.411124999998876,42
+26460,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0006427416216735709,0,0,126.1652919999996,1
+27160,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.0005646875899077476,0,0,105.06329200000053,7
+26600,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0018509860493876415,0,0,160.87037500000002,16
+26740,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.003634547558935832,0,0,149.14004199999908,24
+27580,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,16,1800,0.002137432430713696,0,0,102.58325000000035,10
+27020,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.00112097722584345,0,0,122.6273330000005,9
+26880,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0026009470716290718,0,0,143.08637499999932,6
+27440,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0006052338951683873,0,0,150.84254200000123,3
+27300,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.0011250463064388283,0,0,150.30937499999908,0
+27860,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,8,6000,0.0005439983402011301,0,0,194.65179200000017,7
+27720,apobec_shower_null,Host Deaminase / APOBEC Mutational Shower,12,600,0.001935859927202768,0,0,195.41075000000063,5
+28140,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0005699495273161743,0,0,102.00391700000111,6
+28000,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0038666368818200706,0,0,121.57379199999951,21
+28420,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0009233615565393799,0,0,98.63320800000075,10
+28980,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.003370004454698013,0,0,46.69929099999948,10
+28700,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0012385645807696953,0,0,116.44558300000085,14
+28280,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0022793324118927758,0,0,119.96479100000101,23
+28560,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0017669725865673584,0,0,32.323083999999724,3
+29120,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.003809182444091545,0,0,57.45354099999922,33
+28840,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.004891357569662628,0,0,55.42095900000099,43
+29400,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.003449256127533261,0,0,40.8261250000006,9
+29260,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0006299707245892558,0,0,171.68808399999946,13
+29820,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0036819551007836104,0,0,107.52375000000036,11
+30100,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0023974342280678974,0,0,225.42687500000014,17
+29960,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.004054968502238484,0,0,171.83208299999995,57
+30660,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0011265030326959254,0,0,15.045916000000048,10
+29680,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.004371465725679841,0,0,280.5673330000005,37
+30240,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.004534955567431693,0,0,171.84841600000135,15
+29540,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0027990667048619178,0,0,272.307584,35
+30520,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0017840665093165758,0,0,62.10662500000019,16
+30380,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.00066306139659935,0,0,62.20670799999972,15
+31220,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0010874510760374239,0,0,124.43216600000007,13
+30800,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.004075719850618714,0,0,151.6670409999996,52
+31500,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0028888018027947208,0,0,63.43758299999891,7
+30940,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.003210417937096183,0,0,177.4387500000003,24
+31360,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0015134817191841251,0,0,88.6577500000012,14
+31640,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0032764452622096652,0,0,119.85004199999949,42
+31780,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.001547417288678402,0,0,94.68245800000119,22
+31920,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.002221397820974952,0,0,72.04566699999937,14
+31080,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.001421210438053937,0,0,94.17683400000065,12
+32340,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0026599617690717175,0,0,165.74704199999957,10
+32200,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0017865783645235162,0,0,247.50345800000062,14
+32060,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.004614152254128424,0,0,230.79695800000087,49
+32620,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.002789946825590923,0,0,169.34320799999904,18
+32480,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0006515733889268801,0,0,169.1960839999993,10
+33180,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0017728425189443829,0,0,88.47533299999988,6
+32760,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.004661490846550366,0,0,88.30395899999921,16
+32900,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.004680320240119072,0,0,174.6100410000011,49
+33320,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0023434871888045896,0,0,111.97662499999872,25
+33600,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.002713891468849205,0,0,143.39362499999987,7
+33040,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0017176772619958097,0,0,174.62075000000078,16
+33740,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0020790199329228584,0,0,143.4725830000012,30
+33460,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.003999465741014212,0,0,194.77766700000032,24
+34020,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.0007939233151119945,0,0,234.43050000000022,6
+34160,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.0015439366129805915,0,0,204.46324999999987,15
+33880,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0007125624902579507,0,0,241.7219579999994,10
+34720,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0027800232394700466,0,0,117.73733299999911,35
+34440,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.004433448415900818,0,0,109.96170899999846,6
+34300,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,16,1800,0.0007342832597138087,0,0,167.7323340000001,13
+34580,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,8,6000,0.00063653775732718,0,0,95.29612500000084,12
+34860,darwinian_burst_null,Episodic Positive Burst / Convergent Hotspot,12,600,0.00279963280580188,0,0,9.611125000001053,7

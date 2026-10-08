@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RhizAeon Web: Phylo-Attention Force Field Recombination Scanner</title>
+  <meta name="description" content="Sub-second, alignment-wide viral and bacterial recombination detection running 100% client-side in WebAssembly.">
+  <style>
+    :root {
+      --bg-base: #090d16;
+      --bg-card: #111827;
+      --bg-card-hover: #1f2937;
+      --border: #1f2937;
+      --border-bright: #374151;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #a855f7;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .title-group h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-group h1 .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .header-links a, .header-links button {
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .header-links a:hover, .header-links button:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--cyan);
+    }
+
+    /* Privacy Banner */
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--emerald);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    /* Grid Layout */
+    .app-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Panels */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Examples Toolbar */
+    .preset-group {
+      margin-bottom: 16px;
+    }
+
+    .preset-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: var(--bg-surface-elevated, #1f2937);
+      border: 1px solid var(--border-bright);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    /* Upload Target */
+    .drop-zone {
+      border: 2px dashed var(--border-bright);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 14px;
+      background: rgba(17, 24, 39, 0.5);
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    .drop-zone svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .drop-zone span {
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    /* Textarea */
+    textarea {
+      width: 100%;
+      height: 180px;
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus {
+      border-color: var(--cyan);
+    }
+
+    /* Controls */
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .control-row label {
+      color: var(--text-muted);
+    }
+
+    .control-row input[type="range"] {
+      width: 140px;
+      accent-color: var(--cyan);
+    }
+
+    .control-value {
+      font-family: monospace;
+      color: var(--cyan);
+      font-weight: bold;
+      margin-left: 8px;
+      min-width: 24px;
+      display: inline-block;
+    }
+
+    /* Primary Scan Button */
+    .scan-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      color: #ffffff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px var(--cyan-glow);
+    }
+
+    .scan-btn:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .scan-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* KPI Summary Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .kpi-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: ui-monospace, monospace;
+    }
+
+    .kpi-val.cyan { color: var(--cyan); }
+    .kpi-val.emerald { color: var(--emerald); }
+    .kpi-val.amber { color: var(--amber); }
+    .kpi-val.rose { color: var(--rose); }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Recombination Table */
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      background: #1f2937;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.6);
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+    }
+
+    tr:hover td {
+      background: rgba(31, 41, 55, 0.4);
+    }
+
+    .badge-crossover {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .badge-cassette {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Actions Toolbar */
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: var(--bg-surface-elevated, #1f2937);
+      border: 1px solid var(--border-bright);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* Embedded Report Frame */
+    .report-frame-container {
+      width: 100%;
+      height: 900px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #090d16;
+      margin-top: 14px;
+    }
+
+    iframe#reportFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #090d16;
+    }
+
+    /* Status Pill */
+    .status-alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-alert.info {
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--cyan);
+    }
+
+    .status-alert.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+    }
+
+    .status-alert.error {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: var(--rose);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="title-group">
+        <h1>
+          RhizAeon Web
+          <span class="badge">PA-FF v2.1 WASM</span>
+        </h1>
+        <p>Phylo-Attention Force Field Continuous Recombination Scanner (Client-Side WebAssembly)</p>
+      </div>
+      <div class="header-links">
+        <a href="https://github.com/veg/rhizaeon-code" target="_blank" rel="noopener">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub Repository
+        </a>
+      </div>
+    </header>
+
+    <!-- Privacy Banner -->
+    <div class="privacy-badge">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v4a1 1 0 102 0V7z" clip-rule="evenodd"></path></svg>
+      100% Client-Side Privacy: All alignment processing and force field deconvolution runs locally via WebAssembly. Your sequence data never leaves your browser.
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="app-grid">
+      <!-- Left Column: Input and Configuration -->
+      <div>
+        <div class="card">
+          <h2>Input FASTA Alignment</h2>
+
+          <!-- Presets -->
+          <div class="preset-group">
+            <div class="preset-label">Load Empirical Benchmark</div>
+            <div class="preset-buttons">
+              <button class="preset-btn" onclick="loadExample('pvy')">🥔 Potato Virus Y (PVY)</button>
+              <button class="preset-btn" onclick="loadExample('kal153')">🧬 HIV-1 KAL153</button>
+              <button class="preset-btn" onclick="loadExample('xbb')">🦠 SARS-CoV-2 XBB</button>
+              <button class="preset-btn" onclick="loadExample('mtdna')">👤 Human mtDNA (Null)</button>
+            </div>
+          </div>
+
+          <!-- File Upload Target -->
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+            <p>Drag & drop FASTA file or <span>browse</span></p>
+            <input type="file" id="fileInput" accept=".fasta,.fas,.fa,.fna,.txt" style="display: none">
+          </div>
+
+          <!-- Raw Textarea -->
+          <textarea id="fastaInput" placeholder=">Taxon_1&#10;ATGCGATCGATC...&#10;>Taxon_2&#10;ATGCGATCGATC..." spellcheck="false"></textarea>
+
+          <!-- Parameters -->
+          <div class="control-row">
+            <label for="landmarksK">Landmarks (K):</label>
+            <div>
+              <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value">
+              <span class="control-value" id="kVal">16</span>
+            </div>
+          </div>
+
+          <!-- Run Button -->
+          <button class="scan-btn" id="scanBtn" onclick="runScanner()">
+            <span id="btnIcon">⚡</span>
+            <span id="btnText">Run RhizAeon Scanner (WASM)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Results & Interactive Dossier -->
+      <div>
+        <!-- Status Message -->
+        <div id="statusAlert" class="status-alert info">
+          <span>WASM Engine ready. Load a FASTA alignment or select an empirical benchmark preset to scan.</span>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpiGrid" style="display: none;">
+          <div class="kpi-card">
+            <div class="kpi-val cyan" id="kpiStatus">—</div>
+            <div class="kpi-label">Diagnosis</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpiTaxa">—</div>
+            <div class="kpi-label">Taxa (N)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="kpiLength">—</div>
+            <div class="kpi-label">Length (L)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val amber" id="kpiInformative">—</div>
+            <div class="kpi-label">Informative Sites</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val emerald" id="kpiEvents">—</div>
+            <div class="kpi-label">Verified Events</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val purple" id="kpiTime">—</div>
+            <div class="kpi-label">WASM Latency</div>
+          </div>
+        </div>
+
+        <!-- Recombination Events Table -->
+        <div id="resultsSection" style="display: none;">
+          <div class="card" style="padding: 16px;">
+            <h2>
+              Verified Recombination Events (|E| = <span id="eventCountBadge">0</span>)
+            </h2>
+            <div class="table-container">
+              <table id="eventsTable">
+                <thead>
+                  <tr>
+                    <th>Recombinant</th>
+                    <th>Home Parent</th>
+                    <th>Donor Parent</th>
+                    <th>Type</th>
+                    <th>Tract (bp)</th>
+                    <th>Length</th>
+                    <th>Fisher p-value</th>
+                    <th>Physical Z</th>
+                  </tr>
+                </thead>
+                <tbody id="eventsTbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions-bar">
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-action" onclick="downloadHtmlReport()">📥 Download Standalone HTML</button>
+                <button class="btn-action" onclick="downloadJsonResults()">📥 Download JSON Summary</button>
+              </div>
+              <button class="btn-action" onclick="openFullscreenReport()">⛶ Open Fullscreen Dossier</button>
+            </div>
+          </div>
+
+          <!-- Embedded Dossier Frame -->
+          <div class="report-frame-container">
+            <iframe id="reportFrame" title="RhizAeon Interactive Visualization Dossier"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WASM Engine Script -->
+  <script type="module">
+    import init, { scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js';
+
+    let wasmReady = false;
+    let latestScanResult = null;
+    let latestHtmlReport = null;
+
+    // Initialize WASM
+    async function initWasmEngine() {
+      try {
+        await init();
+        wasmReady = true;
+        document.getElementById('statusAlert').className = 'status-alert info';
+        document.getElementById('statusAlert').innerHTML = '✅ WebAssembly engine compiled and initialized. Ready to scan.';
+      } catch (err) {
+        console.error('Failed to init WASM:', err);
+        document.getElementById('statusAlert').className = 'status-alert error';
+        document.getElementById('statusAlert').innerText = '❌ Failed to initialize WebAssembly engine: ' + err.message;
+      }
+    }
+    initWasmEngine();
+
+    // Preset Loader
+    window.loadExample = async function(presetKey) {
+      const urls = {
+        pvy: 'examples/pvy_example1.fasta',
+        kal153: 'examples/hiv1_kal153_crf02_ag.fasta',
+        xbb: 'examples/sars2_xbb_spike.fasta',
+        mtdna: 'examples/human_mtdna.fasta'
+      };
+
+      const titles = {
+        pvy: 'Potato Virus Y (Darren Martin Positive Control)',
+        kal153: 'HIV-1 KAL153 (CRF02_AG Empirical Control)',
+        xbb: 'SARS-CoV-2 XBB Spike Recombinant',
+        mtdna: 'Human mtDNA (Strictly Clonal Empirical Null)'
+      };
+
+      const url = urls[presetKey];
+      if (!url) return;
+
+      document.getElementById('statusAlert').className = 'status-alert info';
+      document.getElementById('statusAlert').innerHTML = `<span class="spinner"></span> Loading ${titles[presetKey]}...`;
+
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const fastaText = await resp.text();
+        document.getElementById('fastaInput').value = fastaText;
+        document.getElementById('statusAlert').className = 'status-alert success';
+        document.getElementById('statusAlert').innerText = `Loaded ${titles[presetKey]} (${fastaText.length.toLocaleString()} characters). Click Run to scan.`;
+      } catch (e) {
+        document.getElementById('statusAlert').className = 'status-alert error';
+        document.getElementById('statusAlert').innerText = `Failed to load example: ${e.message}`;
+      }
+    };
+
+    // File Drag and Drop
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('fastaInput').value = e.target.result;
+        document.getElementById('statusAlert').className = 'status-alert success';
+        document.getElementById('statusAlert').innerText = `Loaded file: ${file.name} (${e.target.result.length.toLocaleString()} characters).`;
+      };
+      reader.readAsText(file);
+    }
+
+    // Run Scanner Function
+    window.runScanner = async function() {
+      if (!wasmReady) {
+        alert('WebAssembly engine is still compiling. Please wait a second.');
+        return;
+      }
+
+      const fastaText = document.getElementById('fastaInput').value.trim();
+      if (!fastaText || !fastaText.startsWith('>')) {
+        document.getElementById('statusAlert').className = 'status-alert error';
+        document.getElementById('statusAlert').innerText = 'Please provide a valid FASTA sequence alignment (must begin with ">").';
+        return;
+      }
+
+      const k = parseInt(document.getElementById('landmarksK').value, 10) || 16;
+      const scanBtn = document.getElementById('scanBtn');
+      const btnIcon = document.getElementById('btnIcon');
+      const btnText = document.getElementById('btnText');
+
+      scanBtn.disabled = true;
+      btnIcon.innerHTML = '<span class="spinner"></span>';
+      btnText.innerText = 'Scanning Phylo-Attention Flux...';
+
+      document.getElementById('statusAlert').className = 'status-alert info';
+      document.getElementById('statusAlert').innerHTML = '<span class="spinner"></span> Running continuous force field deconvolution...';
+
+      // Yield thread to let UI update
+      await new Promise(r => setTimeout(r, 50));
+
+      try {
+        const t0 = performance.now();
+        const res = scan_fasta(fastaText, k);
+        const htmlDoc = scan_fasta_html(fastaText, "RhizAeon Analysis", k);
+        const elapsed = performance.now() - t0;
+
+        latestScanResult = res;
+        latestHtmlReport = htmlDoc;
+
+        renderResults(res, elapsed, htmlDoc);
+      } catch (err) {
+        console.error('Scan failed:', err);
+        document.getElementById('statusAlert').className = 'status-alert error';
+        document.getElementById('statusAlert').innerText = 'Scan error: ' + (err.message || err);
+      } finally {
+        scanBtn.disabled = false;
+        btnIcon.innerText = '⚡';
+        btnText.innerText = 'Run RhizAeon Scanner (WASM)';
+      }
+    };
+
+    function renderResults(res, clientMs, htmlDoc) {
+      // Show KPI cards and results section
+      document.getElementById('kpiGrid').style.display = 'grid';
+      document.getElementById('resultsSection').style.display = 'block';
+
+      // Diagnosis
+      const statusEl = document.getElementById('kpiStatus');
+      if (res.is_non_recombinant_h0 || res.events.length === 0) {
+        statusEl.innerText = 'Clonal H₀';
+        statusEl.className = 'kpi-val emerald';
+        document.getElementById('statusAlert').className = 'status-alert success';
+        document.getElementById('statusAlert').innerText = `Scan completed in ${clientMs.toFixed(1)} ms. Alignment is strictly clonal (0 recombination events detected).`;
+      } else {
+        statusEl.innerText = `${res.events.length} Reticulations`;
+        statusEl.className = 'kpi-val amber';
+        document.getElementById('statusAlert').className = 'status-alert success';
+        document.getElementById('statusAlert').innerText = `Scan completed in ${clientMs.toFixed(1)} ms. Found ${res.events.length} verified recombination event(s).`;
+      }
+
+      document.getElementById('kpiTaxa').innerText = res.num_taxa.toLocaleString();
+      document.getElementById('kpiLength').innerText = res.length.toLocaleString() + ' bp';
+      document.getElementById('kpiInformative').innerText = res.informative_sites.toLocaleString();
+      document.getElementById('kpiEvents').innerText = res.events.length;
+      document.getElementById('kpiTime').innerText = (res.run_time_ms || clientMs).toFixed(1) + ' ms';
+      document.getElementById('eventCountBadge').innerText = res.events.length;
+
+      // Populate Table
+      const tbody = document.getElementById('eventsTbody');
+      tbody.innerHTML = '';
+
+      if (res.events.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-dim); padding: 24px;">No recombination events detected (Null Hypothesis H₀ accepted).</td>`;
+        tbody.appendChild(row);
+      } else {
+        for (const ev of res.events) {
+          const row = document.createElement('tr');
+          const typeBadge = ev.is_crossover 
+            ? '<span class="badge-crossover">Crossover</span>' 
+            : '<span class="badge-cassette">Cassette</span>';
+          
+          row.innerHTML = `
+            <td style="font-weight: 700; color: var(--cyan);">${ev.candidate_name}</td>
+            <td>${ev.home_name}</td>
+            <td style="color: var(--amber); font-weight: 600;">${ev.donor_name}</td>
+            <td>${typeBadge}</td>
+            <td>${ev.u1.toLocaleString()} – ${ev.u2.toLocaleString()}</td>
+            <td>${ev.tract_length.toLocaleString()} bp</td>
+            <td>${ev.p_fisher < 1e-300 ? '< 1e-300' : ev.p_fisher.toExponential(2)}</td>
+            <td>${ev.z_phys.toFixed(2)}</td>
+          `;
+          tbody.appendChild(row);
+        }
+      }
+
+      // Populate Embedded Report iframe
+      const frame = document.getElementById('reportFrame');
+      frame.srcdoc = htmlDoc;
+    }
+
+    // Download Standalone HTML
+    window.downloadHtmlReport = function() {
+      if (!latestHtmlReport) return;
+      const blob = new Blob([latestHtmlReport], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rhizaeon_report.html';
+      a.click();
+    };
+
+    // Download JSON Results
+    window.downloadJsonResults = function() {
+      if (!latestScanResult) return;
+      const blob = new Blob([JSON.stringify(latestScanResult, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rhizaeon_summary.json';
+      a.click();
+    };
+
+    // Open Fullscreen
+    window.openFullscreenReport = function() {
+      if (!latestHtmlReport) return;
+      const win = window.open('', '_blank');
+      win.document.write(latestHtmlReport);
+      win.document.close();
+    };
+  </script>
+</body>
+</html>
