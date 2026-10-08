@@ -1,0 +1,54 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Mutation, recombination, and selection drive evolutionary diversification across all domains of life.
+While point mutations introduce novel genetic variants, homologous recombination and horizontal gene transfer assemble mosaic chromosomes from divergent evolutionary lineages in sudden macro-evolutionary leaps \cite{simonloriere2011recombination,didelot2010impact}.
+Reticulate exchanges reshape viral, bacterial, and eukaryotic genomes by shuffling adaptive alleles and breaking linkage disequilibrium.
+Mosaicism alters pathogen transmission dynamics.
+In viral and bacterial epidemics, genetic exchange shifts antigenic presentation and accelerates antimicrobial resistance, as seen across circulating recombinant forms of HIV-1, SARS-CoV-2, and multi-drug resistant bacteria \cite{alfonsi2024data,didelot2010impact}.
+Beyond pathogen surveillance, meiotic crossover and adaptive introgression govern eukaryotic evolution \cite{rieseberg2003major,mcvean2004fine}.
+They purge deleterious mutational load, drive ecological speciation, and assemble complex hybrid phenotypes across plant and animal taxa.
+Resolving physical crossover boundaries remains foundational.
+
+At the sequence level, genetic exchange physically splices distinct evolutionary ancestries into a single continuous molecule.
+Trees cannot describe hybrids.
+Instead of hierarchical branches, the true evolutionary genealogy forms a reticulating network or ancestral recombination graph \cite{hudson1983properties,griffiths1996ancestral}.
+Graphs are notoriously difficult.
+Reconstructing ancestral recombination graphs requires exploring an astronomical combinatorial space of coalescent and reticulation events, scaling exponentially with sample size and leaving internal graph topologies heavily underdetermined by contemporary sequence data.
+Yet genetic exchange leaves an unmistakable physical footprint across multiple sequence alignments.
+Mutations across the chromosome generate phylogenetic incompatibility, where site patterns cannot be mapped onto any common tree without invoking parallel mutations or reversals \cite{bruen2006simple,posada2002evaluation}.
+Most intuitively, the nearest neighbor of a recombinant changes depending on where one looks along the sequence.
+Within one genomic span, the mosaic chromosome clusters tightly with its primary parental clade, but across a crossover junction, its evolutionary affinity abruptly pivots toward a divergent donor.
+Tracking spatial handovers in sequence neighborhood reveals the physical boundaries of genetic exchange.
+
+Computational tools designed to track this reticulate footprint remain divided between two incompatible algorithmic paradigms \cite{posada2002evaluation,martin2015rdp4}.
+Phylogenetic changepoint algorithms, exemplified by GARD \cite{kosakovsky2006gard}, formulate recombination detection as statistical model selection across partitioned trees.
+Partitioning strategies fit independent continuous-time Markov substitution processes to candidate genomic segments, optimizing partition boundaries through likelihood criteria.
+Because the joint combinatorial search space of partition boundaries and tree topologies scales exponentially with breakpoint count and cubically with cohort size ($\mathcal{O}(L^K \cdot N^3)$), exploring multiple breakpoints across hundreds of genomes requires days of cluster compute.
+Trees are expensive.
+Isolated triplet scans take the opposite extreme.
+Methods such as 3Seq \cite{lam20183seq} and RDP5 \cite{martin2021rdp5} evaluate sequence triplets for clustering of informative polymorphisms.
+Triplet enumeration scales combinatorially as $\binom{N}{3} \sim \mathcal{O}(N^3)$, becoming computationally intractable on modern genomic cohorts.
+Evaluating triplets in isolation discards the global phylogenetic reference frame.
+When substitution rates vary across sites, localized mutational clustering mimics reciprocal genetic exchange.
+Under realistic Gamma rate heterogeneity, isolated triplet scans mistake hyper-variable patches for mosaicism, inflating false positive rates beyond thirty percent \cite{posada2001evaluation,kosakovsky2006gard}.
+When recombinant segments descend from unsampled ancestral lineages, triplet scans fail entirely, placing arbitrary boundaries inside flat, uninformative genomic intervals.
+
+Overcoming this computational divide requires an analytical framework that replaces discrete tree searches with continuous sequence geometry.
+Here we introduce \RhizAeon, named after the botanical and philosophical concept of the \emph{rhizome}---a reticulate, non-hierarchical network of subterranean roots that defies strictly bifurcating trees \cite{deleuze1987thousand}.
+\RhizAeon maps multiple sequence alignments into a continuous metric manifold, using rotary position embeddings and substitution priors to parameterize cross-sequence attention along the chromosome.
+As alignment coordinates advance, attention weights trace continuous trajectory curves that measure the instantaneous affinity of each genome to candidate parental lineages.
+Trajectories replace trees.
+To prevent private substitution bursts from mimicking recombination, the architecture anchors an unpolarized ancestral root token at the metric origin, which acts as a sink that absorbs autapomorphic noise and heterotachy.
+A true crossover produces a localized force imbalance, deflecting the cumulative trajectory from its home corridor toward a donor lineage.
+By evaluating trajectory inflections through continuous force fields rather than combinatorial tree partitions, \RhizAeon detects reticulation in linear time, screening genomic cohorts in milliseconds.
+
+We evaluated \RhizAeon across standardized simulation batteries and real-world viral and bacterial cohorts.
+Across five thousand synthetic alignments incorporating extreme Gamma rate variation and episodic heterotachy, the manifold engine maintained a zero percent false positive rate while retaining high detection power.
+Speed does not sacrifice sensitivity.
+Head-to-head benchmarks against 3Seq confirm identical breakpoint resolution alongside a hundred-fold runtime reduction on moderate cohorts.
+On large cohorts, computational gains exceed three orders of magnitude.
+Across empirical retroviral and coronaviral datasets, the continuous framework resolved complex multi-way mosaicism in HIV-1 KAL153 and accurately mapped circulating recombinant breakpoints in SARS-CoV-2 XBB lineages.
+For multi-megabase bacterial chromosomes, parsimony-informative site compression shrinks memory footprints by over two hundred fold.
+Whole-genome recombination scans of \textit{Streptococcus pneumoniae} PMEN1 execute in under one second on standard personal laptops \cite{croucher2011rapid}.
+The software is distributed as a high-performance native Rust binary and an interactive client-side WebAssembly interface that runs locally within modern web browsers without transmitting sequence data across external networks.

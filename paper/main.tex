@@ -1,0 +1,58 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage[top=1.8cm,bottom=2.0cm,left=2.0cm,right=2.0cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=footnotesize,labelfont=bf}
+\usepackage{bm}
+\usepackage{xspace}
+\usepackage{enumitem}
+
+\newcommand{\RhizAeon}{\texttt{RhizAeon}\xspace}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    citecolor=blue!80!black,
+    urlcolor=blue!80!black
+}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Clean Breaks: Tracking Recombination as Continuous Motion \\ Across Sequence Manifolds}\\[0.8em]
+{\small
+Sergei L.\ Kosakovsky Pond$^{1,2,*}$,
+Danielle Callan$^{1,2}$,
+Steven Weaver$^{1}$,
+Anton Nekrutenko$^{3}$,
+Darren P.\ Martin$^{4}$
+}\\[0.4em]
+{\footnotesize
+$^{1}$Institute for Genomics and Evolutionary Medicine, Temple University, Philadelphia, PA, USA \quad
+$^{2}$Department of Biology, Temple University, PA, USA \\
+$^{3}$Department of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA \\
+$^{4}$IDM, University of Cape Town, Cape Town, South Africa \\
+$^{*}$Corresponding author: \texttt{spond@temple.edu} \quad $\cdot$ \quad \today
+}
+\end{center}
+\vspace{-0.4em}
+
+\input{sections/01_introduction.tex}
+\input{sections/02_theory.tex}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

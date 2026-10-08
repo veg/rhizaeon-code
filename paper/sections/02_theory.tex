@@ -1,0 +1,30 @@
+\section{Geometric Foundations and Continuous Trajectory Theory}
+\label{sec:theory}
+
+\subsection{Sequence Metric Space and Buneman Coordinates}
+\label{subsec:metric_space}
+
+We ground the method in an authentic viral benchmark: the HIV-1 circulating recombinant forms CRF07\_BC and CRF08\_BC \cite{su2000characterization}.
+Both lineages emerged from independent recombination events between Subtype B and Subtype C in China.
+They share parental sources across the 3,120-nucleotide \textit{pol} gene.
+Real chimeras test theory.
+Our alignment comprises 22 sequences: eight Subtype B references, eight Subtype C references, three CRF07\_BC isolates, and three CRF08\_BC isolates.
+From these sequences, we compute the global pairwise evolutionary distance matrix $\mathbf{D} \in \mathbb{R}^{22 \times 22}$ under the Tamura-Nei substitution model with pairwise deletion of gap characters, capturing nucleotide transition and transversion rate biases across the retroviral genome \cite{tamura1993estimation}.
+We center the squared distances using the projection operator $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$, forming the inner-product Gram matrix $\mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}$ \cite{gower1966some}.
+Spectral decomposition of $\mathbf{B}$ yields non-negative eigenvalues $\mathbf{\Lambda}_k$ and eigenvectors $\mathbf{V}_k$, projecting each sequence $i$ into a continuous coordinate $\mathbf{x}_i = \mathbf{V}_{k, i} \mathbf{\Lambda}_k^{1/2} \in \mathbb{R}^d$ \cite{buneman1974note}.
+The primary axis cleanly separates Subtype B from Subtype C.
+Canonical metric coordinates are computed once for the entire alignment.
+An invariant coordinate basis eliminates Procrustes alignment overhead and establishes a fixed reference frame for continuous trajectory tracking.
+
+To track sequence affinity along the chromosome, each genome requires an instantaneous coordinate at every position $u \in [1, L]$.
+Recalculating multidimensional scaling across sliding windows would distort the geometric space and require expensive Procrustes rotations.
+Instead, we project local distance vectors into the fixed coordinate basis using Gower's analytical out-of-sample mapping \cite{gower1968adding}.
+At coordinate $u$, sequence $i$ presents an instantaneous distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to the $N$ reference genomes, projecting to $\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_k^{-1/2} \mathbf{V}_k^T (\bar{\mathbf{d}}^2 - \mathbf{d}_i^2(u))$ where $\bar{\mathbf{d}}^2 = \frac{1}{N} \mathbf{D}^{(2)} \mathbf{1}_N$ represents the mean squared reference distance.
+When applied to our HIV-1 benchmark, the resulting coordinate trajectories reveal the physical dynamics of genetic exchange.
+Non-recombinant Subtype B and Subtype C genomes remain stationary within their respective corridors across the entire gene.
+Wobble never crosses clades.
+Point mutations generate harmless local flutter around parental medoids, but unreticulated lineages never breach the inter-subtype divide.
+In sharp contrast, the recombinant CRF07\_BC trajectory tracks within Subtype C territory through Protease, abruptly vaults across the zero-axis into Subtype B space in Reverse Transcriptase, and plunges back into Subtype C.
+CRF08\_BC shares the identical parental gene pool but enters the Subtype B cassette approximately 130 nucleotides upstream.
+In two-dimensional metric space, the two chimeras trace distinct orbital loops, resolving competing recombinant structures in linear time without triplet enumeration.
+Manifolds preserve chimeras.

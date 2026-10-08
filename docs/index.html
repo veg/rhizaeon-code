@@ -852,7 +852,11 @@
           </div>
           <div class="instrument-dial">
             <div class="dial-val accent" id="kpiEvents">—</div>
-            <div class="dial-label">Verified (|E|)</div>
+            <div class="dial-label">Unique Events</div>
+          </div>
+          <div class="instrument-dial">
+            <div class="dial-val accent" id="kpiIsolates">—</div>
+            <div class="dial-label">Recombinant Isolates</div>
           </div>
           <div class="instrument-dial">
             <div class="dial-val" id="kpiTime">—</div>
@@ -873,7 +877,8 @@
               <table id="eventsTable">
                 <thead>
                   <tr>
-                    <th>Recombinant</th>
+                    <th>Event ID</th>
+                    <th>Isolates</th>
                     <th>Home Lineage</th>
                     <th>Donor Lineage</th>
                     <th>Topology</th>
@@ -1099,7 +1104,17 @@
       document.getElementById('kpiTaxa').innerText = res.num_taxa.toLocaleString();
       document.getElementById('kpiLength').innerText = res.length.toLocaleString();
       document.getElementById('kpiInformative').innerText = res.informative_sites.toLocaleString();
+      let totalIsolates = new Set();
+      for (const ev of res.events) {
+        if (ev.isolates) {
+          ev.isolates.forEach(i => totalIsolates.add(i));
+        } else if (ev.candidate_name) {
+          totalIsolates.add(ev.candidate_name);
+        }
+      }
+      
       document.getElementById('kpiEvents').innerText = res.events.length;
+      document.getElementById('kpiIsolates').innerText = totalIsolates.size;
       document.getElementById('kpiTime').innerText = (res.run_time_ms || clientMs).toFixed(1);
       document.getElementById('eventCountBadge').innerText = res.events.length;
 
@@ -1116,9 +1131,10 @@
           const typeTag = ev.is_crossover 
             ? '<span class="tag-crossover">Crossover</span>' 
             : '<span class="tag-cassette">Cassette</span>';
-          
+          const isolatesDisplay = ev.isolates.join(', ');
           tr.innerHTML = `
-            <td style="font-weight: 700; color: var(--text-primary);">${ev.candidate_name}</td>
+            <td style="font-weight: 700; color: var(--braun-orange);">#${ev.event_id}</td>
+            <td style="font-weight: 700; color: var(--text-primary);" title="${isolatesDisplay}">${ev.isolates.length} Isolates <span style="font-size:10px; font-weight:normal; color:var(--text-tertiary)">(${isolatesDisplay.length > 20 ? isolatesDisplay.substring(0,20)+'...' : isolatesDisplay})</span></td>
             <td style="color: var(--text-secondary);">${ev.home_name}</td>
             <td style="font-weight: 700; color: var(--braun-orange);">${ev.donor_name}</td>
             <td>${typeTag}</td>

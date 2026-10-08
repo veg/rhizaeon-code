@@ -1,0 +1,136 @@
+\begin{thebibliography}{10}
+
+\bibitem{alfonsi2024data}
+Tommaso Alfonsi, Eleonora Cella, Giorgio Berno, Diana Fanti, Silvia Fabris,
+  Marta Giovanetti, Massimo Ciccozzi, Alberto Riva, Gianguglielmo Zehender, and
+  Allegra Via.
+\newblock Data-driven recombination detection in viral genomes.
+\newblock {\em Nature Communications}, 15:3110, 2024.
+
+\bibitem{bruen2006simple}
+Trevor~C Bruen, Herv{\'e} Philippe, and David Bryant.
+\newblock A simple and robust statistical test for detecting the presence of
+  recombination.
+\newblock {\em Genetics}, 172(4):2665--2681, 2006.
+
+\bibitem{buneman1974note}
+Peter Buneman.
+\newblock A note on the metric properties of trees.
+\newblock {\em Journal of Combinatorial Theory, Series B}, 17(1):48--50, 1974.
+
+\bibitem{croucher2011rapid}
+Nicholas~J Croucher, Simon~R Harris, Christophe Fraser, Michael~A Quail, John
+  Burton, Mark van~der Linden, Lesley McGee, Anne von Gottberg, Jae~Hoon Song,
+  Kwan~Soo Ko, Bruno Pichon, Stephen Baker, Christopher~M Parry, Lotte~M
+  Lambertsen, Dea Shahinas, Dylan~R Pillai, Timothy~J Mitchell, Gordon Dougan,
+  Alexander Tomasz, Keith~P Klugman, Julian Parkhill, William~P Hanage, and
+  Stephen~D Bentley.
+\newblock Rapid pneumococcal evolution in response to clinical interventions.
+\newblock {\em Science}, 331(6016):430--434, 2011.
+
+\bibitem{deleuze1987thousand}
+Gilles Deleuze and F{\'e}lix Guattari.
+\newblock {\em A Thousand Plateaus: Capitalism and Schizophrenia}.
+\newblock University of Minnesota Press, 1987.
+
+\bibitem{didelot2010impact}
+Xavier Didelot and Martin C~J Maiden.
+\newblock Impact of recombination on bacterial evolution.
+\newblock {\em Trends in Microbiology}, 18(7):315--322, 2010.
+
+\bibitem{gower1966some}
+J.~C. Gower.
+\newblock Some distance properties of latent root and vector methods used in
+  multivariate analysis.
+\newblock {\em Biometrika}, 53(3-4):325--338, 1966.
+
+\bibitem{gower1968adding}
+J.~C. Gower.
+\newblock Adding a point to vector diagrams in multivariate analysis.
+\newblock {\em Biometrika}, 55(3):582--585, 1968.
+
+\bibitem{griffiths1996ancestral}
+Robert~C Griffiths and Paul Marjoram.
+\newblock Ancestral inference from gene trees with recombination.
+\newblock {\em Theoretical Population Biology}, 50(3):341--377, 1996.
+
+\bibitem{hudson1983properties}
+Richard~R Hudson.
+\newblock Properties of a neutral allele model with intragenic recombination.
+\newblock {\em Genetical Research}, 41(3):261--269, 1983.
+
+\bibitem{kosakovsky2006gard}
+Sergei~L Kosakovsky~Pond, David Posada, Michael~B Gravenor, Christopher~H
+  Woelk, and Simon D~W Frost.
+\newblock Automated phylogenetic detection of recombination using a genetic
+  algorithm.
+\newblock {\em Molecular Biology and Evolution}, 23(10):1891--1901, 2006.
+
+\bibitem{lam20183seq}
+H~M Lam, O~Ratmann, and M~F Boni.
+\newblock Improved algorithmic complexity for the {3SEQ} recombination
+  detection algorithm.
+\newblock {\em Molecular Biology and Evolution}, 35(1):247--251, 2018.
+
+\bibitem{martin2015rdp4}
+Darren~P Martin, Ben Murrell, Michael Golden, Arshan Khoosal, and Brejnev
+  Muhire.
+\newblock {RDP4}: Detection and analysis of recombination patterns in virus
+  genomes.
+\newblock {\em Virus Evolution}, 1(1):vev003, 2015.
+
+\bibitem{martin2021rdp5}
+Darren~P Martin, Arvind Varsani, Philippe Roumagnac, Gonasagren Botha, Shailen
+  Maslamoney, Travis Schwab, Zander Kelz, Sudhir Kumar, and Ben Murrell.
+\newblock {RDP5}: a computer program for analyzing recombination in, and
+  removing signals of recombination from, nucleotide sequence datasets.
+\newblock {\em Virus Evolution}, 7(1):veaa087, 2021.
+
+\bibitem{mcvean2004fine}
+Gil A~T McVean, Simon~R Myers, Sarah Hunt, Panos Deloukas, David~R Bentley, and
+  Peter Donnelly.
+\newblock The fine-scale structure of recombination rate variation in the human
+  genome.
+\newblock {\em Science}, 304(5670):581--584, 2004.
+
+\bibitem{posada2002evaluation}
+David Posada.
+\newblock Evaluation of methods for detecting recombination from {DNA}
+  sequences: Empirical data.
+\newblock {\em Molecular Biology and Evolution}, 19(5):708--717, 2002.
+
+\bibitem{posada2001evaluation}
+David Posada and Keith~A Crandall.
+\newblock Evaluation of methods for detecting recombination from {DNA}
+  sequences: Computer simulations.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  98(24):13757--13762, 2001.
+
+\bibitem{rieseberg2003major}
+Loren~H Rieseberg, Olivier Raymond, David~M Rosenthal, Zhao Lai, Kevin
+  Livingstone, Takuya Nakazato, Jennifer~L Durphy, Andrea~E Schwarzbach, Lisa~A
+  Donovan, and Christian Lexer.
+\newblock Major ecological transitions in wild sunflowers facilitated by
+  hybridization.
+\newblock {\em Science}, 301(5637):1211--1216, 2003.
+
+\bibitem{simonloriere2011recombination}
+Etienne Simon-Loriere and Edward~C Holmes.
+\newblock Why do {RNA} viruses recombine?
+\newblock {\em Nature Reviews Microbiology}, 9(8):617--626, 2011.
+
+\bibitem{su2000characterization}
+Ling Su, Marcus Graf, Ying Zhang, Hagen von Briesen, Hui Xing, Josef
+  K{\"o}stler, H~Melzl, Hans Wolf, Yiming Shao, and Ralf Wagner.
+\newblock Characterization of a virtually full-length human immunodeficiency
+  virus type 1 genome of a prevalent intersubtype ({C/B}$'$) recombinant strain
+  in {China}.
+\newblock {\em Journal of Virology}, 74(23):11367--11376, 2000.
+
+\bibitem{tamura1993estimation}
+Koichiro Tamura and Masatoshi Nei.
+\newblock Estimation of the number of nucleotide substitutions in the control
+  region of mitochondrial {DNA} in humans and chimpanzees.
+\newblock {\em Molecular Biology and Evolution}, 10(3):512--526, 1993.
+
+\end{thebibliography}
