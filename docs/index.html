@@ -82,6 +82,24 @@
       gap: 16px;
     }
 
+    .brand-header-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-emblem {
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-emblem:hover {
+      transform: scale(1.05);
+    }
+
     .brand-block {
       display: flex;
       flex-direction: column;
@@ -694,12 +712,15 @@
   <div class="container">
     <!-- Masthead -->
     <header>
-      <div class="brand-block">
-        <div class="brand-title">
-          RHIZAEON
-          <span class="brand-model">PA-FF 2.1 WASM</span>
+      <div class="brand-header-group">
+        <img src="assets/rhizaeon_emblem.png" alt="RhizAeon Emblem" class="brand-emblem">
+        <div class="brand-block">
+          <div class="brand-title">
+            RHIZAEON
+            <span class="brand-model">PA-FF 2.1 WASM</span>
+          </div>
+          <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
-        <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
       </div>
       <div class="masthead-tools">
         <div class="system-status-led">
@@ -785,8 +806,22 @@
           </button>
         </div>
 
-        <div style="font-size: 11px; color: var(--text-tertiary); line-height: 1.6; padding: 0 4px;">
+        <div style="font-size: 11px; color: var(--text-tertiary); line-height: 1.6; padding: 0 4px; margin-bottom: 16px;">
           <strong>Data Sovereignty Guarantee:</strong> All Buneman 4D projection, continuous attention tracking, and Due Diligence adjudication execute exclusively within your local browser thread via native WebAssembly. Zero sequences are transmitted over the network.
+        </div>
+
+        <!-- Manifold Architecture Card -->
+        <div class="panel" style="padding: 16px;">
+          <div class="panel-header" style="margin-bottom: 12px;">
+            <div class="panel-title">Manifold Resonator Topology</div>
+            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">FIG // 01</div>
+          </div>
+          <div style="background: var(--surface-recessed); border: 1px solid var(--border-normal); border-radius: 3px; padding: 14px; text-align: center;">
+            <img src="assets/rhizaeon_emblem.png" alt="RhizAeon Continuous Trajectory Manifold" style="width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));">
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 10px;">
+            <strong>PA-FF Topology:</strong> Continuous metric manifold tracking over 4D Buneman projection, $K$ spectral landmarks, dynamic reticulation vectors, and zero-drift `[ROOT]` sink dissipation.
+          </div>
         </div>
       </div>
 
