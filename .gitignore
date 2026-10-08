@@ -1,0 +1,23 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+
+# OS & Editor artifacts
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.env/
+.venv/
+venv/
+
+# Temporary run outputs
+*.tmp
+*.log
