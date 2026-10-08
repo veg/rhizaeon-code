@@ -8,3 +8,6 @@
 \BOOKMARK [2][-]{subsection.3.1}{Adversarial Null Calibration and Immunity to Biological Heterotachy}{section.3}% 8
 \BOOKMARK [2][-]{subsection.3.2}{Multi-Way Mosaicism and Unsampled Lineage Introgression}{section.3}% 9
 \BOOKMARK [2][-]{subsection.3.3}{Computational Scalability and Real-Time Genomic Surveillance}{section.3}% 10
+\BOOKMARK [1][-]{section.4}{Discussion and Algorithmic Scaling}{}% 11
+\BOOKMARK [2][-]{subsection.4.1}{Linear Manifold Geometry vs. Combinatorial Triplet Search}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.2}{Data Governance and Biosafety Compliance}{section.4}% 13

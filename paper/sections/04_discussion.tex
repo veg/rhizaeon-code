@@ -1,0 +1,39 @@
+\section{Discussion and Algorithmic Scaling}
+\label{sec:discussion}
+
+\subsection{Linear Manifold Geometry vs.\ Combinatorial Triplet Search}
+\label{subsec:discussion_scaling}
+
+Computational phylogenetic methods confront a difficult choice between evolutionary realism and combinatorial intractability.
+Trees model divergence.
+When reticulate events occur, forcing mosaic genomes into strictly bifurcating topologies distorts branch lengths and inflates substitution rate estimates \cite{schierup2000consequences}.
+Conversely, modeling recombination explicitly through ancestral recombination graphs or phylogenetic changepoints introduces prohibitive computational scaling, demanding cubic or quartic algorithms that collapse on modern genomic datasets \cite{minh2020iqtree2}.
+Triplet scanning methods like 3SEQ provide an empirical compromise by evaluating small three-sequence subgraphs \cite{boni2007exact}.
+Triplet decomposition avoids tree estimation.
+Yet exhaustive triplet testing scales cubically with sample size ($\binom{N}{3} \sim O(N^3)$), creating an inescapable computational barrier when surveillance cohorts expand to hundreds or thousands of isolates.
+
+\RhizAeon demonstrates that continuous metric geometry dissolves this dichotomy.
+By projecting whole-genome sequence divergence into fixed Buneman coordinates once for the entire alignment, the engine establishes an invariant spatial reference frame.
+Zero Procrustes rotations are required.
+Instantaneous sequence affinities are tracked continuously along the chromosome via analytical Gower out-of-sample projection, replacing discrete topology searches with smooth dynamical trajectories.
+Manifolds preserve spatial continuity.
+Cross-taxa attention operates against a fixed landmark basis ($K \le 32$), ensuring that trajectory extraction scales strictly as $O(N \cdot K \cdot L)$.
+As our empirical benchmarks demonstrate, this linear scaling yields two- to three-order-of-magnitude accelerations over triplet tools on standard cohorts, finishing multi-kilobase scans in milliseconds where triplet enumeration requires minutes or hours.
+
+Equally consequential is the resolution of complex multi-way mosaicism.
+Triplet tools assume two-parent ancestry.
+When circulating recombinant lineages accumulate segments from three or more parental lineages, examining triplets in isolation inevitably truncates mosaic tracts, missing breakpoints and hallucinating recombinant candidates.
+By tracking continuous trajectory tensors across the entire cohort simultaneously, physical force field deconvolution decomposes multiple orthogonal spatial modes.
+The framework detects interleaved parental contributions without prior constraints on parental cardinality.
+Furthermore, metric isolation prevents unsampled ghost donors from triggering combinatorial false alarms across innocent contemporary clades.
+
+\subsection{Data Governance and Biosafety Compliance}
+\label{subsec:biosafety}
+
+Research integrity demands strict transparency regarding computational protocols and data sources.
+Computational analyses require ethical clarity.
+We certify that this investigation represents a purely retrospective bioinformatic study operating exclusively on publicly accessible nucleotide sequences deposited in NCBI GenBank, GISAID, and the Los Alamos National Laboratory HIV Sequence Database.
+No biological specimens, clinical samples, or viral cultures were collected, isolated, cultivated, or manipulated during this study.
+All research was conducted entirely in silico using audited open-source algorithms.
+The software performs automated sequence alignment scanning without generating actionable protocols for pathogen enhancement, gain-of-function phenotypes, or laboratory synthesis.
+Source code, documentation, and client-side browser modules are freely available under permissive open-source licensing at \url{https://github.com/veg/rhizaeon-code}, promoting reproducible evolutionary genomics and accessible public health surveillance.
