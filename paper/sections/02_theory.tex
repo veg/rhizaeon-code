@@ -28,3 +28,64 @@ In sharp contrast, the recombinant CRF07\_BC trajectory tracks within Subtype C 
 CRF08\_BC shares the identical parental gene pool but enters the Subtype B cassette approximately 130 nucleotides upstream.
 In two-dimensional metric space, the two chimeras trace distinct orbital loops, resolving competing recombinant structures in linear time without triplet enumeration.
 Manifolds preserve chimeras.
+
+\subsection{Rotary Phase Embeddings and Markov Substitution Priors}
+\label{subsec:rotary_prior}
+
+Standard transformer architectures encode sequential position along one-dimensional strings using Rotary Position Embeddings (Tree-RoPE), but biological sequences diverge across multidimensional evolutionary space.
+Linear string offsets cannot capture tree distance.
+To integrate phylogenetic divergence directly into sequence attention, we generalize rotary embeddings from one-dimensional sequence indices to continuous metric coordinates \cite{su2024roformer}.
+For each sequence $i$, its $d$-dimensional Buneman coordinate $\mathbf{x}_i \in \mathbb{R}^d$ parameterizes a set of rotary phase angles:
+\begin{equation}
+\theta_{i, m} = \sum_{c=1}^d x_{i, c} \Theta_{m, c},
+\label{eq:tree_rope_angle}
+\end{equation}
+where $\mathbf{\Theta} \in \mathbb{R}^{d_{\text{head}}/2 \times d}$ is a fixed frequency projection matrix.
+At each aligned site $u$, the sequence embedding generates query and key vectors $\mathbf{q}_i(u), \mathbf{k}_i(u) \in \mathbb{R}^{d_{\text{head}}}$.
+We apply two-dimensional block-diagonal Givens rotation matrices $\mathbf{R}(\theta_i)$ to rotate query and key representations according to each taxon's continuous metric position.
+Because the inner product satisfies $\langle \mathbf{R}(\theta_i) \mathbf{q}_i, \mathbf{R}(\theta_j) \mathbf{k}_j \rangle = \mathbf{q}_i^T \mathbf{R}(\theta_j - \theta_i) \mathbf{k}_j$, pairwise attention naturally attenuates as evolutionary divergence in Buneman metric space increases.
+Rotations preserve geometry.
+
+Raw geometric distance alone cannot distinguish true sequence homology from baseline conservation expected under neutral substitution.
+Homology requires evolutionary calibration.
+We therefore incorporate a log-space continuous-time Markov substitution prior directly into the attention logits.
+For any sequence pair $(i, j)$ separated by evolutionary distance $d_{i, j}$, the transition probability under a neutral continuous-time Markov substitution model with equilibrium frequency $\epsilon_0$ is:
+\begin{equation}
+P_{i, j} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h d_{i, j}),
+\label{eq:phylo_prior}
+\end{equation}
+where $\lambda_h$ is the global substitution scaling rate and $\epsilon_0 = 0.25$ for nucleotides.
+We formulate the phylogenetic prior bias as $\text{PhyloBias}_{i, j} = \ln[\max(10^{-5}, P_{i, j})]$.
+The composite unnormalized attention score between sequence $i$ and candidate reference $j$ at coordinate $u$ becomes:
+\begin{equation}
+S_u(i, j) = \frac{(\mathbf{R}(\theta_i) \mathbf{q}_i(u))^T (\mathbf{R}(\theta_j) \mathbf{k}_j(u))}{\sqrt{d_{\text{head}}}} + \text{PhyloBias}_{i, j}.
+\label{eq:composite_attention}
+\end{equation}
+Unifying geometric distance with Markov substitution priors establishes a principled directed attention tensor along the chromosome.
+
+\subsection{The Unpolarized Ancestral Root Sink Token}
+\label{subsec:root_sink}
+
+Standard attention mechanisms distribute probability exclusively across contemporary sequences, creating an acute vulnerability to lineage-specific rate variation.
+Private mutations lack donors.
+When an isolated lineage undergoes an episodic substitution burst---such as host-mediated APOBEC3G cytidine deamination or accelerated heterotachy---conventional models mistake localized divergent clusters for horizontal genetic exchange \cite{posada2001evaluation}.
+Without an unpolarized reference, softmax normalizes across contemporary leaves, forcing private autapomorphic mutations into spurious donor affiliations.
+False positives surge.
+To insulate trajectory tracking from unreticulated rate bursts, \RhizAeon reserves index zero in the sequence dimension for an unpolarized ancestral root token $\mathbf{x}_{\text{root}}$.
+
+The root token is anchored at the origin of the Buneman metric space:
+\begin{equation}
+\mathbf{x}_{\text{root}} = \mathbf{0} \in \mathbb{R}^d.
+\label{eq:root_anchor}
+\end{equation}
+For an alignment of $N$ contemporary sequences, the cross-attention operator operates over $N+1$ nodes, spanning the ancestral root and all contemporary leaves.
+The softmax normalization strictly conserves probability across all $N+1$ nodes:
+\begin{equation}
+A_u(i \to \text{root}) + \sum_{j=1}^N A_u(i \to j) = 1.0.
+\label{eq:root_softmax}
+\end{equation}
+Because the root token resides at the metric origin with neutral substitution priors, private substitutions that lack homologous support in other contemporary lineages naturally route their attention into node zero.
+The root acts as an unpolarized sink.
+Private noise is absorbed without perturbing leaf coordinates.
+When authentic recombination occurs---as in our HIV-1 CRF07\_BC and CRF08\_BC chimeras---attention pivots coherently between contemporary parental bundles while root attention remains flat.
+Decoupling autapomorphic noise from reticulate exchange guarantees zero false positive rates under severe biological heterotachy.

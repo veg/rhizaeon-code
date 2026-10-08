@@ -119,6 +119,11 @@ Etienne Simon-Loriere and Edward~C Holmes.
 \newblock Why do {RNA} viruses recombine?
 \newblock {\em Nature Reviews Microbiology}, 9(8):617--626, 2011.
 
+\bibitem{su2024roformer}
+Jianlin Su, Murtadha Ahmed, Yu~Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu.
+\newblock {RoFormer}: Enhanced transformer with {Rotary Position Embedding}.
+\newblock {\em Neurocomputing}, 568:127063, 2024.
+
 \bibitem{su2000characterization}
 Ling Su, Marcus Graf, Ying Zhang, Hagen von Briesen, Hui Xing, Josef
   K{\"o}stler, H~Melzl, Hans Wolf, Yiming Shao, and Ralf Wagner.
