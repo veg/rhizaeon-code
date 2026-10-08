@@ -3,403 +3,635 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RhizAeon Web: Phylo-Attention Force Field Recombination Scanner</title>
-  <meta name="description" content="Sub-second, alignment-wide viral and bacterial recombination detection running 100% client-side in WebAssembly.">
+  <title>RhizAeon | Continuous Metric Manifold Recombination Scanner</title>
+  <meta name="description" content="Dieter Rams inspired client-side WebAssembly recombination scanner for viral and bacterial genomes.">
   <style>
+    /* Dieter Rams / Braun Industrial Design System: Less, but better. */
     :root {
-      --bg-base: #090d16;
-      --bg-card: #111827;
-      --bg-card-hover: #1f2937;
-      --border: #1f2937;
-      --border-bright: #374151;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
-      --cyan: #06b6d4;
-      --cyan-glow: rgba(6, 182, 212, 0.25);
-      --emerald: #10b981;
-      --amber: #f59e0b;
-      --rose: #f43f5e;
-      --purple: #a855f7;
-      --blue: #3b82f6;
+      --canvas: #f2f1ed;
+      --surface: #ffffff;
+      --surface-subtle: #faf9f6;
+      --surface-recessed: #eae8e1;
+      --surface-hover: #e5e3dc;
+      
+      --border-hairline: #e0ded8;
+      --border-normal: #d0cecd;
+      --border-strong: #9c9a94;
+      
+      --text-primary: #121212;
+      --text-secondary: #585651;
+      --text-tertiary: #8a8882;
+      --text-dim: #b0aea8;
+      
+      --braun-orange: #ff4f00;
+      --braun-orange-hover: #eb4800;
+      --braun-orange-active: #cc3f00;
+      --braun-orange-tint: rgba(255, 79, 0, 0.08);
+      
+      --braun-dark: #222220;
+      --braun-dark-hover: #333330;
+      
+      --status-green: #15803d;
+      --status-green-bg: #ecfdf5;
+      --status-green-border: #a7f3d0;
+      
+      --status-red: #b91c1c;
+      --status-red-bg: #fef2f2;
+      --status-red-border: #fecaca;
+      
+      --status-orange: #c2410c;
+      --status-orange-bg: #fff7ed;
+      --status-orange-border: #fed7aa;
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-base);
-      color: var(--text-main);
+      background-color: var(--canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
       line-height: 1.5;
-      padding: 24px;
+      padding: 32px 24px;
       min-height: 100vh;
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
     }
 
-    /* Header */
+    /* Masthead */
     header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--border);
+      align-items: flex-end;
       padding-bottom: 20px;
+      margin-bottom: 28px;
+      border-bottom: 2px solid var(--border-normal);
       flex-wrap: wrap;
       gap: 16px;
     }
 
-    .title-group h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+    .brand-block {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
       gap: 10px;
     }
 
-    .title-group h1 .badge {
+    .brand-model {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      background: var(--surface-recessed);
+      border: 1px solid var(--border-normal);
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .masthead-tools {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Hardware Status LED */
+    .system-status-led {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      padding: 5px 10px;
+      border-radius: 3px;
       font-size: 11px;
       font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 9999px;
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-secondary);
     }
 
-    .title-group p {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-top: 4px;
+    .led-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--status-green);
+      box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.2);
     }
 
-    .header-links {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .header-links a, .header-links button {
-      background: var(--bg-card);
-      border: 1px solid var(--border-bright);
-      color: var(--text-main);
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .header-links a:hover, .header-links button:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--cyan);
-    }
-
-    /* Privacy Banner */
-    .privacy-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      color: var(--emerald);
+    .btn-neutral {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.1s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
-    /* Grid Layout */
-    .app-grid {
+    .btn-neutral:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .btn-neutral:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    /* Grid Architecture */
+    .workspace-grid {
       display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 24px;
+      grid-template-columns: 460px 1fr;
+      gap: 28px;
       align-items: start;
     }
 
-    @media (max-width: 1024px) {
-      .app-grid {
+    @media (max-width: 1080px) {
+      .workspace-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* Card Panels */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
+    /* Physical Enclosure (Panels) */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      border-radius: 4px;
+      padding: 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
     }
 
-    .card h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 14px;
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 8px;
     }
 
-    /* Examples Toolbar */
-    .preset-group {
-      margin-bottom: 16px;
+    .panel-title::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: var(--text-primary);
+      border-radius: 1px;
+    }
+
+    /* Program Station Presets */
+    .preset-bay {
+      background: var(--surface-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 18px;
     }
 
     .preset-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-tertiary);
       margin-bottom: 8px;
     }
 
-    .preset-buttons {
-      display: flex;
-      flex-wrap: wrap;
+    .preset-bank {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 6px;
     }
 
-    .preset-btn {
-      background: var(--bg-surface-elevated, #1f2937);
-      border: 1px solid var(--border-bright);
-      color: var(--text-muted);
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
+    .station-btn {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      border-radius: 3px;
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: left;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.1s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .station-btn:hover {
+      background: #ffffff;
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+    }
+
+    .station-btn.active {
+      background: var(--braun-dark);
+      color: #ffffff;
+      border-color: var(--braun-dark);
+    }
+
+    .station-btn.active .station-tag {
+      background: var(--braun-orange);
+      color: #ffffff;
+    }
+
+    .station-tag {
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--surface-recessed);
+      color: var(--text-tertiary);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* Tactile Dropzone */
+    .dropzone-bay {
+      background: var(--surface-subtle);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: 4px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 14px;
       transition: all 0.15s ease;
     }
 
-    .preset-btn:hover {
-      background: var(--bg-card-hover);
-      color: var(--cyan);
-      border-color: var(--cyan);
+    .dropzone-bay:hover, .dropzone-bay.dragover {
+      background: #ffffff;
+      border-color: var(--text-primary);
     }
 
-    /* Upload Target */
-    .drop-zone {
-      border: 2px dashed var(--border-bright);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 14px;
-      background: rgba(17, 24, 39, 0.5);
+    .dropzone-text {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
     }
 
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--cyan);
-      background: rgba(6, 182, 212, 0.05);
-    }
-
-    .drop-zone svg {
-      width: 32px;
-      height: 32px;
-      fill: var(--text-dim);
-      margin-bottom: 8px;
-    }
-
-    .drop-zone p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .drop-zone span {
-      color: var(--cyan);
-      font-weight: 500;
+    .dropzone-sub {
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      margin-top: 3px;
     }
 
     /* Textarea */
     textarea {
       width: 100%;
       height: 180px;
-      background: #090d16;
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-normal);
+      border-radius: 3px;
       padding: 12px;
-      color: #e5e7eb;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 12px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-primary);
       resize: vertical;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       outline: none;
       transition: border-color 0.15s;
     }
 
     textarea:focus {
-      border-color: var(--cyan);
+      background: #ffffff;
+      border-color: var(--text-primary);
     }
 
-    /* Controls */
-    .control-row {
+    /* Linear Sliders / Rotary emulation */
+    .controls-group {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-hairline);
+      border-radius: 3px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+    }
+
+    .slider-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
-      font-size: 13px;
+      gap: 14px;
     }
 
-    .control-row label {
-      color: var(--text-muted);
+    .slider-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
     }
 
-    .control-row input[type="range"] {
+    .slider-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
       width: 140px;
-      accent-color: var(--cyan);
+      height: 4px;
+      background: var(--border-strong);
+      border-radius: 2px;
+      outline: none;
     }
 
-    .control-value {
-      font-family: monospace;
-      color: var(--cyan);
-      font-weight: bold;
-      margin-left: 8px;
-      min-width: 24px;
-      display: inline-block;
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: background 0.1s;
     }
 
-    /* Primary Scan Button */
-    .scan-btn {
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--braun-orange);
+    }
+
+    .slider-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* The Iconic Braun Orange Button (ET66) */
+    .btn-braun-primary {
       width: 100%;
-      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      background-color: var(--braun-orange);
       color: #ffffff;
       border: none;
-      padding: 12px 18px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 14px 18px;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 14px var(--cyan-glow);
+      box-shadow: 0 2px 0 #cc3f00, 0 3px 6px rgba(0, 0, 0, 0.12);
+      transition: all 0.08s ease;
     }
 
-    .scan-btn:hover:not(:disabled) {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
+    .btn-braun-primary:hover:not(:disabled) {
+      background-color: var(--braun-orange-hover);
     }
 
-    .scan-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn-braun-primary:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 0 0 #cc3f00;
+    }
+
+    .btn-braun-primary:disabled {
+      background-color: var(--border-strong);
       box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.6;
     }
 
-    /* KPI Summary Cards */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    /* Instrument Status Banner */
+    .status-strip {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
 
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
+    .status-strip.info {
+      border-left: 4px solid var(--text-primary);
+      color: var(--text-primary);
+    }
+
+    .status-strip.success {
+      border-left: 4px solid var(--status-green);
+      background: var(--status-green-bg);
+      color: var(--status-green);
+      border-color: var(--status-green-border);
+    }
+
+    .status-strip.alert {
+      border-left: 4px solid var(--braun-orange);
+      background: var(--status-orange-bg);
+      color: var(--status-orange);
+      border-color: var(--status-orange-border);
+    }
+
+    .status-strip.error {
+      border-left: 4px solid var(--status-red);
+      background: var(--status-red-bg);
+      color: var(--status-red);
+      border-color: var(--status-red-border);
+    }
+
+    /* Digital Instrument Readout (KPI Cards) */
+    .instrument-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .instrument-dial {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      border-radius: 3px;
+      padding: 14px 12px;
       text-align: center;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
 
-    .kpi-val {
+    .dial-val {
+      font-family: var(--font-mono);
       font-size: 22px;
       font-weight: 700;
-      color: var(--text-main);
-      font-family: ui-monospace, monospace;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
     }
 
-    .kpi-val.cyan { color: var(--cyan); }
-    .kpi-val.emerald { color: var(--emerald); }
-    .kpi-val.amber { color: var(--amber); }
-    .kpi-val.rose { color: var(--rose); }
+    .dial-val.accent {
+      color: var(--braun-orange);
+    }
 
-    .kpi-label {
-      font-size: 11px;
-      color: var(--text-dim);
+    .dial-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      font-weight: 600;
-      margin-top: 4px;
-      letter-spacing: 0.5px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
     }
 
-    /* Recombination Table */
-    .table-container {
+    /* Results Table */
+    .table-chamber {
+      background: var(--surface);
+      border: 1px solid var(--border-normal);
+      border-radius: 4px;
       overflow-x: auto;
       margin-bottom: 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg-card);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 13px;
-    }
-
-    th {
-      background: #1f2937;
-      color: var(--text-dim);
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    td {
-      padding: 10px 14px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.6);
-      font-family: ui-monospace, monospace;
       font-size: 12px;
     }
 
-    tr:hover td {
-      background: rgba(31, 41, 55, 0.4);
-    }
-
-    .badge-crossover {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
+    thead th {
+      background: var(--surface-recessed);
+      color: var(--text-secondary);
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-normal);
+      white-space: nowrap;
     }
 
-    .badge-cassette {
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-hairline);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--surface-subtle);
+    }
+
+    .tag-cassette {
+      background: var(--braun-orange-tint);
+      color: var(--braun-orange);
+      border: 1px solid rgba(255, 79, 0, 0.25);
       padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
+      border-radius: 2px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    /* Actions Toolbar */
-    .actions-bar {
+    .tag-crossover {
+      background: var(--surface-recessed);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Embedded Screen Bezel */
+    .screen-bezel {
+      background: var(--surface-recessed);
+      border: 1px solid var(--border-normal);
+      border-radius: 4px;
+      padding: 8px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .screen-frame {
+      width: 100%;
+      height: 900px;
+      border: 1px solid var(--border-normal);
+      border-radius: 2px;
+      background: #ffffff;
+      display: block;
+    }
+
+    iframe#reportFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Action Deck */
+    .action-deck {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -408,83 +640,13 @@
       gap: 10px;
     }
 
-    .btn-action {
-      background: var(--bg-surface-elevated, #1f2937);
-      border: 1px solid var(--border-bright);
-      color: var(--text-main);
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .btn-action:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--cyan);
-      color: var(--cyan);
-    }
-
-    /* Embedded Report Frame */
-    .report-frame-container {
-      width: 100%;
-      height: 900px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #090d16;
-      margin-top: 14px;
-    }
-
-    iframe#reportFrame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #090d16;
-    }
-
-    /* Status Pill */
-    .status-alert {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-alert.info {
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.3);
-      color: var(--cyan);
-    }
-
-    .status-alert.success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--emerald);
-    }
-
-    .status-alert.error {
-      background: rgba(244, 63, 94, 0.1);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      color: var(--rose);
-    }
-
     .spinner {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
       border-top-color: #ffffff;
-      animation: spin 0.8s linear infinite;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
       display: inline-block;
     }
 
@@ -495,155 +657,188 @@
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
+    <!-- Masthead -->
     <header>
-      <div class="title-group">
-        <h1>
-          RhizAeon Web
-          <span class="badge">PA-FF v2.1 WASM</span>
-        </h1>
-        <p>Phylo-Attention Force Field Continuous Recombination Scanner (Client-Side WebAssembly)</p>
+      <div class="brand-block">
+        <div class="brand-title">
+          RHIZAEON
+          <span class="brand-model">PA-FF 2.1 WASM</span>
+        </div>
+        <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
       </div>
-      <div class="header-links">
-        <a href="https://github.com/veg/rhizaeon-code" target="_blank" rel="noopener">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub Repository
+      <div class="masthead-tools">
+        <div class="system-status-led">
+          <div class="led-dot" id="systemLed"></div>
+          <span id="systemLedText">System: Standby</span>
+        </div>
+        <a class="btn-neutral" href="https://github.com/veg/rhizaeon-code" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Source [Git]
         </a>
       </div>
     </header>
 
-    <!-- Privacy Banner -->
-    <div class="privacy-badge">
-      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v4a1 1 0 102 0V7z" clip-rule="evenodd"></path></svg>
-      100% Client-Side Privacy: All alignment processing and force field deconvolution runs locally via WebAssembly. Your sequence data never leaves your browser.
-    </div>
-
-    <!-- Main Workspace -->
-    <div class="app-grid">
-      <!-- Left Column: Input and Configuration -->
+    <!-- Workspace Grid -->
+    <div class="workspace-grid">
+      <!-- Input Control Deck -->
       <div>
-        <div class="card">
-          <h2>Input FASTA Alignment</h2>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Alignment Ingestion</div>
+            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">01 // INPUT</div>
+          </div>
 
-          <!-- Presets -->
-          <div class="preset-group">
-            <div class="preset-label">Load Empirical Benchmark</div>
-            <div class="preset-buttons">
-              <button class="preset-btn" onclick="loadExample('pvy')">🥔 Potato Virus Y (PVY)</button>
-              <button class="preset-btn" onclick="loadExample('kal153')">🧬 HIV-1 KAL153</button>
-              <button class="preset-btn" onclick="loadExample('xbb')">🦠 SARS-CoV-2 XBB</button>
-              <button class="preset-btn" onclick="loadExample('mtdna')">👤 Human mtDNA (Null)</button>
+          <!-- Station Presets -->
+          <div class="preset-bay">
+            <div class="preset-label">Program Presets (Empirical Controls)</div>
+            <div class="preset-bank">
+              <button class="station-btn" id="btn-pvy" onclick="loadExample('pvy')">
+                <span>01: PVY POTYVIRUS</span>
+                <span class="station-tag">25T/9.6K</span>
+              </button>
+              <button class="station-btn" id="btn-kal153" onclick="loadExample('kal153')">
+                <span>02: HIV-1 KAL153</span>
+                <span class="station-tag">12T/9.1K</span>
+              </button>
+              <button class="station-btn" id="btn-xbb" onclick="loadExample('xbb')">
+                <span>03: SARS2 XBB</span>
+                <span class="station-tag">18T/3.8K</span>
+              </button>
+              <button class="station-btn" id="btn-mtdna" onclick="loadExample('mtdna')">
+                <span>04: mtDNA NULL</span>
+                <span class="station-tag">79T/16K</span>
+              </button>
             </div>
           </div>
 
-          <!-- File Upload Target -->
-          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-            <p>Drag & drop FASTA file or <span>browse</span></p>
+          <!-- File Target -->
+          <div class="dropzone-bay" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <div class="dropzone-text">Drop FASTA File Here</div>
+            <div class="dropzone-sub">or click to open local file system (.fasta, .fas, .fa, .txt)</div>
             <input type="file" id="fileInput" accept=".fasta,.fas,.fa,.fna,.txt" style="display: none">
           </div>
 
-          <!-- Raw Textarea -->
-          <textarea id="fastaInput" placeholder=">Taxon_1&#10;ATGCGATCGATC...&#10;>Taxon_2&#10;ATGCGATCGATC..." spellcheck="false"></textarea>
+          <!-- Text Input Bay -->
+          <textarea id="fastaInput" placeholder=">Taxon_A&#10;ATGCGATCGATC...&#10;>Taxon_B&#10;ATGCGATCGATC..." spellcheck="false"></textarea>
 
-          <!-- Parameters -->
-          <div class="control-row">
-            <label for="landmarksK">Landmarks (K):</label>
-            <div>
-              <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value">
-              <span class="control-value" id="kVal">16</span>
+          <!-- Instrument Tuning -->
+          <div class="controls-group">
+            <div class="slider-row">
+              <span class="slider-label">Metric Landmarks (K)</span>
+              <div class="slider-control">
+                <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value">
+                <span class="slider-num" id="kVal">16</span>
+              </div>
             </div>
           </div>
 
-          <!-- Run Button -->
-          <button class="scan-btn" id="scanBtn" onclick="runScanner()">
-            <span id="btnIcon">⚡</span>
-            <span id="btnText">Run RhizAeon Scanner (WASM)</span>
+          <!-- Braun Primary Trigger -->
+          <button class="btn-braun-primary" id="scanBtn" onclick="runScanner()">
+            <span id="btnIcon">●</span>
+            <span id="btnText">Scan For Recombination</span>
           </button>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-tertiary); line-height: 1.6; padding: 0 4px;">
+          <strong>Data Sovereignty Guarantee:</strong> All Buneman 4D projection, continuous attention tracking, and Due Diligence adjudication execute exclusively within your local browser thread via native WebAssembly. Zero sequences are transmitted over the network.
         </div>
       </div>
 
-      <!-- Right Column: Results & Interactive Dossier -->
+      <!-- Instrument Output Deck -->
       <div>
-        <!-- Status Message -->
-        <div id="statusAlert" class="status-alert info">
-          <span>WASM Engine ready. Load a FASTA alignment or select an empirical benchmark preset to scan.</span>
+        <!-- Status Notification Strip -->
+        <div id="statusAlert" class="status-strip info">
+          <span>Engine initialized. Ingest alignment data or select a station preset to begin scanning.</span>
         </div>
 
-        <!-- KPI Cards -->
-        <div class="kpi-grid" id="kpiGrid" style="display: none;">
-          <div class="kpi-card">
-            <div class="kpi-val cyan" id="kpiStatus">—</div>
-            <div class="kpi-label">Diagnosis</div>
+        <!-- Digital Readout Meters (KPIs) -->
+        <div class="instrument-grid" id="kpiGrid" style="display: none;">
+          <div class="instrument-dial">
+            <div class="dial-val" id="kpiStatus">—</div>
+            <div class="dial-label">Diagnosis</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-val" id="kpiTaxa">—</div>
-            <div class="kpi-label">Taxa (N)</div>
+          <div class="instrument-dial">
+            <div class="dial-val" id="kpiTaxa">—</div>
+            <div class="dial-label">Taxa (N)</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-val" id="kpiLength">—</div>
-            <div class="kpi-label">Length (L)</div>
+          <div class="instrument-dial">
+            <div class="dial-val" id="kpiLength">—</div>
+            <div class="dial-label">Length (L)</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-val amber" id="kpiInformative">—</div>
-            <div class="kpi-label">Informative Sites</div>
+          <div class="instrument-dial">
+            <div class="dial-val" id="kpiInformative">—</div>
+            <div class="dial-label">Informative (M)</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-val emerald" id="kpiEvents">—</div>
-            <div class="kpi-label">Verified Events</div>
+          <div class="instrument-dial">
+            <div class="dial-val accent" id="kpiEvents">—</div>
+            <div class="dial-label">Verified (|E|)</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-val purple" id="kpiTime">—</div>
-            <div class="kpi-label">WASM Latency</div>
+          <div class="instrument-dial">
+            <div class="dial-val" id="kpiTime">—</div>
+            <div class="dial-label">Latency (ms)</div>
           </div>
         </div>
 
-        <!-- Recombination Events Table -->
+        <!-- Output Chamber -->
         <div id="resultsSection" style="display: none;">
-          <div class="card" style="padding: 16px;">
-            <h2>
-              Verified Recombination Events (|E| = <span id="eventCountBadge">0</span>)
-            </h2>
-            <div class="table-container">
+          <div class="panel" style="padding: 18px;">
+            <div class="panel-header">
+              <div class="panel-title">Reticulation Event Roster (|E| = <span id="eventCountBadge">0</span>)</div>
+              <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">02 // VERIFIED EVENTS</div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-chamber">
               <table id="eventsTable">
                 <thead>
                   <tr>
                     <th>Recombinant</th>
-                    <th>Home Parent</th>
-                    <th>Donor Parent</th>
-                    <th>Type</th>
-                    <th>Tract (bp)</th>
-                    <th>Length</th>
-                    <th>Fisher p-value</th>
-                    <th>Physical Z</th>
+                    <th>Home Lineage</th>
+                    <th>Donor Lineage</th>
+                    <th>Topology</th>
+                    <th>Interval (bp)</th>
+                    <th>Tract Length</th>
+                    <th>Fisher Exact (p)</th>
+                    <th>Physical Metric (Z)</th>
                   </tr>
                 </thead>
                 <tbody id="eventsTbody">
-                  <!-- Populated by JS -->
+                  <!-- Injected via JS -->
                 </tbody>
               </table>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="actions-bar">
+            <!-- Action Controls -->
+            <div class="action-deck">
               <div style="display: flex; gap: 8px;">
-                <button class="btn-action" onclick="downloadHtmlReport()">📥 Download Standalone HTML</button>
-                <button class="btn-action" onclick="downloadJsonResults()">📥 Download JSON Summary</button>
+                <button class="btn-neutral" onclick="downloadHtmlReport()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  Export HTML Dossier
+                </button>
+                <button class="btn-neutral" onclick="downloadJsonResults()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  Export JSON Matrix
+                </button>
               </div>
-              <button class="btn-action" onclick="openFullscreenReport()">⛶ Open Fullscreen Dossier</button>
+              <button class="btn-neutral" onclick="openFullscreenReport()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                Fullscreen Monitor
+              </button>
             </div>
           </div>
 
-          <!-- Embedded Dossier Frame -->
-          <div class="report-frame-container">
-            <iframe id="reportFrame" title="RhizAeon Interactive Visualization Dossier"></iframe>
+          <!-- Dossier Monitor Bezel -->
+          <div class="screen-bezel">
+            <div class="screen-frame">
+              <iframe id="reportFrame" title="Interactive Visualization Dossier"></iframe>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- WASM Engine Script -->
+  <!-- WASM Engine Client Logic -->
   <script type="module">
     import init, { scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js';
 
@@ -651,23 +846,25 @@
     let latestScanResult = null;
     let latestHtmlReport = null;
 
-    // Initialize WASM
-    async function initWasmEngine() {
+    async function initWasm() {
       try {
         await init();
         wasmReady = true;
-        document.getElementById('statusAlert').className = 'status-alert info';
-        document.getElementById('statusAlert').innerHTML = '✅ WebAssembly engine compiled and initialized. Ready to scan.';
+        document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
+        document.getElementById('systemLedText').innerText = 'System: Ready';
+        document.getElementById('statusAlert').className = 'status-strip info';
+        document.getElementById('statusAlert').innerHTML = '<strong>WASM Engine Operational.</strong> Select an empirical station preset or drop a FASTA file.';
       } catch (err) {
-        console.error('Failed to init WASM:', err);
-        document.getElementById('statusAlert').className = 'status-alert error';
-        document.getElementById('statusAlert').innerText = '❌ Failed to initialize WebAssembly engine: ' + err.message;
+        console.error('WASM Init error:', err);
+        document.getElementById('systemLed').style.backgroundColor = 'var(--status-red)';
+        document.getElementById('systemLedText').innerText = 'System: Error';
+        document.getElementById('statusAlert').className = 'status-strip error';
+        document.getElementById('statusAlert').innerText = 'WebAssembly compilation failed: ' + err.message;
       }
     }
-    initWasmEngine();
+    initWasm();
 
-    // Preset Loader
-    window.loadExample = async function(presetKey) {
+    window.loadExample = async function(key) {
       const urls = {
         pvy: 'examples/pvy_example1.fasta',
         kal153: 'examples/hiv1_kal153_crf02_ag.fasta',
@@ -675,33 +872,33 @@
         mtdna: 'examples/human_mtdna.fasta'
       };
 
-      const titles = {
-        pvy: 'Potato Virus Y (Darren Martin Positive Control)',
-        kal153: 'HIV-1 KAL153 (CRF02_AG Empirical Control)',
-        xbb: 'SARS-CoV-2 XBB Spike Recombinant',
-        mtdna: 'Human mtDNA (Strictly Clonal Empirical Null)'
+      const labels = {
+        pvy: 'Station 01: Potato Virus Y (Darren Martin Benchmark)',
+        kal153: 'Station 02: HIV-1 KAL153 (CRF02_AG Circulating Form)',
+        xbb: 'Station 03: SARS-CoV-2 XBB Spike Recombinant',
+        mtdna: 'Station 04: Human mtDNA (Strictly Clonal Empirical Null)'
       };
 
-      const url = urls[presetKey];
-      if (!url) return;
+      document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`btn-${key}`);
+      if (activeBtn) activeBtn.classList.add('active');
 
-      document.getElementById('statusAlert').className = 'status-alert info';
-      document.getElementById('statusAlert').innerHTML = `<span class="spinner"></span> Loading ${titles[presetKey]}...`;
+      document.getElementById('statusAlert').className = 'status-strip info';
+      document.getElementById('statusAlert').innerHTML = `Ingesting ${labels[key]}...`;
 
       try {
-        const resp = await fetch(url);
+        const resp = await fetch(urls[key]);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const fastaText = await resp.text();
-        document.getElementById('fastaInput').value = fastaText;
-        document.getElementById('statusAlert').className = 'status-alert success';
-        document.getElementById('statusAlert').innerText = `Loaded ${titles[presetKey]} (${fastaText.length.toLocaleString()} characters). Click Run to scan.`;
+        const fasta = await resp.text();
+        document.getElementById('fastaInput').value = fasta;
+        document.getElementById('statusAlert').className = 'status-strip success';
+        document.getElementById('statusAlert').innerHTML = `<strong>Loaded ${labels[key]}.</strong> Length: ${fasta.length.toLocaleString()} characters. Ready to execute.`;
       } catch (e) {
-        document.getElementById('statusAlert').className = 'status-alert error';
-        document.getElementById('statusAlert').innerText = `Failed to load example: ${e.message}`;
+        document.getElementById('statusAlert').className = 'status-strip error';
+        document.getElementById('statusAlert').innerText = `Failed to load station preset: ${e.message}`;
       }
     };
 
-    // File Drag and Drop
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
 
@@ -718,37 +915,37 @@
       e.preventDefault();
       dropZone.classList.remove('dragover');
       if (e.dataTransfer.files.length > 0) {
-        handleFile(e.dataTransfer.files[0]);
+        loadFile(e.dataTransfer.files[0]);
       }
     });
 
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
-        handleFile(e.target.files[0]);
+        loadFile(e.target.files[0]);
       }
     });
 
-    function handleFile(file) {
+    function loadFile(file) {
+      document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('fastaInput').value = e.target.result;
-        document.getElementById('statusAlert').className = 'status-alert success';
-        document.getElementById('statusAlert').innerText = `Loaded file: ${file.name} (${e.target.result.length.toLocaleString()} characters).`;
+        document.getElementById('statusAlert').className = 'status-strip success';
+        document.getElementById('statusAlert').innerHTML = `<strong>Ingested File:</strong> ${file.name} (${e.target.result.length.toLocaleString()} characters). Ready to scan.`;
       };
       reader.readAsText(file);
     }
 
-    // Run Scanner Function
     window.runScanner = async function() {
       if (!wasmReady) {
-        alert('WebAssembly engine is still compiling. Please wait a second.');
+        alert('WebAssembly engine initializing. Please allow 1-2 seconds.');
         return;
       }
 
-      const fastaText = document.getElementById('fastaInput').value.trim();
-      if (!fastaText || !fastaText.startsWith('>')) {
-        document.getElementById('statusAlert').className = 'status-alert error';
-        document.getElementById('statusAlert').innerText = 'Please provide a valid FASTA sequence alignment (must begin with ">").';
+      const fasta = document.getElementById('fastaInput').value.trim();
+      if (!fasta || !fasta.startsWith('>')) {
+        document.getElementById('statusAlert').className = 'status-strip error';
+        document.getElementById('statusAlert').innerText = 'Invalid format. Input alignment must be in FASTA format starting with ">".';
         return;
       }
 
@@ -759,96 +956,95 @@
 
       scanBtn.disabled = true;
       btnIcon.innerHTML = '<span class="spinner"></span>';
-      btnText.innerText = 'Scanning Phylo-Attention Flux...';
+      btnText.innerText = 'Adjudicating Manifold Flux...';
 
-      document.getElementById('statusAlert').className = 'status-alert info';
-      document.getElementById('statusAlert').innerHTML = '<span class="spinner"></span> Running continuous force field deconvolution...';
+      document.getElementById('systemLed').style.backgroundColor = 'var(--braun-orange)';
+      document.getElementById('systemLedText').innerText = 'System: Active';
 
-      // Yield thread to let UI update
-      await new Promise(r => setTimeout(r, 50));
+      document.getElementById('statusAlert').className = 'status-strip info';
+      document.getElementById('statusAlert').innerHTML = '<span class="spinner" style="border-top-color:var(--text-primary); border-color:rgba(0,0,0,0.15)"></span> Deconvolving continuous trajectory tensors and Due Diligence cycles...';
+
+      await new Promise(r => setTimeout(r, 40));
 
       try {
         const t0 = performance.now();
-        const res = scan_fasta(fastaText, k);
-        const htmlDoc = scan_fasta_html(fastaText, "RhizAeon Analysis", k);
+        const res = scan_fasta(fasta, k);
+        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k);
         const elapsed = performance.now() - t0;
 
         latestScanResult = res;
         latestHtmlReport = htmlDoc;
 
-        renderResults(res, elapsed, htmlDoc);
+        renderOutput(res, elapsed, htmlDoc);
       } catch (err) {
-        console.error('Scan failed:', err);
-        document.getElementById('statusAlert').className = 'status-alert error';
-        document.getElementById('statusAlert').innerText = 'Scan error: ' + (err.message || err);
+        console.error('Scan error:', err);
+        document.getElementById('statusAlert').className = 'status-strip error';
+        document.getElementById('statusAlert').innerText = 'Execution Fault: ' + (err.message || err);
       } finally {
         scanBtn.disabled = false;
-        btnIcon.innerText = '⚡';
-        btnText.innerText = 'Run RhizAeon Scanner (WASM)';
+        btnIcon.innerText = '●';
+        btnText.innerText = 'Scan For Recombination';
+        document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
+        document.getElementById('systemLedText').innerText = 'System: Ready';
       }
     };
 
-    function renderResults(res, clientMs, htmlDoc) {
-      // Show KPI cards and results section
+    function renderOutput(res, clientMs, htmlDoc) {
       document.getElementById('kpiGrid').style.display = 'grid';
       document.getElementById('resultsSection').style.display = 'block';
 
-      // Diagnosis
       const statusEl = document.getElementById('kpiStatus');
       if (res.is_non_recombinant_h0 || res.events.length === 0) {
-        statusEl.innerText = 'Clonal H₀';
-        statusEl.className = 'kpi-val emerald';
-        document.getElementById('statusAlert').className = 'status-alert success';
-        document.getElementById('statusAlert').innerText = `Scan completed in ${clientMs.toFixed(1)} ms. Alignment is strictly clonal (0 recombination events detected).`;
+        statusEl.innerText = 'CLONAL H₀';
+        statusEl.className = 'dial-val';
+        document.getElementById('statusAlert').className = 'status-strip success';
+        document.getElementById('statusAlert').innerHTML = `<strong>Scan Complete (${clientMs.toFixed(1)} ms).</strong> Null hypothesis H₀ accepted. The cohort is strictly clonal with zero reticulations.`;
       } else {
-        statusEl.innerText = `${res.events.length} Reticulations`;
-        statusEl.className = 'kpi-val amber';
-        document.getElementById('statusAlert').className = 'status-alert success';
-        document.getElementById('statusAlert').innerText = `Scan completed in ${clientMs.toFixed(1)} ms. Found ${res.events.length} verified recombination event(s).`;
+        statusEl.innerText = `${res.events.length} EVENTS`;
+        statusEl.className = 'dial-val accent';
+        document.getElementById('statusAlert').className = 'status-strip alert';
+        document.getElementById('statusAlert').innerHTML = `<strong>Scan Complete (${clientMs.toFixed(1)} ms).</strong> Recombinant reticulation swarm verified. Detected ${res.events.length} distinct event(s).`;
       }
 
       document.getElementById('kpiTaxa').innerText = res.num_taxa.toLocaleString();
-      document.getElementById('kpiLength').innerText = res.length.toLocaleString() + ' bp';
+      document.getElementById('kpiLength').innerText = res.length.toLocaleString();
       document.getElementById('kpiInformative').innerText = res.informative_sites.toLocaleString();
       document.getElementById('kpiEvents').innerText = res.events.length;
-      document.getElementById('kpiTime').innerText = (res.run_time_ms || clientMs).toFixed(1) + ' ms';
+      document.getElementById('kpiTime').innerText = (res.run_time_ms || clientMs).toFixed(1);
       document.getElementById('eventCountBadge').innerText = res.events.length;
 
-      // Populate Table
       const tbody = document.getElementById('eventsTbody');
       tbody.innerHTML = '';
 
       if (res.events.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-dim); padding: 24px;">No recombination events detected (Null Hypothesis H₀ accepted).</td>`;
-        tbody.appendChild(row);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-tertiary); padding: 24px;">No recombination events detected (Null Hypothesis H₀ accepted).</td>`;
+        tbody.appendChild(tr);
       } else {
         for (const ev of res.events) {
-          const row = document.createElement('tr');
-          const typeBadge = ev.is_crossover 
-            ? '<span class="badge-crossover">Crossover</span>' 
-            : '<span class="badge-cassette">Cassette</span>';
+          const tr = document.createElement('tr');
+          const typeTag = ev.is_crossover 
+            ? '<span class="tag-crossover">Crossover</span>' 
+            : '<span class="tag-cassette">Cassette</span>';
           
-          row.innerHTML = `
-            <td style="font-weight: 700; color: var(--cyan);">${ev.candidate_name}</td>
-            <td>${ev.home_name}</td>
-            <td style="color: var(--amber); font-weight: 600;">${ev.donor_name}</td>
-            <td>${typeBadge}</td>
-            <td>${ev.u1.toLocaleString()} – ${ev.u2.toLocaleString()}</td>
+          tr.innerHTML = `
+            <td style="font-weight: 700; color: var(--text-primary);">${ev.candidate_name}</td>
+            <td style="color: var(--text-secondary);">${ev.home_name}</td>
+            <td style="font-weight: 700; color: var(--braun-orange);">${ev.donor_name}</td>
+            <td>${typeTag}</td>
+            <td>${ev.u1.toLocaleString()} &ndash; ${ev.u2.toLocaleString()}</td>
             <td>${ev.tract_length.toLocaleString()} bp</td>
             <td>${ev.p_fisher < 1e-300 ? '< 1e-300' : ev.p_fisher.toExponential(2)}</td>
-            <td>${ev.z_phys.toFixed(2)}</td>
+            <td style="font-weight: 700;">${ev.z_phys.toFixed(2)}</td>
           `;
-          tbody.appendChild(row);
+          tbody.appendChild(tr);
         }
       }
 
-      // Populate Embedded Report iframe
       const frame = document.getElementById('reportFrame');
       frame.srcdoc = htmlDoc;
     }
 
-    // Download Standalone HTML
     window.downloadHtmlReport = function() {
       if (!latestHtmlReport) return;
       const blob = new Blob([latestHtmlReport], { type: 'text/html' });
@@ -858,7 +1054,6 @@
       a.click();
     };
 
-    // Download JSON Results
     window.downloadJsonResults = function() {
       if (!latestScanResult) return;
       const blob = new Blob([JSON.stringify(latestScanResult, null, 2)], { type: 'application/json' });
@@ -868,7 +1063,6 @@
       a.click();
     };
 
-    // Open Fullscreen
     window.openFullscreenReport = function() {
       if (!latestHtmlReport) return;
       const win = window.open('', '_blank');
