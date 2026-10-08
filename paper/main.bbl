@@ -7,6 +7,12 @@ Tommaso Alfonsi, Eleonora Cella, Giorgio Berno, Diana Fanti, Silvia Fabris,
 \newblock Data-driven recombination detection in viral genomes.
 \newblock {\em Nature Communications}, 15:3110, 2024.
 
+\bibitem{boni2007exact}
+Maciej~F Boni, David Posada, and Marcus~W Feldman.
+\newblock An exact nonparametric method for inferring mosaic structure with
+  application to genetics data and simulated data.
+\newblock {\em Genetics}, 176(2):1035--1047, 2007.
+
 \bibitem{bruen2006simple}
 Trevor~C Bruen, Herv{\'e} Philippe, and David Bryant.
 \newblock A simple and robust statistical test for detecting the presence of
@@ -17,6 +23,14 @@ Trevor~C Bruen, Herv{\'e} Philippe, and David Bryant.
 Peter Buneman.
 \newblock A note on the metric properties of trees.
 \newblock {\em Journal of Combinatorial Theory, Series B}, 17(1):48--50, 1974.
+
+\bibitem{carr1998full}
+Jean~K Carr, Mika~O Salminen, Christina Koch, Daniela Gotte, Andrew~W
+  Artenstein, Patricia~A Hegerich, Donald St~Louis, Donald~S Burke, and
+  Francine~E McCutchan.
+\newblock Full-length sequence and mosaic structure of a human immunodeficiency
+  virus type 1 isolate from thailand.
+\newblock {\em Journal of Virology}, 72(3):2018--2026, 1998.
 
 \bibitem{croucher2011rapid}
 Nicholas~J Croucher, Simon~R Harris, Christophe Fraser, Michael~A Quail, John
@@ -37,6 +51,13 @@ Gilles Deleuze and F{\'e}lix Guattari.
 Xavier Didelot and Martin C~J Maiden.
 \newblock Impact of recombination on bacterial evolution.
 \newblock {\em Trends in Microbiology}, 18(7):315--322, 2010.
+
+\bibitem{glais2002}
+I~Glais, M~Tribodet, and C~Kerlan.
+\newblock Genomic variability in {Potato} potyvirus {Y} ({PVY}): evidence that
+  {PVY(N)W} and {PVY(NTN)} variants are single to multiple recombinants between
+  {PVY(O)} and {PVY(N)} isolates.
+\newblock {\em Archives of Virology}, 147(2):363--378, 2002.
 
 \bibitem{gower1966some}
 J.~C. Gower.
@@ -137,5 +158,11 @@ Koichiro Tamura and Masatoshi Nei.
 \newblock Estimation of the number of nucleotide substitutions in the control
   region of mitochondrial {DNA} in humans and chimpanzees.
 \newblock {\em Molecular Biology and Evolution}, 10(3):512--526, 1993.
+
+\bibitem{worobey2002questioning}
+Michael Worobey, Andrew Rambaut, Oliver~G. Pybus, and David~L. Robertson.
+\newblock Questioning the evidence for genetic recombination in the 1918
+  "spanish flu" virus.
+\newblock {\em Science}, 296(5566):211, 2002.
 
 \end{thebibliography}
