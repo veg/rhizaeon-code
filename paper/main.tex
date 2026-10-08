@@ -1,58 +1,57 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{textcomp}
-\usepackage[top=1.8cm,bottom=2.0cm,left=2.0cm,right=2.0cm]{geometry}
-\usepackage{amsmath,amssymb,amsfonts,amsthm}
+%%% OUP Authoring Template for Molecular Biology and Evolution %%%
+\documentclass[unnumsec,webpdf,contemporary,large,nocrop]{oup-authoring-template}%
+\onecolumn
+
 \usepackage{graphicx}
+\graphicspath{{./}}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{microtype}
-\usepackage{hyperref}
-\usepackage{xcolor}
-\usepackage{cite}
-\usepackage{caption}
-\usepackage{subcaption}
-\captionsetup{font=footnotesize,labelfont=bf}
 \usepackage{bm}
 \usepackage{xspace}
-\usepackage{enumitem}
+\usepackage{hyperref}
+
+\newcommand{\societylogo}{}
+\def\city#1{#1}
 
 \newcommand{\RhizAeon}{\texttt{RhizAeon}\xspace}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue!80!black,
-    citecolor=blue!80!black,
-    urlcolor=blue!80!black
-}
-
 \begin{document}
 
-\begin{center}
-{\LARGE Clean Breaks: Tracking Recombination as Continuous Motion \\ Across Sequence Manifolds}\\[0.8em]
-{\small
-Sergei L.\ Kosakovsky Pond$^{1,2,*}$,
-Danielle Callan$^{1,2}$,
-Steven Weaver$^{1}$,
-Anton Nekrutenko$^{3}$,
-Darren P.\ Martin$^{4}$
-}\\[0.4em]
-{\footnotesize
-$^{1}$Institute for Genomics and Evolutionary Medicine, Temple University, Philadelphia, PA, USA \quad
-$^{2}$Department of Biology, Temple University, PA, USA \\
-$^{3}$Department of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA \\
-$^{4}$IDM, University of Cape Town, Cape Town, South Africa \\
-$^{*}$Corresponding author: \texttt{spond@temple.edu} \quad $\cdot$ \quad \today
-}
-\end{center}
-\vspace{-0.4em}
+\journaltitle{Molecular Biology and Evolution}
+\DOI{10.1093/molbev/msaa000}
+\copyrightyear{2026}
+\pubyear{2026}
+\appnotes{Discoveries}
+\firstpage{1}
+
+\title[Clean Breaks: Tracking Recombination as Continuous Motion]{Clean Breaks: Tracking Recombination as Continuous Motion Across Sequence Manifolds}
+
+\author[1,2,$\ast$]{Sergei L.\ Kosakovsky Pond}
+\author[1,2]{Danielle Callan}
+\author[1]{Steven Weaver}
+\author[3]{Anton Nekrutenko}
+\author[4]{Darren P.\ Martin}
+
+\address[1]{\orgdiv{Institute for Genomics and Evolutionary Medicine}, \orgname{Temple University}, \orgaddress{\city{Philadelphia}, \state{PA}, \country{USA}}}
+\address[2]{\orgdiv{Department of Biology}, \orgname{Temple University}, \orgaddress{\city{Philadelphia}, \state{PA}, \country{USA}}}
+\address[3]{\orgdiv{Department of Biochemistry and Molecular Biology}, \orgname{The Pennsylvania State University}, \orgaddress{\city{University Park}, \state{PA}, \country{USA}}}
+\address[4]{\orgdiv{Institute of Infectious Disease and Molecular Medicine}, \orgname{University of Cape Town}, \orgaddress{\city{Cape Town}, \country{South Africa}}}
+
+\corresp[$\ast$]{Corresponding author: \href{mailto:spond@temple.edu}{spond@temple.edu}}
+
+\abstract{Homologous recombination and horizontal gene transfer drive macro-evolutionary adaptation across viral, bacterial, and eukaryotic genomes by assembling mosaic chromosomes from divergent lineages. Trees cannot describe hybrids. Existing detection tools remain trapped between computationally prohibitive phylogenetic changepoint algorithms that explore combinatorial partition spaces in cubic time and isolated triplet scans that suffer severe false positive rates under realistic mutational rate variation. We introduce \RhizAeon, an open-source framework that maps multiple sequence alignments into continuous metric spaces, tracking sequence affinities along the chromosome as continuous trajectories without navigating discrete trees or enumerating triplets. By coupling rotary phase embeddings with an unpolarized ancestral root token that absorbs autapomorphic noise, \RhizAeon deconvolves reticulation through physical force field dynamics, isolating mosaic breakpoints in linear time. Trajectories replace combinatorial tree searches. Across five thousand synthetic alignments incorporating extreme rate heterogeneity, the trajectory engine maintained a zero percent false positive rate, while empirical analyses resolved complex retroviral mosaics, coronaviral chimeras, and multi-megabase bacterial genomes in fractions of a second. Compiled to native Rust binaries and zero-install client-side WebAssembly, \RhizAeon executes real-time reticulation surveillance within modern web browsers without transmitting sequence data across external networks.}
+
+\keywords{Recombination, Reticulate Evolution, Sequence Manifolds, Continuous Trajectory Tracking, Multidimensional Scaling, Foundation Models}
+
+\maketitle
 
 \input{sections/01_introduction.tex}
 \input{sections/02_theory.tex}
 
-\bibliographystyle{plain}
+\bibliographystyle{oup-plain}
 \bibliography{references}
 
 \end{document}
