@@ -1,0 +1,348 @@
+\section{Materials and Methods}
+\label{sec:methods}
+
+\subsection{Farthest-Point Landmark Sampling and Metric Basis Construction}
+\label{subsec:methods_landmark_sampling}
+
+Let $\mathcal{S} = \{s_1, s_2, \dots, s_M\}$ denote a multiple sequence alignment of $M$ contemporary nucleotide sequences of length $L$ over the alphabet $\Sigma = \{\text{A}, \text{C}, \text{G}, \text{T}\} \cup \{-\}$.
+When $M \gg 1,000$, computing an all-to-all pairwise distance matrix requires $\binom{M}{2} \approx \frac{1}{2} M^2$ pairwise comparisons, scaling as $O(M^2 L)$ and creating a computational bottleneck for large-scale genomic surveillance.
+Diversity anchors coordinates.
+\RhizAeon eliminates this quadratic barrier through sequential Farthest-Point Sampling (FPS) \cite{gonzalez1985clustering}, selecting a sparse subset of $N \ll M$ reference landmark genomes in strictly $O(N M L)$ operations.
+
+The selection algorithm begins by designating the initial reference landmark $s_{(1)}$ as the sequence exhibiting the highest non-gap coverage across the alignment:
+\begin{equation}
+s_{(1)} = \arg\max_{s_i \in \mathcal{S}} \sum_{u=1}^L \mathbb{I}(s_i(u) \neq \text{'-'}).
+\label{eq:methods_fps_seed}
+\end{equation}
+The algorithm then computes the pairwise evolutionary distance from $s_{(1)}$ to all $M$ sequences in the cohort, initializing a running minimum distance vector $\mathbf{r} = (r_1, \dots, r_M)^T \in \mathbb{R}^M$, where $r_i = d(s_i, s_{(1)})$.
+Pairwise evolutionary distances $d(s_i, s_j)$ are computed under the Tamura-Nei (TN93) continuous-time Markov substitution model with pairwise deletion of gap positions \cite{tamura1993estimation}:
+\begin{equation}
+d_{\text{TN93}} = -2 a_1 \ln\left(1 - \frac{P_1}{2 a_1} - \frac{Q}{2 a_3}\right) - 2 a_2 \ln\left(1 - \frac{P_2}{2 a_2} - \frac{Q}{2 a_3}\right) - 2 (a_3 - a_1 - a_2) \ln\left(1 - \frac{Q}{2 a_3}\right),
+\label{eq:methods_tn93}
+\end{equation}
+where $P_1$ and $P_2$ represent transitional differences between purines and pyrimidines, $Q$ represents transversional differences, and $a_1, a_2, a_3$ denote equilibrium nucleotide frequency constants.
+For alignments of highly divergent or non-coding sequences, normalized Hamming distance is supported as a scale-invariant alternative.
+
+Each subsequent reference landmark $k \in \{2, \dots, N\}$ is selected sequentially by identifying the sequence that maximizes the minimum distance to the existing set of selected landmarks:
+\begin{equation}
+s_{(k)} = \arg\max_{i \in \{1,\dots,M\} \setminus \{s_{(1)},\dots,s_{(k-1)}\}} r_i.
+\label{eq:methods_fps_iter}
+\end{equation}
+Upon selecting $s_{(k)}$, the algorithm evaluates distances from $s_{(k)}$ to all $M$ sequences and updates the running minimum distance array in $O(M L)$ time:
+\begin{equation}
+r_i \leftarrow \min\left(r_i, \, d(s_i, s_{(k)})\right), \quad \forall i \in \{1, \dots, M\}.
+\label{eq:methods_fps_update}
+\end{equation}
+Selecting $N$ reference genomes across $M$ isolates requires exactly $N \times M$ distance evaluations, reducing the computational burden from $O(M^2 L)$ to $O(N M L)$.
+For an alignment of 10,000 genomes with $N = 16$ landmarks, distance evaluations collapse from $49,995,000$ to $160,000$, representing a 312-fold empirical speedup.
+Farthest points span divergence.
+
+From the selected reference genomes $\{s_{(1)}, \dots, s_{(N)}\}$, we construct the symmetric reference distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$, with elements $D_{i,j} = d(s_{(i)}, s_{(j)})$ and diagonal entries $D_{i,i} = 0$.
+We define the element-wise squared distance matrix $\mathbf{D}^{(2)} \in \mathbb{R}^{N \times N}$ such that $[\mathbf{D}^{(2)}]_{i,j} = D_{i,j}^2$.
+To map these distances into an inner-product space, we apply the geometric centering projection operator $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$, where $\mathbf{I}_N$ is the $N \times N$ identity matrix and $\mathbf{1}_N = (1, \dots, 1)^T \in \mathbb{R}^N$ is the all-ones vector.
+The doubly centered inner-product Gram matrix $\mathbf{B} \in \mathbb{R}^{N \times N}$ is formulated via classical multidimensional scaling (MDS) \cite{gower1966some}:
+\begin{equation}
+\mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}.
+\label{eq:methods_gram_matrix}
+\end{equation}
+Spectral decomposition of the symmetric matrix $\mathbf{B}$ yields:
+\begin{equation}
+\mathbf{B} = \mathbf{V} \mathbf{\Lambda} \mathbf{V}^T = \sum_{k=1}^N \lambda_k \mathbf{v}_k \mathbf{v}_k^T,
+\label{eq:methods_spectral_decomp}
+\end{equation}
+where $\mathbf{\Lambda} = \operatorname{diag}(\lambda_1, \lambda_2, \dots, \lambda_N)$ contains real eigenvalues arranged in descending order ($\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_N$), and $\mathbf{V} = [\mathbf{v}_1, \dots, \mathbf{v}_N] \in \mathbb{R}^{N \times N}$ is the orthonormal eigenvector matrix satisfying $\mathbf{V}^T \mathbf{V} = \mathbf{I}_N$.
+Spectra reveal splits.
+
+We retain the leading $d$ dimensions corresponding to the largest positive eigenvalues ($d \le \min(4, N-1)$):
+\begin{equation}
+\mathbf{\Lambda}_d = \operatorname{diag}(\lambda_1, \dots, \lambda_d) \in \mathbb{R}^{d \times d}, \quad \mathbf{V}_d = [\mathbf{v}_1, \dots, \mathbf{v}_d] \in \mathbb{R}^{N \times d}.
+\label{eq:methods_retained_eigen}
+\end{equation}
+The static $d$-dimensional metric coordinates $\mathbf{x}_i \in \mathbb{R}^d$ for reference landmark $i \in \{1, \dots, N\}$ are given by:
+\begin{equation}
+\mathbf{x}_i = \mathbf{\Lambda}_d^{1/2} (\mathbf{V}_d)_{i, :}^T = \left(\sqrt{\lambda_1} v_{1, i}, \, \sqrt{\lambda_2} v_{2, i}, \, \dots, \, \sqrt{\lambda_d} v_{d, i}\right)^T.
+\label{eq:methods_static_coords}
+\end{equation}
+By construction, these coordinates satisfy $\langle \mathbf{x}_i, \mathbf{x}_j \rangle = [\mathbf{B}]_{i,j}$ within the subspace $\mathbb{R}^d$.
+By Buneman's metric tree theorem \cite{buneman1974note}, tree metrics satisfy four-point additivity conditions $d(a, b) + d(c, d) \le \max(d(a, c) + d(b, d), \, d(a, d) + d(b, c))$, ensuring that tree-like evolutionary divergences embed into Euclidean spaces where macroscopic clade splits project onto the dominant eigenvectors.
+
+\subsection{Analytical Gower Out-of-Sample Trajectory Projection}
+\label{subsec:methods_gower_projection}
+
+Tracking sequence affinities along the chromosome requires establishing an instantaneous coordinate $\mathbf{z}_i(u) \in \mathbb{R}^d$ for each query sequence $i \in \{1, \dots, M\}$ at every genomic site $u \in [1, L]$.
+Recomputing multidimensional scaling independently within sliding windows would produce arbitrary orthogonal rotations and reflections, distorting geometric distances and necessitating expensive Procrustes alignments.
+Instead, \RhizAeon projects local distance vectors into the fixed canonical coordinate basis $(\mathbf{V}_d, \mathbf{\Lambda}_d)$ using Gower's analytical out-of-sample interpolation theorem \cite{gower1968adding}.
+
+At coordinate $u$, we evaluate local evolutionary distances across an aligned window $[u - W/2, u + W/2]$ of width $W$ (default $W = 300\text{ nt}$) sampled at stride $S$ (default $S = 10\text{ nt}$).
+For query sequence $i$, this yields an instantaneous local distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to the $N$ reference landmarks:
+\begin{equation}
+\mathbf{d}_i(u) = \left(d_i(1; u), \, d_i(2; u), \, \dots, \, d_i(N; u)\right)^T.
+\label{eq:methods_local_dist_vec}
+\end{equation}
+We define the vector of squared local distances as $\mathbf{d}_i^2(u) = (d_i(1; u)^2, \dots, d_i(N; u)^2)^T \in \mathbb{R}^N$, and the vector of mean squared reference distances as:
+\begin{equation}
+\bar{\mathbf{d}}^2 = \frac{1}{N} \mathbf{D}^{(2)} \mathbf{1}_N = \left( \frac{1}{N} \sum_{j=1}^N D_{1, j}^2, \, \dots, \, \frac{1}{N} \sum_{j=1}^N D_{N, j}^2 \right)^T \in \mathbb{R}^N.
+\label{eq:methods_mean_sq_dist}
+\end{equation}
+
+Gower's out-of-sample mapping identifies the coordinate $\mathbf{z}_i(u) \in \mathbb{R}^d$ that minimizes squared Euclidean distance distortions relative to the static reference coordinates $\mathbf{x}_j$:
+\begin{equation}
+\min_{\mathbf{z} \in \mathbb{R}^d} \sum_{j=1}^N \left( \|\mathbf{z} - \mathbf{x}_j\|^2 - d_i(j; u)^2 \right)^2.
+\label{eq:methods_gower_objective}
+\end{equation}
+Expanding the Euclidean norm $\|\mathbf{z} - \mathbf{x}_j\|^2 = \|\mathbf{z}\|^2 - 2 \mathbf{z}^T \mathbf{x}_j + \|\mathbf{x}_j\|^2$, utilizing the centering condition $\sum_{j=1}^N \mathbf{x}_j = \mathbf{0}$, and equating the gradient to zero yields the exact analytical solution:
+\begin{equation}
+\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_d^{-1/2} \mathbf{V}_d^T \left( \bar{\mathbf{d}}^2 - \mathbf{d}_i^2(u) \right) \in \mathbb{R}^d,
+\label{eq:methods_gower_formula}
+\end{equation}
+where $\mathbf{\Lambda}_d^{-1/2} = \operatorname{diag}(1/\sqrt{\lambda_1}, \dots, 1/\sqrt{\lambda_d})$.
+Evaluating \eqref{eq:methods_gower_formula} across all coordinates $u \in \{1, 1+S, \dots, L\}$ constructs the continuous trajectory tensor $\mathbf{Z} \in \mathbb{R}^{M \times U \times d}$, where $U = \lceil L/S \rceil$.
+
+Because the basis $(\mathbf{V}_d, \mathbf{\Lambda}_d)$ and mean vector $\bar{\mathbf{d}}^2$ are computed once from whole-genome reference divergence, every sliding window maps into the identical, rigid metric reference frame.
+Zero Procrustes rotations are required.
+Projections preserve geometry.
+Furthermore, substituting the whole-genome distance vector of reference landmark $k$ into \eqref{eq:methods_gower_formula} analytically recovers its exact MDS coordinate:
+\begin{equation}
+\frac{1}{2} \mathbf{\Lambda}_d^{-1/2} \mathbf{V}_d^T \left( \bar{\mathbf{d}}^2 - \left( \mathbf{D}^{(2)}_{k, :} \right)^T \right) = \mathbf{\Lambda}_d^{1/2} (\mathbf{V}_d)_{k, :}^T = \mathbf{x}_k,
+\label{eq:methods_gower_identity}
+\end{equation}
+proving algebraic self-consistency and zero metric distortion on reference taxa.
+
+\subsection{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}
+\label{subsec:methods_treerope_prior}
+
+Standard transformer neural networks incorporate sequential position along one-dimensional text using Rotary Position Embeddings (RoPE) \cite{su2024roformer}.
+However, biological sequences diverge across multidimensional phylogenetic trees rather than linear strings.
+To integrate evolutionary distance directly into cross-sequence attention, \RhizAeon generalizes rotary embeddings from one-dimensional sequence indices to continuous metric coordinates.
+
+Let $\mathbf{x}_i \in \mathbb{R}^d$ denote the continuous metric coordinates of sequence $i$.
+We construct a fixed frequency projection basis $\mathbf{\Theta} \in \mathbb{R}^{(d_{\text{head}}/2) \times d}$, with components parameterized by base frequency $\theta_0 = 10,000$:
+\begin{equation}
+\Theta_{m, c} = \theta_0^{-2(m-1)/d_{\text{head}}} \cdot \omega_c, \quad m \in \{1, \dots, d_{\text{head}}/2\}, \; c \in \{1, \dots, d\},
+\label{eq:methods_freq_basis}
+\end{equation}
+where $\omega_c = \sqrt{\lambda_c / \sum_{k=1}^d \lambda_k}$ weights each dimension by its relative spectral variance.
+For sequence $i$, the rotary phase angle vector $\bm{\theta}_i = (\theta_{i, 1}, \dots, \theta_{i, d_{\text{head}}/2})^T$ is computed as:
+\begin{equation}
+\theta_{i, m} = \sum_{c=1}^d x_{i, c} \Theta_{m, c}.
+\label{eq:methods_tree_rope_angle}
+\end{equation}
+Angles encode divergence.
+
+At each aligned site $u$, sequence representations generate query and key vectors $\mathbf{q}_i(u), \mathbf{k}_i(u) \in \mathbb{R}^{d_{\text{head}}}$.
+We define the block-diagonal Givens rotation matrix $\mathbf{R}(\bm{\theta}_i) \in \mathbb{R}^{d_{\text{head}} \times d_{\text{head}}}$ as:
+\begin{equation}
+\mathbf{R}(\bm{\theta}_i) = \bigoplus_{m=1}^{d_{\text{head}}/2} \begin{pmatrix} \cos \theta_{i, m} & -\sin \theta_{i, m} \\ \sin \theta_{i, m} & \cos \theta_{i, m} \end{pmatrix}.
+\label{eq:methods_givens_rot}
+\end{equation}
+Applying $\mathbf{R}(\bm{\theta}_i)$ rotates query and key representations according to each taxon's continuous metric position.
+The inner product between rotated vectors satisfies:
+\begin{equation}
+\langle \mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u), \, \mathbf{R}(\bm{\theta}_j) \mathbf{k}_j(u) \rangle = \mathbf{q}_i(u)^T \mathbf{R}(\bm{\theta}_j - \bm{\theta}_i) \mathbf{k}_j(u).
+\label{eq:methods_rot_inner}
+\end{equation}
+Because rotation angles depend linearly on metric coordinates, the phase shift $\|\bm{\theta}_j - \bm{\theta}_i\|$ increases with evolutionary divergence in Buneman metric space, naturally attenuating pairwise attention as phylogenetic distance increases.
+
+To calibrate geometric distances against baseline neutral sequence homology, we integrate a continuous-time Markov substitution prior directly into the attention logits.
+For any pair of sequences $(i, j)$ separated by evolutionary distance $D_{i,j}$, the probability of observing identical homologous nucleotides under a continuous-time Markov substitution model with substitution scaling rate $\lambda_h$ and equilibrium frequency $\epsilon_0 = 0.25$ is:
+\begin{equation}
+P_{i, j} = \epsilon_0 + (1 - \epsilon_0) \exp\left(-\lambda_h D_{i, j}\right).
+\label{eq:methods_markov_prior}
+\end{equation}
+We define the logarithmic phylogenetic prior bias as:
+\begin{equation}
+\text{PhyloBias}_{i, j} = \ln \left[ \max\left(10^{-5}, \, P_{i, j}\right) \right].
+\label{eq:methods_phylobias}
+\end{equation}
+The composite unnormalized cross-attention score $S_u(i, j)$ between query sequence $i$ and candidate reference $j$ at coordinate $u$ becomes:
+\begin{equation}
+S_u(i, j) = \frac{(\mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u))^T (\mathbf{R}(\bm{\theta}_j) \mathbf{k}_j(u))}{\sqrt{d_{\text{head}}}} + \text{PhyloBias}_{i, j}.
+\label{eq:methods_composite_score}
+\end{equation}
+
+\subsection{Unpolarized Root Sink Architecture and Autapomorphy Absorption}
+\label{subsec:methods_root_sink}
+
+Standard cross-attention mechanisms normalize probability exclusively across contemporary leaves, creating structural vulnerability to lineage-specific rate variation.
+Private mutations lack donors.
+When an isolated lineage undergoes an episodic substitution burst---such as APOBEC3G cytidine deamination or accelerated heterotachy---private mutations lack homologous counterparts in contemporary clades.
+Without an unpolarized reference, softmax forces these private mutations to affiliate with whichever contemporary leaf presents the smallest stochastic mismatch, generating severe false positive recombination calls.
+
+To insulate trajectory inference from unreticulated rate bursts, \RhizAeon reserves index zero in the sequence dimension for an unpolarized ancestral root token $\mathbf{x}_{\text{root}}$.
+The root token is anchored at the origin of the Buneman metric space:
+\begin{equation}
+\mathbf{x}_{\text{root}} = \mathbf{0} = (0, 0, \dots, 0)^T \in \mathbb{R}^d.
+\label{eq:methods_root_anchor}
+\end{equation}
+For an alignment of $N$ contemporary reference genomes, the cross-attention operator operates over $N+1$ nodes, spanning the ancestral root ($j=0$) and all contemporary leaves ($j=1, \dots, N$).
+The softmax normalization strictly conserves probability across all $N+1$ nodes:
+\begin{equation}
+A_u(i \to j) = \frac{\exp(S_u(i, j))}{\sum_{k=0}^N \exp(S_u(i, k))}, \quad \text{such that} \quad A_u(i \to 0) + \sum_{j=1}^N A_u(i \to j) = 1.0.
+\label{eq:methods_root_softmax}
+\end{equation}
+
+\begin{proof}[Proof of Autapomorphy Absorption]
+Consider a genomic site $u$ where sequence $i$ acquires a private autapomorphic mutation that does not match any contemporary reference genome $j \in \{1, \dots, N\}$.
+For all contemporary leaves $j \ge 1$, the mismatch depresses both query-key matching and the phylogenetic prior, yielding low scores $S_u(i, j) \le S_{\text{mismatch}}$.
+In contrast, the unpolarized root token at $\mathbf{x}_{\text{root}} = \mathbf{0}$ represents the baseline unmutated ancestral state with neutral substitution distance, maintaining $S_u(i, 0) = S_{\text{root}} > S_{\text{mismatch}}$.
+In the limit where private divergence increases:
+\begin{equation}
+\lim_{S_u(i, j) \to -\infty, \, \forall j \ge 1} A_u(i \to 0) = \frac{\exp(S_u(i, 0))}{\exp(S_u(i, 0)) + \sum_{j=1}^N \exp(S_u(i, j))} = 1.0,
+\end{equation}
+and $A_u(i \to j) \to 0.0$ for all $j \ge 1$.
+Consequently, autapomorphic substitution bursts route their attention flux into node zero rather than contemporary leaves, preventing spurious donor excursions and guaranteeing a 0.00\% false positive rate under biological heterotachy.
+\end{proof}
+Sinks absorb outliers.
+
+\subsection{Continuous Trajectory Integration and Brownian Bridge Inference}
+\label{subsec:methods_brownian_bridge}
+
+At individual polymorphic sites, instantaneous attention weights exhibit stochastic high-frequency jitter.
+To extract continuous evolutionary trajectories, \RhizAeon integrates attention into cumulative trajectory curves.
+Let $\mathcal{B}_m \subset \{1, \dots, N\}$ denote the set of reference genomes belonging to phylogenetic clade $m$.
+The instantaneous bundle attention is $\alpha_{i, m}(u) = \sum_{j \in \mathcal{B}_m} A_u(i \to j)$.
+The continuous cumulative attention curve $C_{i, m}(u)$ represents the integrated affinity to clade $m$ up to coordinate $u$:
+\begin{equation}
+C_{i, m}(u) = \sum_{v=1}^u \alpha_{i, m}(v) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} A_v(i \to j).
+\label{eq:methods_cum_curve}
+\end{equation}
+
+The home clade $m_{\text{home}}(i)$ is identified as the lineage accumulating the greatest integrated affinity across the full chromosome:
+\begin{equation}
+m_{\text{home}}(i) = \arg\max_m C_{i, m}(L).
+\label{eq:methods_home_clade}
+\end{equation}
+For any candidate donor clade $m \neq m_{\text{home}}$, we formulate the differential attention trajectory as:
+\begin{equation}
+Y_{i, m}(u) = C_{i, m}(u) - C_{i, m_{\text{home}}}(u).
+\label{eq:methods_diff_trajectory}
+\end{equation}
+Under clonal evolution within the parental background, attention to the home clade exceeds donor attention at nearly all sites ($A_v(i \to \text{home}) > A_v(i \to m)$), causing $Y_{i, m}(u)$ to drift monotonically downward with negative slope.
+Recombination reverses the derivative: within a converted donor tract $[u_1, u_2]$, donor attention dominates, producing a positive slope ($dY/du > 0$) and a prominent upward excursion.
+Bridges bound excursions.
+
+To test the clonal null hypothesis $H_0$, we construct the centered Brownian bridge process $B_{i, m}(u)$ by subtracting the chromosome-wide linear drift:
+\begin{equation}
+B_{i, m}(u) = Y_{i, m}(u) - \frac{u}{L} Y_{i, m}(L), \quad u \in [1, L].
+\label{eq:methods_brownian_bridge}
+\end{equation}
+Let $\Delta Y(u) = Y(u) - Y(u-1)$ denote the local trajectory increments, with sample mean $\bar{\Delta Y} = \frac{1}{L} Y(L)$ and empirical increment variance:
+\begin{equation}
+\sigma^2 = \frac{1}{L - 1} \sum_{u=1}^L \left( \Delta Y(u) - \bar{\Delta Y} \right)^2.
+\label{eq:methods_sigma_sq}
+\end{equation}
+
+Under the clonal null hypothesis $H_0$, the increments are stationary and unreticulated.
+By Donsker's functional central limit theorem \cite{donsker1951invariance}, the standardized process:
+\begin{equation}
+W_L^0(t) = \frac{B_{i, m}(\lfloor t L \rfloor)}{\sigma \sqrt{L}}, \quad t \in [0, 1],
+\label{eq:methods_donsker_bridge}
+\end{equation}
+converges weakly as $L \to \infty$ to a standard Brownian bridge $W^0(t)$ with continuous sample paths, mean $\mathbb{E}[W^0(t)] = 0$, and covariance $\operatorname{Cov}(W^0(s), W^0(t)) = \min(s, t) - s t$.
+The supremum of the absolute bridge trajectory follows the two-sided Kolmogorov distribution:
+\begin{equation}
+P\left( \sup_{t \in [0, 1]} |W^0(t)| \le z \right) = 1 - 2 \sum_{k=1}^\infty (-1)^{k-1} \exp\left(-2 k^2 z^2\right).
+\label{eq:methods_kolmogorov_cdf}
+\end{equation}
+
+To control the family-wise error rate (FWER) across all $M_{\text{topo}} = \binom{N}{2} \max(1, N - 2)$ testable donor-recipient reticulation topologies at nominal significance $\alpha = 0.05$, we apply the Dunn-\v{S}id\'{a}k extreme-value correction \cite{sidak1967rectangular}:
+\begin{equation}
+K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( 1 - (1 - \alpha)^{1 / M_{\text{topo}}} \right)} \approx \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2 M_{\text{topo}}} \right)}.
+\label{eq:methods_sidak_bound}
+\end{equation}
+If the normalized trajectory supremum satisfies:
+\begin{equation}
+\frac{\sup_{u \in [1, L]} |B_{i, m}(u)|}{\sigma \sqrt{L}} \ge K_{\text{crit}},
+\label{eq:methods_rejection_rule}
+\end{equation}
+\RhizAeon rejects the clonal null hypothesis and confirms a statistically significant reticulation event.
+
+\subsection{Dyadic Scale-Space Matched Filtering and Running Drawdown}
+\label{subsec:methods_scalespace_drawdown}
+
+For short genetic conversions and micro-recombinations ($< 200\text{ nt}$), global Brownian bridge tests can suffer signal dilution across multi-kilobase chromosomes.
+To achieve multi-scale sensitivity, \RhizAeon convolves the differential trajectory flux $\Delta Y(u)$ with a bank of zero-mean bipolar dyadic matched filters $h_\tau(s)$ evaluated across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$ nucleotides:
+\begin{equation}
+h_\tau(s) = \begin{cases} +1, & 0 \le s < \tau/2 \\ -1, & \tau/2 \le s < \tau \\ 0, & \text{otherwise} \end{cases}.
+\label{eq:methods_wavelet}
+\end{equation}
+The discrete convolution $(dY * h_\tau)(u) = \sum_{s=0}^\tau \Delta Y(u - s) h_\tau(s)$ isolates rapid step transitions across dyadic scale space.
+Wavelets isolate tracts.
+
+Concurrently, \RhizAeon tracks the running high-water mark $M(u)$ and running drawdown $\text{DD}(u)$:
+\begin{equation}
+M(u) = \max_{1 \le v \le u} Y(v), \quad \text{DD}(u) = M(u) - Y(u).
+\label{eq:methods_running_dd}
+\end{equation}
+The drawdown metric localizes points where trajectory momentum collapses, marking the exit boundary $u_2$ of a donor tract.
+To distinguish single crossovers from intercalary cassette swaps, we evaluate the normalized energy density ratio of the trajectory excursions outside versus inside the candidate tract $[u_1, u_2]$:
+\begin{equation}
+\mathcal{E}_{\text{ratio}} = \frac{\frac{1}{L - (u_2 - u_1)} \int_{u \notin [u_1, u_2]} (Y(u) - Y_{\text{base}})^2 \, du}{\frac{1}{u_2 - u_1} \int_{u_1}^{u_2} (Y(u) - Y_{\text{base}})^2 \, du},
+\label{eq:methods_energy_ratio}
+\end{equation}
+where $Y_{\text{base}}$ denotes the linear baseline drift.
+A single crossover spans half the chromosome, producing high residual energy across the alignment ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
+In contrast, an intercalary cassette returns cleanly to baseline on both flanks, characterized by $\mathcal{E}_{\text{ratio}} < 0.15$.
+
+\subsection{Physical Force Field Deconvolution and Random Matrix Halting}
+\label{subsec:methods_force_field}
+
+To deconvolve complex multi-way mosaicism, \RhizAeon models trajectory excursions as physical displacements within an evolutionary force field.
+We parameterize the evolutionary pull of the home lineage as a Hookean restoring potential $U(\mathbf{z}) = \frac{1}{2} \lambda \|\mathbf{z} - \mathbf{z}_{\text{home}}\|^2$, generating a continuous restoring force:
+\begin{equation}
+\mathbf{f}(u) = -\nabla U = -\lambda \left(\mathbf{z}(u) - \mathbf{z}_{\text{home}}\right) \in \mathbb{R}^d.
+\label{eq:methods_force_vector}
+\end{equation}
+
+Across a candidate breakpoint boundary, let $\mathbf{f}_{\text{left}}$ and $\mathbf{f}_{\text{right}}$ denote the mean force vectors on the flanking intervals.
+The directional deflection angle $\theta$ satisfies $\cos \theta = \frac{\langle \mathbf{f}_{\text{left}}, \mathbf{f}_{\text{right}} \rangle}{\|\mathbf{f}_{\text{left}}\| \|\mathbf{f}_{\text{right}}\|}$, and the step velocity is $v_{\text{step}} = \|\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}\|$.
+The dynamic velocity reversal score is defined as:
+\begin{equation}
+R = v_{\text{step}} (1 - \cos \theta).
+\label{eq:methods_velocity_reversal}
+\end{equation}
+Forces deconvolve modes.
+To achieve scale-invariance across cohorts of varying divergence, we standardize the velocity reversal along the unit parental dipole axis $\mathbf{d}_{\text{hat}} = \frac{\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}}{\|\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}\|}$:
+\begin{equation}
+Z_{\text{flip}} = \frac{\left| (\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}) \cdot \mathbf{d}_{\text{hat}} \right|}{\sqrt{\frac{\sigma_{\text{left}}^2}{L_{\text{left}}} + \frac{\sigma_{\text{right}}^2}{L_{\text{right}}}}},
+\label{eq:methods_z_flip}
+\end{equation}
+where $\sigma_{\text{left}}^2, \sigma_{\text{right}}^2$ represent residual force variances along $\mathbf{d}_{\text{hat}}$ across flanking segments of lengths $L_{\text{left}}, L_{\text{right}}$.
+
+For alignments exhibiting multiple recombinant tracts, we stack force vectors into the spatio-temporal force matrix $\mathbf{F} \in \mathbb{R}^{N \times L}$ and perform singular value decomposition:
+\begin{equation}
+\mathbf{F} = \sum_{m=1}^r s_m \mathbf{u}_m \mathbf{v}_m^T,
+\label{eq:methods_svd_peeling}
+\end{equation}
+where $s_1 \ge s_2 \ge \dots \ge s_r$ denote singular values.
+Each detected reticulation mode $m$ is deconvolved via iterative mode peeling, subtracting $s_m \mathbf{u}_m \mathbf{v}_m^T$ from $\mathbf{F}$.
+To prevent over-segmentation and halt peeling when residual variation reflects neutral coalescent drift, we apply random matrix theory.
+Under the unreticulated null hypothesis, the singular values of an $N \times L$ random noise matrix follow the Marchenko-Pastur distribution \cite{marchenko1967distribution}.
+The theoretical upper boundary of the bulk spectral noise edge is:
+\begin{equation}
+s_{\text{bulk}} = \sigma \sqrt{L} \left( 1 + \sqrt{\frac{N}{L}} \right),
+\label{eq:methods_marchenko_pastur}
+\end{equation}
+where $\sigma$ represents the baseline standard deviation of empirical force increments.
+Mode peeling halts when the leading residual singular value satisfies $s_m \le s_{\text{bulk}}$, terminating iteration without manual parameter tuning.
+
+\subsection{Profile Maximum Likelihood Breakpoint Polishing}
+\label{subsec:methods_polisher}
+
+Following changepoint localization from continuous trajectory dynamics, \RhizAeon refines candidate breakpoints down to single-nucleotide resolution using profile maximum likelihood polishing.
+Within a local search radius $[u_{\text{init}} - \delta, u_{\text{init}} + \delta]$ (default $\delta = 50\text{ nt}$), the engine scans each candidate coordinate $c$ and computes the partitioned log-likelihood:
+\begin{equation}
+\ln \mathcal{L}(c) = \sum_{u=1}^c \ln P\left(s_{\text{rec}}(u) \mid s_{\text{left}}(u)\right) + \sum_{u=c+1}^L \ln P\left(s_{\text{rec}}(u) \mid s_{\text{right}}(u)\right),
+\label{eq:methods_profile_likelihood}
+\end{equation}
+where $P(s_{\text{rec}}(u) \mid s(u))$ denotes the conditional probability of the recombinant state given the parental sequence under the fitted nucleotide substitution model.
+
+When invariant or uninformative sites intervene between flanking parental polymorphisms, the likelihood function forms a flat plateau.
+Rather than reporting an arbitrary midpoint, \RhizAeon reports the exact informational plateau $[c_{\text{left}}, c_{\text{right}}]$:
+\begin{equation}
+[c_{\text{left}}, c_{\text{right}}] = \left\{ c \in [1, L] : \ln \mathcal{L}(c) \ge \max_{c'} \ln \mathcal{L}(c') - \Delta_{\text{thresh}} \right\},
+\label{eq:methods_info_plateau}
+\end{equation}
+where $\Delta_{\text{thresh}} = 1.92$ corresponds to the 95\% confidence interval under a $\chi_1^2$ likelihood ratio test.
+The boundary coordinates $c_{\text{left}}$ and $c_{\text{right}}$ demarcate the exact flanking informative polymorphisms that physically bound the genetic exchange.
+Plateaus bound breakpoints.

@@ -12,22 +12,20 @@ In modern genomic surveillance, cohorts encompass thousands of contemporary isol
 Diversity seeds geometry.
 Instead of evaluating all pairs, the engine extracts a sparse basis of $N$ reference landmarks using sequential Farthest-Point Sampling \cite{gonzalez1985clustering}.
 The algorithm seeds the initial reference with the sequence exhibiting maximal non-gap coverage, computing pairwise distances to all $M$ isolates in linear time.
-Each subsequent landmark is selected by maximizing the minimum evolutionary distance to the existing reference set, updating running distance minima in $O(M L)$ operations: $s_k = \arg\max_{i} \min_{j < k} d(i, s_j)$.
+Each subsequent landmark is selected by maximizing the minimum evolutionary distance to the existing reference set, updating running distance minima in $O(M L)$ operations (see Materials and Methods, Section~\ref{subsec:methods_landmark_sampling}).
 Selecting $N$ reference genomes across $M$ isolates collapses distance computations from $\binom{M}{2}$ to strictly $N \times M$.
 For an alignment of 10,000 genomes with $N = 16$ landmarks, distance evaluations drop from fifty million to 160,000---a 300-fold empirical reduction.
 Linear scaling triumphs.
 
-From these $N$ reference genomes, we construct the evolutionary distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$ under the Tamura-Nei substitution model with pairwise deletion of gap characters \cite{tamura1993estimation}.
+From these $N$ reference genomes, classical multidimensional scaling of the Tamura-Nei pairwise distance matrix constructs an invariant, low-dimensional coordinate basis \cite{tamura1993estimation,gower1966some} (see Materials and Methods, Section~\ref{subsec:methods_landmark_sampling}).
 In our retroviral benchmark, the reference set comprises $N = 22$ genomes (eight Subtype B references, eight Subtype C references, three CRF07\_BC isolates, and three CRF08\_BC isolates).
-We center squared distances using the projection operator $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$, forming the inner-product Gram matrix $\mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}$ \cite{gower1966some}.
-Spectral decomposition of $\mathbf{B}$ yields non-negative eigenvalues $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_N \ge 0$ and orthonormal eigenvectors $\mathbf{v}_1, \dots, \mathbf{v}_N$.
-We retain the leading $d$ dimensions to define the continuous sequence embedding space $\mathbb{R}^d$, mapping each reference genome to continuous coordinates $\mathbf{x}_i = (\sqrt{\lambda_1} v_{1, i}, \dots, \sqrt{\lambda_d} v_{d, i})^T \in \mathbb{R}^d$.
-What does $d$ represent?
+Spectral decomposition of the centered distance Gram matrix yields non-negative eigenvalues and orthonormal eigenvectors, mapping each reference genome to continuous coordinates $\mathbf{x}_i \in \mathbb{R}^d$.
+What does $d$ represent in this embedding space?
 In geometric sequence space, $d$ denotes the number of orthogonal macroscopic axes of phylogenetic divergence.
 Splits define dimensions.
 By Buneman's metric tree theorem, additive phylogenetic trees embed isometrically into low-dimensional Euclidean spaces satisfying four-point metric conditions \cite{buneman1974note}.
-The dominant dimension $Z_1$ ($c=1$) captures the deepest bifurcation, accounting for 50.8\% of total variance in our retroviral benchmark and cleanly segregating Subtype B from Subtype C (Figure~\ref{fig:theory_metric_trajectories}A).
-The secondary dimension $Z_2$ ($c=2$) captures orthogonal intra-clade divergence (21.4\% of variance), separating sub-lineages and providing the essential degree of freedom to resolve recombinant trajectories into open orbital loops.
+The dominant dimension $Z_1$ captures the deepest bifurcation, accounting for 50.8\% of total variance in our retroviral benchmark and cleanly segregating Subtype B from Subtype C (Figure~\ref{fig:theory_metric_trajectories}A).
+The secondary dimension $Z_2$ captures orthogonal intra-clade divergence (21.4\% of variance), separating sub-lineages and providing the essential degree of freedom to resolve recombinant trajectories into open orbital loops.
 Higher dimensions decay into a Marchenko-Pastur bulk spectral tail of neutral mutational jitter.
 Low dimensions filter noise.
 Restricting coordinates to $d \in \{2, 3, 4\}$ acts as an intrinsic physical filter, preserving macroscopic clade topology while projecting stochastic autapomorphic noise into the null space.
@@ -35,8 +33,8 @@ Restricting coordinates to $d \in \{2, 3, 4\}$ acts as an intrinsic physical fil
 To track sequence affinity along the chromosome, each genome requires an instantaneous coordinate at every position $u \in [1, L]$.
 Recalculating multidimensional scaling across sliding windows would distort the geometric space and require expensive Procrustes rotations.
 Rotations destabilize tracking.
-Instead, we project local distance vectors into the fixed coordinate basis using Gower's analytical out-of-sample mapping \cite{gower1968adding}.
-At coordinate $u$, sequence $i$ presents an instantaneous distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to the $N$ reference genomes, projecting to $\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_d^{-1/2} \mathbf{V}_d^T (\bar{\mathbf{d}}^2 - \mathbf{d}_i^2(u)) \in \mathbb{R}^d$, where $\mathbf{\Lambda}_d = \operatorname{diag}(\lambda_1, \dots, \lambda_d)$, $\mathbf{V}_d = [\mathbf{v}_1, \dots, \mathbf{v}_d] \in \mathbb{R}^{N \times d}$, and $\bar{\mathbf{d}}^2 = \frac{1}{N} \mathbf{D}^{(2)} \mathbf{1}_N$ represents the mean squared reference distance.
+Instead, \RhizAeon projects local distance vectors into the fixed coordinate basis using Gower's analytical out-of-sample mapping \cite{gower1968adding} (see Materials and Methods, Section~\ref{subsec:methods_gower_projection}).
+At coordinate $u$, sequence $i$ presents an instantaneous local distance vector to the $N$ reference genomes, projecting to continuous coordinate $\mathbf{z}_i(u) \in \mathbb{R}^d$ through a single matrix-vector multiplication.
 An invariant coordinate basis eliminates Procrustes alignment overhead and establishes a fixed spatial reference frame across the entire chromosome.
 Coordinates remain globally comparable.
 
@@ -53,7 +51,7 @@ Manifolds preserve chimeras.
 \centering
 \includegraphics[width=\textwidth]{figures/fig1_theory_metric_trajectories.pdf}
 \caption{\textbf{Continuous sequence metric manifolds resolve competing retroviral chimeras in linear time without triplet enumeration.}
-\textbf{(A)} Canonical Sequence Metric Space: Classical multidimensional scaling (MDS) embedding of the invariant Gram matrix $\mathbf{B}$ derived from global pairwise Tamura-Nei distances ($N=22$). The primary axis $Z_1$ (50.8\% variance) cleanly separates Subtype B references ($n=8$, blue circles) from Subtype C references ($n=8$, vermilion circles). Recombinant forms CRF07\_BC ($n=3$, green diamonds) and CRF08\_BC ($n=3$, purple squares) sit compressed at intermediate coordinates ($Z_1 \approx -0.03$ to $-0.04$). Whole-genome distances collapse mosaic structures into static averages, obscuring reticulate ancestry.
+\textbf{(A)} Canonical Sequence Metric Space: Classical multidimensional scaling (MDS) embedding of the invariant Gram matrix derived from global pairwise Tamura-Nei distances ($N=22$). The primary axis $Z_1$ (50.8\% variance) cleanly separates Subtype B references ($n=8$, blue circles) from Subtype C references ($n=8$, vermilion circles). Recombinant forms CRF07\_BC ($n=3$, green diamonds) and CRF08\_BC ($n=3$, purple squares) sit compressed at intermediate coordinates ($Z_1 \approx -0.03$ to $-0.04$). Whole-genome distances collapse mosaic structures into static averages, obscuring reticulate ancestry.
 \textbf{(B)} Clonal Stationarity and Coalescent Wobble: Instantaneous Gower out-of-sample projected trajectory $Z_1(u)$ ($W=300\text{ nt}$, stride $10\text{ nt}$) along the 3,120-nucleotide \textit{pol} gene for the 16 non-recombinant references. Both clades remain strictly stationary within their empirical envelopes (Subtype B mean $= +0.052$, flutter $\sigma = 0.008$; Subtype C mean $= -0.053$, flutter $\sigma = 0.012$). Point mutations generate local coalescent flutter, but unreticulated trajectories never cross the inter-clade divide ($Z_1 = 0$).
 \textbf{(C)} Dynamic Recombinant Trajectories and Resolved Breakpoints: Continuous $Z_1(u)$ trajectories for CRF07\_BC (prototype AF286230, green) and CRF08\_BC (prototype AY008715, purple) plotted against shaded parental reference corridors. Aligned beneath is the HIV-1 \textit{pol} functional domain track ($p6^*$, PR, RT, RNase H, IN). In Protease (PR), CRF07 tracks within Subtype B while CRF08 tracks within Subtype C. In Reverse Transcriptase, both lineages enter a Subtype B cassette. CRF08 crosses the zero-axis at nucleotide 894, entering approximately 60 nucleotides upstream of CRF07 (nucleotide 953). Both exit back into Subtype C at nucleotide $\sim 1,230$ and remain in Subtype C through Integrase.
 \textbf{(D)} Metric Phase Space Dynamics: Continuous two-dimensional dynamical orbits in $(Z_1 \times Z_2)$ space. Non-recombinant parental lineages form stationary point basins at $(+0.05, 0.00)$ and $(-0.05, 0.04)$. Recombinant lineages trace smooth, open orbital loops that sweep across the inter-clade divide from $5'$ start positions (circles) to $3'$ terminal positions (squares) with tangent flow arrows. Continuous manifold geometry resolves distinct mosaic architectures in $O(N)$ time without combinatorial explosion.}
@@ -63,35 +61,17 @@ Manifolds preserve chimeras.
 \subsection{Rotary Phase Embeddings and Markov Substitution Priors}
 \label{subsec:rotary_prior}
 
-Standard transformer architectures encode sequential position along one-dimensional strings using Rotary Position Embeddings (Tree-RoPE), but biological sequences diverge across multidimensional evolutionary space.
+Standard transformer architectures encode sequential position along one-dimensional strings using Rotary Position Embeddings (RoPE), but biological sequences diverge across multidimensional evolutionary space \cite{su2024roformer}.
 Linear string offsets cannot capture tree distance.
-To integrate phylogenetic divergence directly into sequence attention, we generalize rotary embeddings from one-dimensional sequence indices to continuous metric coordinates \cite{su2024roformer}.
-For each sequence $i$, its $d$-dimensional Buneman coordinate $\mathbf{x}_i \in \mathbb{R}^d$ parameterizes a set of rotary phase angles:
-\begin{equation}
-\theta_{i, m} = \sum_{c=1}^d x_{i, c} \Theta_{m, c},
-\label{eq:tree_rope_angle}
-\end{equation}
-where $\mathbf{\Theta} \in \mathbb{R}^{d_{\text{head}}/2 \times d}$ is a fixed frequency projection matrix.
-At each aligned site $u$, the sequence embedding generates query and key vectors $\mathbf{q}_i(u), \mathbf{k}_i(u) \in \mathbb{R}^{d_{\text{head}}}$.
-We apply two-dimensional block-diagonal Givens rotation matrices $\mathbf{R}(\theta_i)$ to rotate query and key representations according to each taxon's continuous metric position.
-Because the inner product satisfies $\langle \mathbf{R}(\theta_i) \mathbf{q}_i, \mathbf{R}(\theta_j) \mathbf{k}_j \rangle = \mathbf{q}_i^T \mathbf{R}(\theta_j - \theta_i) \mathbf{k}_j$, pairwise attention naturally attenuates as evolutionary divergence in Buneman metric space increases.
+To integrate phylogenetic divergence directly into sequence attention, we generalize rotary embeddings from one-dimensional sequence indices to continuous metric coordinates (see Materials and Methods, Section~\ref{subsec:methods_treerope_prior}).
+For each sequence, its $d$-dimensional Buneman coordinate $\mathbf{x}_i \in \mathbb{R}^d$ parameterizes a set of rotary phase angles that rotate query and key representations.
+Because vector inner products attenuate as the angular separation between rotated representations widens, pairwise attention naturally decays as evolutionary divergence in Buneman metric space increases.
 Rotations preserve geometry.
 
 Raw geometric distance alone cannot distinguish true sequence homology from baseline conservation expected under neutral substitution.
 Homology requires evolutionary calibration.
-We therefore incorporate a log-space continuous-time Markov substitution prior directly into the attention logits.
-For any sequence pair $(i, j)$ separated by evolutionary distance $d_{i, j}$, the transition probability under a neutral continuous-time Markov substitution model with equilibrium frequency $\epsilon_0$ is:
-\begin{equation}
-P_{i, j} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h d_{i, j}),
-\label{eq:phylo_prior}
-\end{equation}
-where $\lambda_h$ is the global substitution scaling rate and $\epsilon_0 = 0.25$ for nucleotides.
-We formulate the phylogenetic prior bias as $\text{PhyloBias}_{i, j} = \ln[\max(10^{-5}, P_{i, j})]$.
-The composite unnormalized attention score between sequence $i$ and candidate reference $j$ at coordinate $u$ becomes:
-\begin{equation}
-S_u(i, j) = \frac{(\mathbf{R}(\theta_i) \mathbf{q}_i(u))^T (\mathbf{R}(\theta_j) \mathbf{k}_j(u))}{\sqrt{d_{\text{head}}}} + \text{PhyloBias}_{i, j}.
-\label{eq:composite_attention}
-\end{equation}
+We therefore incorporate a log-space continuous-time Markov substitution prior directly into the attention logits (see Materials and Methods, Section~\ref{subsec:methods_treerope_prior}).
+For any sequence pair separated by evolutionary distance, the prior penalizes matches that fall within the expectation of neutral drift while amplifying matches that require horizontal exchange to explain observed identity.
 Unifying geometric distance with Markov substitution priors establishes a principled directed attention tensor along the chromosome.
 
 \subsection{The Unpolarized Ancestral Root Sink Token}
@@ -102,76 +82,45 @@ Private mutations lack donors.
 When an isolated lineage undergoes an episodic substitution burst---such as host-mediated APOBEC3G cytidine deamination or accelerated heterotachy---conventional models mistake localized divergent clusters for horizontal genetic exchange \cite{posada2001evaluation}.
 Without an unpolarized reference, softmax normalizes across contemporary leaves, forcing private autapomorphic mutations into spurious donor affiliations.
 False positives surge.
-To insulate trajectory tracking from unreticulated rate bursts, \RhizAeon reserves index zero in the sequence dimension for an unpolarized ancestral root token $\mathbf{x}_{\text{root}}$.
+To insulate trajectory tracking from unreticulated rate bursts, \RhizAeon reserves index zero in the sequence dimension for an unpolarized ancestral root token $\mathbf{x}_{\text{root}}$ anchored at the origin of the metric space (see Materials and Methods, Section~\ref{subsec:methods_root_sink}).
 
-The root token is anchored at the origin of the Buneman metric space:
-\begin{equation}
-\mathbf{x}_{\text{root}} = \mathbf{0} \in \mathbb{R}^d.
-\label{eq:root_anchor}
-\end{equation}
-For an alignment of $N$ contemporary sequences, the cross-attention operator operates over $N+1$ nodes, spanning the ancestral root and all contemporary leaves.
-The softmax normalization strictly conserves probability across all $N+1$ nodes:
-\begin{equation}
-A_u(i \to \text{root}) + \sum_{j=1}^N A_u(i \to j) = 1.0.
-\label{eq:root_softmax}
-\end{equation}
+Cross-attention operates over all contemporary leaves plus the ancestral root node, strictly conserving total probability.
 Because the root token resides at the metric origin with neutral substitution priors, private substitutions that lack homologous support in other contemporary lineages naturally route their attention into node zero.
 The root acts as an unpolarized sink.
 Private noise is absorbed without perturbing leaf coordinates.
 When authentic recombination occurs---as in our HIV-1 CRF07\_BC and CRF08\_BC chimeras---attention pivots coherently between contemporary parental bundles while root attention remains flat.
 Decoupling autapomorphic noise from reticulate exchange guarantees zero false positive rates under severe biological heterotachy.
 
-\subsection{Continuous Trajectory Dynamics and Statistical Change-Point Inference}
+\subsection{Continuous Trajectory Dynamics and Physical Change-Point Inference}
 \label{subsec:changepoint}
 
 Instantaneous attention weights fluctuate at individual polymorphic sites.
 Mutations produce high-frequency jitter.
-To extract continuous evolutionary trajectories from noisy site-level attention tensors, \RhizAeon integrates attention into continuous cumulative trajectory curves.
-For sequence $i$ and reference bundle $m$, the cumulative attention curve represents the integrated evolutionary affinity up to coordinate $u$:
-\begin{equation}
-C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} A_v(i \to j).
-\label{eq:cumulative_attention}
-\end{equation}
-The dominant lineage across the full chromosome defines the home clade: $m_{\text{home}}(i) = \arg\max_m C_{i, m}(L)$.
+To extract continuous evolutionary trajectories from noisy site-level attention tensors, \RhizAeon integrates attention into continuous cumulative trajectory curves (see Materials and Methods, Section~\ref{subsec:methods_brownian_bridge}).
+The dominant lineage across the full chromosome defines the home clade.
 Drift governs the null.
-When sequence $i$ evolves clonally within its parental background, attention to the home clade exceeds attention to any divergent reference at nearly every site.
-Consequently, the differential attention curve $Y_{i, m}(u) = C_{i, m}(u) - C_{i, \text{home}}(u)$ exhibits a monotonic negative slope throughout the genome.
+When a sequence evolves clonally within its parental background, attention to the home clade exceeds attention to any divergent reference at nearly every site.
+Consequently, the differential attention curve comparing donor affinity to home affinity exhibits a monotonic negative slope throughout the genome.
 Home affinity pulls downward.
 Point mutations cause temporary minor dips in slope, but the cumulative trajectory drifts relentlessly toward large negative values.
 
 Recombination breaks linearity.
-When a horizontal exchange incorporates foreign genetic material from donor $m$, sequence affinities invert abruptly across the exchange tract $[u_1, u_2]$.
-Within the converted interval, attention to donor $m$ surges while home attention collapses.
-The derivative reverses sign: $dY_{i, m}/du > 0$.
+When a horizontal exchange incorporates foreign genetic material from a donor clade, sequence affinities invert abruptly across the exchange tract.
+Within the converted interval, attention to the donor surges while home attention collapses.
+The trajectory derivative reverses sign.
 The differential curve climbs steeply, tracing a prominent positive excursion that peaks at the terminal exchange boundary before decaying back into negative baseline drift once home sequence resumes.
 Excursions record reticulations.
 Single crossover events generate asymmetric global arches spanning half the chromosome, whereas intercalary cassette insertions trace compact, localized pulses that return cleanly to the clonal baseline on both flanks.
 
-To separate true genetic exchange from neutral coalescent fluctuations, \RhizAeon maps differential attention trajectories into continuous Brownian bridge processes.
-Under the clonal null hypothesis, subtracting the chromosome-wide linear trend yields a centered functional bridge:
-\begin{equation}
-B_{i, m}(u) = Y_{i, m}(u) - \frac{u}{L} Y_{i, m}(L).
-\label{eq:brownian_bridge}
-\end{equation}
-By Donsker's invariance principle, the normalized supremum $\sup_{u} |B_{i, m}(u)| / (\sigma \sqrt{L})$ asymptotically converges to the Kolmogorov distribution.
-Here $\sigma$ represents the empirical diffusion coefficient of the local attention increments.
-Physics bounds the noise.
-To control the family-wise error rate across all pairwise lineage comparisons and coordinate scans, we compute the extreme value boundary crossing threshold via Dunn-Sidak correction:
-\begin{equation}
-K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2M} \right)},
-\label{eq:kolmogorov_bound}
-\end{equation}
-where $M = \binom{N}{2} \max(1, N - 2)$ accounts for all testable donor-recipient reticulation topologies.
-When an observed trajectory exceeds $K_{\text{crit}}$, \RhizAeon rejects the clonal null hypothesis at rigorous confidence.
+To separate true genetic exchange from neutral coalescent fluctuations, \RhizAeon maps differential attention trajectories into continuous Brownian bridge processes (see Materials and Methods, Section~\ref{subsec:methods_brownian_bridge}).
+Subtracting the chromosome-wide linear drift yields a centered functional bridge whose normalized supremum converges asymptotically to the Kolmogorov distribution by Donsker's invariance principle \cite{donsker1951invariance}.
+To control the family-wise error rate across all pairwise lineage comparisons and coordinate scans, we compute an extreme value boundary crossing threshold via Dunn-Sidak correction \cite{sidak1967rectangular}.
+When an observed trajectory exceeds the critical boundary, \RhizAeon rejects the clonal null hypothesis at rigorous statistical confidence.
 
 For short conversion tracts and micro-recombinations, standard bridge tests can dilute localized signals across multi-kilobase chromosomes.
 Cassettes require scale-space filters.
-We therefore convolve the differential attention flux $dY$ with a bank of zero-mean dyadic matched filter wavelets $h_\tau(s)$ evaluated across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$ nucleotides.
-Dyadic filters zoom into tracts.
-Concurrently, \RhizAeon tracks the running drawdown $\text{DD}(u) = \max_{v \le u} Y(v) - Y(u)$, localizing rapid polarity shifts where trajectory momentum collapses.
-Candidate breakpoints undergo physical force field deconvolution.
-We measure dynamic metric velocity reversals along the parental dipole axis: $R = v_{\text{step}} (1 - \cos \theta)$, where $\theta$ denotes the directional deflection angle between flanking segmental force vectors.
+We therefore convolve the differential attention flux with a bank of zero-mean dyadic matched filter wavelets evaluated across scales from 15 to 500 nucleotides, while tracking running drawdowns to pinpoint rapid momentum collapses (see Materials and Methods, Section~\ref{subsec:methods_scalespace_drawdown}).
+Candidate breakpoints undergo physical force field deconvolution, measuring dynamic metric velocity reversals along the parental dipole axis (see Materials and Methods, Section~\ref{subsec:methods_force_field}).
 Lineage transitions invert momentum.
-To prevent over-segmentation in highly diverged cohorts, mode peeling halts when the residual singular value falls below the Marchenko-Pastur bulk spectral edge $s_{\text{bulk}} = \sigma \sqrt{L} (1 + \sqrt{N/L})$.
-Random matrix theory halts peeling.
-Finally, a profile maximum likelihood polisher refines candidate changepoints down to single-nucleotide coordinates, reporting the exact informational plateau $[c_{\text{left}}, c_{\text{right}}]$ where flanking parental substitutions cease to provide discriminative phylogenetic information.
+To prevent over-segmentation in highly diverged cohorts, mode peeling halts when the residual singular value falls below the Marchenko-Pastur bulk spectral edge of random matrix theory \cite{marchenko1967distribution}.
+Finally, a profile maximum likelihood polisher refines candidate changepoints down to single-nucleotide coordinates, reporting the exact informational plateau where flanking parental substitutions cease to provide discriminative phylogenetic information (see Materials and Methods, Section~\ref{subsec:methods_polisher}).

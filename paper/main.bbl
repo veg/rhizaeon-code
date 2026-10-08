@@ -51,6 +51,11 @@ Xavier Didelot and Martin C~J Maiden.
 \newblock Impact of recombination on bacterial evolution.
 \newblock {\em Trends in Microbiology}, 18(7):315--322, 2010.
 
+\bibitem{donsker1951invariance}
+Monroe~D. Donsker.
+\newblock An invariance principle for certain probability limit theorems.
+\newblock {\em Memoirs of the American Mathematical Society}, 6:1--12, 1951.
+
 \bibitem{glais2002}
 I~Glais, M~Tribodet, and C~Kerlan.
 \newblock Genomic variability in {Potato} potyvirus {Y} ({PVY}): evidence that
@@ -96,6 +101,11 @@ H~M Lam, O~Ratmann, and M~F Boni.
 \newblock Improved algorithmic complexity for the {3SEQ} recombination
   detection algorithm.
 \newblock {\em Molecular Biology and Evolution}, 35(1):247--251, 2018.
+
+\bibitem{marchenko1967distribution}
+Vladimir~A. Marchenko and Leonid~A. Pastur.
+\newblock Distribution of eigenvalues for some sets of random matrices.
+\newblock {\em Mathematics of the USSR-Sbornik}, 1(4):457--483, 1967.
 
 \bibitem{martin2015rdp4}
 Darren~P Martin, Ben Murrell, Michael Golden, Arshan Khoosal, and Brejnev
@@ -150,6 +160,13 @@ Loren~H Rieseberg, Olivier Raymond, David~M Rosenthal, Zhao Lai, Kevin
 Mikkel~H Schierup and Jotun Hein.
 \newblock Consequences of recombination on traditional phylogenetic analysis.
 \newblock {\em Genetics}, 156(2):879--891, 2000.
+
+\bibitem{sidak1967rectangular}
+Zbyn{\v{e}}k {\v{S}}id{\'a}k.
+\newblock Rectangular confidence regions for the means of multivariate normal
+  distributions.
+\newblock {\em Journal of the American Statistical Association},
+  62(318):626--633, 1967.
 
 \bibitem{simonloriere2011recombination}
 Etienne Simon-Loriere and Edward~C Holmes.

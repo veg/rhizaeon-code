@@ -3,7 +3,7 @@
 \BOOKMARK [2][-]{subsection.2.1}{Sequence Metric Space and Buneman Coordinates}{section.2}% 3
 \BOOKMARK [2][-]{subsection.2.2}{Rotary Phase Embeddings and Markov Substitution Priors}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.3}{The Unpolarized Ancestral Root Sink Token}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{Continuous Trajectory Dynamics and Statistical Change-Point Inference}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Continuous Trajectory Dynamics and Physical Change-Point Inference}{section.2}% 6
 \BOOKMARK [1][-]{section.3}{Empirical Benchmarks and Real-World Validation}{}% 7
 \BOOKMARK [2][-]{subsection.3.1}{Adversarial Null Calibration and Immunity to Biological Heterotachy}{section.3}% 8
 \BOOKMARK [2][-]{subsection.3.2}{Multi-Way Mosaicism and Unsampled Lineage Introgression}{section.3}% 9
@@ -11,3 +11,12 @@
 \BOOKMARK [1][-]{section.4}{Discussion and Algorithmic Scaling}{}% 11
 \BOOKMARK [2][-]{subsection.4.1}{Linear Manifold Geometry vs. Combinatorial Triplet Search}{section.4}% 12
 \BOOKMARK [2][-]{subsection.4.2}{Data Governance and Biosafety Compliance}{section.4}% 13
+\BOOKMARK [1][-]{section.5}{Materials and Methods}{}% 14
+\BOOKMARK [2][-]{subsection.5.1}{Farthest-Point Landmark Sampling and Metric Basis Construction}{section.5}% 15
+\BOOKMARK [2][-]{subsection.5.2}{Analytical Gower Out-of-Sample Trajectory Projection}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.3}{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}{section.5}% 17
+\BOOKMARK [2][-]{subsection.5.4}{Unpolarized Root Sink Architecture and Autapomorphy Absorption}{section.5}% 18
+\BOOKMARK [2][-]{subsection.5.5}{Continuous Trajectory Integration and Brownian Bridge Inference}{section.5}% 19
+\BOOKMARK [2][-]{subsection.5.6}{Dyadic Scale-Space Matched Filtering and Running Drawdown}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.7}{Physical Force Field Deconvolution and Random Matrix Halting}{section.5}% 21
+\BOOKMARK [2][-]{subsection.5.8}{Profile Maximum Likelihood Breakpoint Polishing}{section.5}% 22
