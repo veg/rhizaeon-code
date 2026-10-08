@@ -23,12 +23,13 @@ export function init_panic_hook() {
  * Scans a FASTA string for recombination events and returns a JS Object payload
  * @param {string} fasta_str
  * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
  * @returns {any}
  */
-export function scan_fasta(fasta_str, target_landmarks) {
+export function scan_fasta(fasta_str, target_landmarks, compress_snps) {
     const ptr0 = passStringToWasm0(fasta_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.scan_fasta(ptr0, len0, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0);
+    const ret = wasm.scan_fasta(ptr0, len0, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0);
     if (ret[2]) {
         throw takeFromExternrefTable0(ret[1]);
     }
@@ -40,14 +41,15 @@ export function scan_fasta(fasta_str, target_landmarks) {
  * @param {string} fasta_str
  * @param {string | null} [title]
  * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
  * @returns {any}
  */
-export function scan_fasta_dossier(fasta_str, title, target_landmarks) {
+export function scan_fasta_dossier(fasta_str, title, target_landmarks, compress_snps) {
     const ptr0 = passStringToWasm0(fasta_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
     var ptr1 = isLikeNone(title) ? 0 : passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     var len1 = WASM_VECTOR_LEN;
-    const ret = wasm.scan_fasta_dossier(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0);
+    const ret = wasm.scan_fasta_dossier(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0);
     if (ret[2]) {
         throw takeFromExternrefTable0(ret[1]);
     }
@@ -59,9 +61,10 @@ export function scan_fasta_dossier(fasta_str, title, target_landmarks) {
  * @param {string} fasta_str
  * @param {string | null} [title]
  * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
  * @returns {string}
  */
-export function scan_fasta_dossier_json(fasta_str, title, target_landmarks) {
+export function scan_fasta_dossier_json(fasta_str, title, target_landmarks, compress_snps) {
     let deferred4_0;
     let deferred4_1;
     try {
@@ -69,7 +72,7 @@ export function scan_fasta_dossier_json(fasta_str, title, target_landmarks) {
         const len0 = WASM_VECTOR_LEN;
         var ptr1 = isLikeNone(title) ? 0 : passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.scan_fasta_dossier_json(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0);
+        const ret = wasm.scan_fasta_dossier_json(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0);
         var ptr3 = ret[0];
         var len3 = ret[1];
         if (ret[3]) {
@@ -89,9 +92,10 @@ export function scan_fasta_dossier_json(fasta_str, title, target_landmarks) {
  * @param {string} fasta_str
  * @param {string | null} [title]
  * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
  * @returns {string}
  */
-export function scan_fasta_html(fasta_str, title, target_landmarks) {
+export function scan_fasta_html(fasta_str, title, target_landmarks, compress_snps) {
     let deferred4_0;
     let deferred4_1;
     try {
@@ -99,7 +103,7 @@ export function scan_fasta_html(fasta_str, title, target_landmarks) {
         const len0 = WASM_VECTOR_LEN;
         var ptr1 = isLikeNone(title) ? 0 : passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len1 = WASM_VECTOR_LEN;
-        const ret = wasm.scan_fasta_html(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0);
+        const ret = wasm.scan_fasta_html(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0);
         var ptr3 = ret[0];
         var len3 = ret[1];
         if (ret[3]) {
@@ -118,15 +122,16 @@ export function scan_fasta_html(fasta_str, title, target_landmarks) {
  * Scans a FASTA string and returns a formatted JSON string (optimal for zero-copy UI passing)
  * @param {string} fasta_str
  * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
  * @returns {string}
  */
-export function scan_fasta_json(fasta_str, target_landmarks) {
+export function scan_fasta_json(fasta_str, target_landmarks, compress_snps) {
     let deferred3_0;
     let deferred3_1;
     try {
         const ptr0 = passStringToWasm0(fasta_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.scan_fasta_json(ptr0, len0, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0);
+        const ret = wasm.scan_fasta_json(ptr0, len0, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0);
         var ptr2 = ret[0];
         var len2 = ret[1];
         if (ret[3]) {

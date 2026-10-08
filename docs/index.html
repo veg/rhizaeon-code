@@ -417,6 +417,41 @@
       text-align: right;
     }
 
+    /* Braun Precision Segmented Switch */
+    .segmented-switch {
+      display: inline-flex;
+      background: var(--surface-recessed);
+      border: 1px solid var(--border-normal);
+      border-radius: 3px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .segment-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-family: var(--font-sans);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .segment-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .segment-btn.active {
+      background: #ffffff;
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
     /* The Iconic Braun Orange Button (ET66) */
     .btn-braun-primary {
       width: 100%;
@@ -723,11 +758,22 @@
 
           <!-- Instrument Tuning -->
           <div class="controls-group">
-            <div class="slider-row">
+            <div class="slider-row" style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-hairline);">
               <span class="slider-label">Metric Landmarks (K)</span>
               <div class="slider-control">
                 <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value">
                 <span class="slider-num" id="kVal">16</span>
+              </div>
+            </div>
+            <div class="slider-row">
+              <div>
+                <div class="slider-label">SNP Compression</div>
+                <div style="font-size: 9.5px; color: var(--text-tertiary); margin-top: 1px;">Auto: L &gt; 50k or density &lt; 0.10</div>
+              </div>
+              <div class="segmented-switch" id="snpCompressionSwitch">
+                <button type="button" class="segment-btn active" data-val="auto" onclick="setSnpMode('auto')">Auto</button>
+                <button type="button" class="segment-btn" data-val="on" onclick="setSnpMode('on')">Force ON</button>
+                <button type="button" class="segment-btn" data-val="off" onclick="setSnpMode('off')">Force OFF</button>
               </div>
             </div>
           </div>
@@ -845,6 +891,14 @@
     let wasmReady = false;
     let latestScanResult = null;
     let latestHtmlReport = null;
+    let snpCompressionMode = 'auto';
+
+    window.setSnpMode = function(mode) {
+      snpCompressionMode = mode;
+      document.querySelectorAll('#snpCompressionSwitch .segment-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-val') === mode);
+      });
+    };
 
     async function initWasm() {
       try {
@@ -968,8 +1022,9 @@
 
       try {
         const t0 = performance.now();
-        const res = scan_fasta(fasta, k);
-        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k);
+        const compressArg = snpCompressionMode === 'auto' ? undefined : (snpCompressionMode === 'on');
+        const res = scan_fasta(fasta, k, compressArg);
+        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg);
         const elapsed = performance.now() - t0;
 
         latestScanResult = res;
