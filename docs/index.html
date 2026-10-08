@@ -634,6 +634,14 @@
       background: var(--surface-subtle);
     }
 
+    tbody tr.selected-event-row td {
+      background: rgba(255, 79, 0, 0.08) !important;
+    }
+
+    tbody tr.selected-event-row {
+      border-left: 3px solid var(--braun-orange);
+    }
+
     .tag-cassette {
       background: var(--braun-orange-tint);
       color: var(--braun-orange);
@@ -1143,6 +1151,21 @@
             <td>${ev.p_fisher < 1e-300 ? '< 1e-300' : ev.p_fisher.toExponential(2)}</td>
             <td style="font-weight: 700;">${ev.z_phys.toFixed(2)}</td>
           `;
+          tr.style.cursor = 'pointer';
+          tr.onclick = () => {
+            document.querySelectorAll('#eventsTbody tr').forEach(r => r.classList.remove('selected-event-row'));
+            tr.classList.add('selected-event-row');
+            const frame = document.getElementById('reportFrame');
+            if (frame && frame.contentWindow) {
+              if (typeof frame.contentWindow.inspectEventById === 'function') {
+                frame.contentWindow.inspectEventById(ev.event_id);
+              } else if (typeof frame.contentWindow.inspectEvent === 'function') {
+                const bId = ev.is_crossover ? `BP_${ev.event_id}` : `BP_${ev.event_id} (5')`;
+                frame.contentWindow.inspectEvent(bId, ev.isolates[0], ev.home_name, ev.donor_name, Math.max(1, ev.u1 - 45), Math.min(res.length, ev.u2 + 45), ev.event_id);
+              }
+              frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          };
           tbody.appendChild(tr);
         }
       }
