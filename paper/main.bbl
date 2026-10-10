@@ -173,10 +173,22 @@ Zbyn{\v{e}}k {\v{S}}id{\'a}k.
 \newblock {\em Journal of the American Statistical Association},
   62(318):626--633, 1967.
 
+\bibitem{simmonds2005}
+Peter Simmonds and Jenny Welch.
+\newblock Frequency and dynamics of recombination within different species of
+  human enteroviruses.
+\newblock {\em Journal of Virology}, 80(1):483--493, 2006.
+
 \bibitem{simonloriere2011recombination}
 Etienne Simon-Loriere and Edward~C Holmes.
 \newblock Why do {RNA} viruses recombine?
 \newblock {\em Nature Reviews Microbiology}, 9(8):617--626, 2011.
+
+\bibitem{smith2023tracking}
+Kyle Smith, Cheng Ye, and Yatish Turakhia.
+\newblock Tracking and curating putative {SARS-CoV-2} recombinants with
+  {RIVET}.
+\newblock {\em Bioinformatics}, 39(9):btad538, 2023.
 
 \bibitem{su2024roformer}
 Jianlin Su, Murtadha Ahmed, Yu~Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu.
@@ -196,6 +208,20 @@ Koichiro Tamura and Masatoshi Nei.
 \newblock Estimation of the number of nucleotide substitutions in the control
   region of mitochondrial {DNA} in humans and chimpanzees.
 \newblock {\em Molecular Biology and Evolution}, 10(3):512--526, 1993.
+
+\bibitem{tamura2023xbb}
+Tomokazu Tamura, Junpei Ito, Keiya Uriu, Jiri Zahradnik, Isaac Kida, Yuki
+  Anraku, Hesham Nasser, Mai Toyoda, Keita Mizuma, Ryo Shimizu, et~al.
+\newblock Virological characteristics of the {SARS-CoV-2} {XBB} variant derived
+  from recombination of two {Omicron} subvariants.
+\newblock {\em The Lancet Microbe}, 4(7):e529--e539, 2023.
+
+\bibitem{turakhia2022pandemic}
+Yatish Turakhia, Bryan Thornlow, Angie~S Hinrichs, Nicola De~Maio, Landen
+  Gozashti, Robert Lanfear, David Haussler, and Russell Corbett-Detig.
+\newblock Pandemic-scale phylogenomics reveals the {SARS-CoV-2} recombination
+  landscape.
+\newblock {\em Nature}, 609(7929):994--997, 2022.
 
 \bibitem{worobey2002questioning}
 Michael Worobey, Andrew Rambaut, Oliver~G. Pybus, and David~L. Robertson.

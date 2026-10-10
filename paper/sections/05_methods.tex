@@ -37,6 +37,20 @@ Selecting $N$ reference genomes across $M$ isolates requires exactly $N \times M
 For an alignment of 10,000 genomes with $N = 16$ landmarks, distance evaluations collapse from $49,995,000$ to $160,000$, representing a 312-fold empirical speedup.
 Farthest points span divergence.
 
+\paragraph{Full-Cohort Representation ($M \le 64$) and Two-Pass Clonal Backbone Re-Anchoring ($M > 64$).}
+When scanning moderate surveillance cohorts ($M \le 64$), downsampling the alignment to a sparse subset of landmarks risks inadvertently selecting a recombinant isolate while omitting its parental lineage, or omitting a minor parental clade entirely.
+To guarantee complete topological coverage, \RhizAeon automatically activates Full-Cohort Channel Tracking when $M \le 64$, setting the landmark set to the complete sequence roster ($N = M$).
+Every sequence is endowed with its own continuous attention channel, eliminating downsampling artifacts and ensuring all prospective parental lineages are present in the reference basis.
+
+For massive surveillance cohorts ($M > 64$), \RhizAeon utilizes Farthest-Point Sampling to select $N \le 32$ landmarks.
+However, in epidemic recombinant swarms, greedy farthest-point exploration can pick an expanded recombinant lineage as a landmark due to its intermediate divergence.
+If a recombinant isolate $R$ is admitted into the landmark basis, co-recombinant sister isolates ($R_1, \dots, R_k$) that share the identical mosaic cassettes will place dominant continuous attention ($\ge 80\%$) onto $R$.
+When the parental resolver assigns Home = $R$, the differential excursion vanishes ($Y(u) \approx 0$), extinguishing the recombination signal in a catastrophic \textit{Landmark Self-Masking Trap}.
+To eliminate this failure mode, \RhizAeon executes Two-Pass Clonal Backbone Re-Anchoring for $M > 64$:
+Pass~1 screens the cohort using initial FPS landmarks to identify candidate recombinants ($\mathcal{C}_{\text{rec}}$).
+If any landmark belongs to $\mathcal{C}_{\text{rec}}$, Pass~2 purges all candidate recombinants from the candidate landmark pool and re-anchors the landmark basis strictly onto verified non-recombinant clonal backbone lineages ($\mathcal{S} \setminus \mathcal{C}_{\text{rec}}$).
+This guarantees that only stable, unadmixed parental lineages serve as coordinate landmarks.
+
 From the selected reference genomes $\{s_{(1)}, \dots, s_{(N)}\}$, we construct the symmetric reference distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$, with elements $D_{i,j} = d(s_{(i)}, s_{(j)})$ and diagonal entries $D_{i,i} = 0$.
 We define the element-wise squared distance matrix $\mathbf{D}^{(2)} \in \mathbb{R}^{N \times N}$ such that $[\mathbf{D}^{(2)}]_{i,j} = D_{i,j}^2$.
 To map these distances into an inner-product space, we apply the geometric centering projection operator $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$, where $\mathbf{I}_N$ is the $N \times N$ identity matrix and $\mathbf{1}_N = (1, \dots, 1)^T \in \mathbb{R}^N$ is the all-ones vector.
@@ -350,6 +364,14 @@ where $\Delta_{\text{thresh}} = 1.92$ corresponds to the 95\% confidence interva
 The boundary coordinates $c_{\text{left}}$ and $c_{\text{right}}$ demarcate the exact flanking informative polymorphisms that physically bound the genetic exchange.
 Plateaus bound breakpoints.
 
+\paragraph{Continuous Gap Bridging Across Stochastic Non-Informative Dips.}
+In low-divergence regimes ($d \le 0.02$), mutation density is inherently sparse ($\sim 1$ substitution every 50 nucleotides).
+Under standard Poisson mutation processes, stochastic intervals of 50--100 bp within an authentic 1,000 nt conversion cassette frequently carry zero donor-specific mutations ($P(0 \text{ mutations}) = e^{-\lambda} \approx 15\%\text{--}35\%$).
+During recursive binary segmentation, instantaneous differential flux drops to zero across these unmutated windows, which would otherwise fracture an intact biological cassette into multiple fragmented micro-tracts.
+To preserve macro-conversion integrity, \RhizAeon implements Continuous Gap Bridging:
+adjacent candidate donor segments separated by small non-informative gaps ($\le 150$ bp) are iteratively coalesced into a single unified tract whenever the net flux across the merged span remains positive ($\frac{1}{e_2 - s_1 + 1} \sum_{u=s_1}^{e_2} X(u) > 0$).
+Bridging restores the contiguous physical envelope of the biological introgression, pooling all supporting mutations together and ensuring the subsequent hypergeometric contingency test operates on the true cumulative evidence.
+
 \subsection{Reticulation Graph Adjudication, Transitive Chains, and Ancestral Event Grouping}
 \label{subsec:methods_adjudication_grouping}
 
@@ -370,8 +392,13 @@ A true recombinant child experiences substantial home backbone disruption ($\Del
 In contrast, a stationary clonal parent remains within its home background throughout the alignment ($\Delta d_{\text{home}} \approx 0$).
 Comparing total transition contrast $\Delta_{\text{trans}} = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$ and mosaic reconstruction residual $d(C, D \mid \text{tract}) + d(C, H \mid \text{flank})$ unambiguously orients the recombinant isolate and purges reciprocal parent false alarms.
 
-To prevent co-recombinant sister isolates from competing with true parental donors during attribution, \RhizAeon screens flanking sequence divergence $d_{\text{flank}}$ between the candidate child and prospective donor channels.
-Sister isolates descending from a shared recombinant ancestor carry identical flanking sequence backgrounds ($d_{\text{flank}} < 0.008$); the algorithm disqualifies such sisters from acting as donor channels, while preserving authentic parental donor candidates from the opposite clade ($d_{\text{flank}} \ge 0.008$).
+\paragraph{Intra-Swarm Sister Isolation, Donor Clade Deduplication, and Sister Preservation.}
+In expanding epidemic swarms, multiple recombinant isolates descend from a common recombinant ancestor, differing only by minor intra-swarm drift ($d < 0.010$).
+Without explicit sister safeguards, three distinct failure modes corrupt swarm deconvolution:
+First, during parental channel resolution, co-recombinant sisters place immense continuous attention onto each other; \RhizAeon strictly excludes contemporary channels within intra-swarm drift ($d(s_i, s_j) < 0.010$) from serving as prospective Home or Donor channels for each other, forcing attention to resolve against genuine parental clades.
+Second, in multi-way mosaics acquiring distinct cassettes from separate donor clades (e.g., $P_2$ and $P_3$), candidate donors from the primary clade ($P_2$) can monopolize the candidate pool; \RhizAeon deduplicates candidate donors by phylogenetic distance ($d(d_1, d_2) < 0.010$), guaranteeing that secondary donor clades are not crowded out by redundant primary sisters.
+Third, in reticulation graph adjudication, reciprocal two-cycle pruning must not confuse parallel sister isolates with reciprocal parental illusions; \RhizAeon explicitly protects co-recombinant sister events sharing identical Home and Donor assignments ($\text{Home}_1 = \text{Home}_2$ and $\text{Donor}_1 = \text{Donor}_2$) from mutual reflection pruning.
+All verified sister isolates are preserved and subsequently aggregated into the ancestral event roster $\mathcal{I} = \{s_1, \dots, s_k\}$.
 
 In surveillance cohorts containing multiple related recombinants, an isolate $A$ may acquire a tract from an ancestral recombinant $B$ before $B$ further diverged or was sampled.
 Under these conditions, isolate $A$ cites $B$ as its donor or home.
@@ -397,8 +424,8 @@ Each event receives a persistent sequential identifier ($1, 2, \dots$), reportin
 \subsection{Outgroup-Invariant Statistical Due Diligence}
 \label{subsec:methods_due_diligence}
 
-Candidate reticulations pass through a multi-tier statistical verification filter to eliminate spurious false discoveries induced by mutational rate heterogeneity or alignment noise.
-In cohorts with $N \ge 4$ taxa, \RhizAeon searches for an unrooted quartet outgroup $O$ that maximizes divergence to candidate and home lineages ($d(O, H) + d(O, D)$), strictly disqualifying candidate recombinants and rate-burst leaves from selection to prevent outgroup poisoning.
+In cohorts with $N \ge 4$ taxa, \RhizAeon searches for an unrooted quartet outgroup $O$ that maximizes divergence to candidate and home lineages ($d(O, H) + d(O, D)$), preferentially selecting non-candidate, non-rate-burst background leaves to prevent outgroup poisoning.
+If all external lineages have been admitted as candidates due to high sensitivity in low-divergence regimes ($d \le 0.02$), the selector falls back to the most divergent available taxon outside $\{C, H, D\}$, ensuring quartet verification never starves.
 When an authentic external outgroup exists, the engine tests the unrooted Buneman four-point condition across tract and flank partitions:
 \begin{align}
 S_1 &= d(C, H) + d(D, O), \label{eq:methods_buneman_s1} \\
@@ -410,7 +437,11 @@ Under genuine recombination, the minimal parsimony split flips from $S_1$ (group
 In two-clade epidemic expansions where all sampled sequences belong to parental clades or recombinant progeny, no authentic phylogenetic outgroup exists.
 Under this regime, \RhizAeon falls back onto outgroup-invariant triplet criteria:
 \begin{enumerate}
-\item \textbf{Hypergeometric Contingency}: Fisher's exact test across informative sites within versus outside the tract ($p \le \alpha / \binom{N}{3}$).
+\item \textbf{Hypergeometric Contingency}: Fisher's exact test across informative sites within versus outside the tract, calibrated against the exact number of unordered candidate triplets:
+\begin{equation}
+p \le p_{\text{crit}} = \frac{\alpha}{\binom{N}{3}} = \frac{6\alpha}{N(N-1)(N-2)}.
+\label{eq:methods_bonferroni_triplets}
+\end{equation}
 \item \textbf{Poisson Informative Floor}: A minimal count of distinguishing mutations donated by the minor parent ($s_{\text{donor}} \ge 3$).
 \item \textbf{Directional Recoil Significance}: Standardized transition displacement along the parental dipole axis exceeding Gaussian extreme-value bounds ($\Delta_{\text{net}} \ge z_{\text{crit}} \cdot \text{SE}$).
 \item \textbf{Private Autapomorphy Sieve}: Bounding private autapomorphic mutations along the candidate branch ($\rho_{\text{priv}} < 0.50$) to reject localized heterotachy spikes.
@@ -491,3 +522,26 @@ To summarize performance across all four biological axes, benchmarks report the 
 \mathbf{S}_{\mathcal{R}} = \left(\text{TPR}_{\mathcal{R}},\, \text{PPV}_{\mathcal{R}},\, \overline{S}_{\text{triad}},\, \overline{J}_{\text{SNP}}\right).
 \label{eq:methods_score_profile}
 \end{equation}
+
+\subsection{Synthetic Benchmark Protocols: Epidemic Clonal Expansions and Multi-Way Mosaics}
+\label{subsec:methods_benchmark_protocols}
+
+To rigorously assess algorithmic fidelity under authentic evolutionary challenges without synthetic placeholders or parametric shortcuts, we implemented automated benchmark generators operating on raw sequence alignments under continuous-time Markov substitution dynamics.
+All evolutionary simulations were conducted under the HKY85 substitution model with transition/transversion bias $\kappa = 2.5$ and empirical base frequencies $\pi = [0.30, 0.20, 0.20, 0.30]$ using exact matrix exponentiation $P(t) = \exp(Q t)$.
+
+\paragraph{Scenario 1.1: Epidemic Clonal Expansion Suite.}
+To assess event consolidation and parental attribution discipline under epidemic lineage growth, we simulated an ancestral recombinant node descending from two parental lineages separated by branch length $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ ($L = 5,000$ nt).
+The ancestral recombinant acquired a 1,500 nt cassette ($[1,500\text{--}3,000]$) from $P_2$ in a $P_1$ background.
+The recombinant node subsequently underwent epidemic transmission expansion, sprouting $K \in \{2, 5, 8, 10, 15\}$ contemporary descendant isolates, each accumulating independent transmission drift ($\delta = 0.002$).
+The alignment contained 40 strictly non-recombinant background parental isolates (20 in $P_1$ and 20 in $P_2$), yielding $N = 42\text{--}55$ taxa.
+Twenty independent replicates were generated for each of the 15 parameter conditions (300 alignments total).
+
+\paragraph{Scenario 1.2: Multi-Way Mosaic Swarms Suite.}
+To evaluate algorithmic limits when the two-parent assumption is violated, we simulated 540 alignments ($L = 6,000$ nt; 20 replicates across 27 parameter conditions) across three distinct multi-parental topologies:
+\begin{enumerate}
+\item \textbf{Dual-Cassette Swarms}: A $P_1$ background acquiring two independent foreign cassettes from $P_2$ ($[1,200\text{--}2,400]$, length 1,201 nt) and $P_3$ ($[3,600\text{--}4,800]$, length 1,201 nt), leaving $P_1$ on flanks and interstitial spacer.
+\item \textbf{Nested Russian Doll Swarms}: A $P_1$ background acquiring an outer introgression from $P_2$ ($[1,500\text{--}4,500]$, length 3,001 nt), within which an internal cassette ($[2,500\text{--}3,500]$, length 1,001 nt) is replaced by $P_3$, modeling secondary crossover within a recombinant lineage.
+\item \textbf{Triple Crossover Cascades}: Sequential serial crossovers traversing the three parental lineages ($P_1 [1\text{--}2,000] \to P_2 [2,001\text{--}4,000] \to P_3 [4,001\text{--}6,000]$).
+\end{enumerate}
+Each topology was evaluated across divergence levels $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and descendant swarm sizes $K \in \{1, 5, 10\}$ with 45 non-recombinant background taxa (15 per parental clade; $N = 46\text{--}55$ taxa).
+Performance was evaluated against 3SEQ using identical alignments, measuring background false positive rate ($\text{FPR}_{\text{parent}}$), precision, event cardinality ($\hat{K}_{\text{unique}}$), spatial Jaccard similarity, and execution runtime.

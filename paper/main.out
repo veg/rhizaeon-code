@@ -14,21 +14,28 @@
 \BOOKMARK [2][-]{subsection.3.1}{Coalescent Benchmarks: The Hyper-Recombination Paradox and Spatial Observability}{section.3}% 14
 \BOOKMARK [2][-]{subsection.3.2}{Adversarial Null Calibration and Immunity to Biological Heterotachy}{section.3}% 15
 \BOOKMARK [2][-]{subsection.3.3}{Epidemic Clonal Expansion: Triplet Redundancy and Event Consolidation}{section.3}% 16
-\BOOKMARK [2][-]{subsection.3.4}{Multi-Way Mosaicism and Unsampled Lineage Introgression}{section.3}% 17
-\BOOKMARK [2][-]{subsection.3.5}{Computational Scalability and Real-Time Genomic Surveillance}{section.3}% 18
-\BOOKMARK [1][-]{section.4}{Discussion and Algorithmic Scaling}{}% 19
-\BOOKMARK [2][-]{subsection.4.1}{Linear Manifold Geometry vs. Combinatorial Triplet Search}{section.4}% 20
-\BOOKMARK [2][-]{subsection.4.2}{Theoretical Boundaries: Pervasive Recombination and the Limits of Parental Attribution}{section.4}% 21
-\BOOKMARK [2][-]{subsection.4.3}{Data Governance and Biosafety Compliance}{section.4}% 22
-\BOOKMARK [1][-]{section.5}{Materials and Methods}{}% 23
-\BOOKMARK [2][-]{subsection.5.1}{Farthest-Point Landmark Sampling and Metric Basis Construction}{section.5}% 24
-\BOOKMARK [2][-]{subsection.5.2}{Analytical Gower Out-of-Sample Trajectory Projection}{section.5}% 25
-\BOOKMARK [2][-]{subsection.5.3}{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}{section.5}% 26
-\BOOKMARK [2][-]{subsection.5.4}{Unpolarized Root Sink Architecture and Autapomorphy Absorption}{section.5}% 27
-\BOOKMARK [2][-]{subsection.5.5}{Continuous Trajectory Integration and Brownian Bridge Inference}{section.5}% 28
-\BOOKMARK [2][-]{subsection.5.6}{Dyadic Scale-Space Matched Filtering and Running Drawdown}{section.5}% 29
-\BOOKMARK [2][-]{subsection.5.7}{Physical Force Field Deconvolution and Random Matrix Halting}{section.5}% 30
-\BOOKMARK [2][-]{subsection.5.8}{Profile Maximum Likelihood Breakpoint Polishing}{section.5}% 31
-\BOOKMARK [2][-]{subsection.5.9}{Reticulation Graph Adjudication, Transitive Chains, and Ancestral Event Grouping}{section.5}% 32
-\BOOKMARK [2][-]{subsection.5.10}{Outgroup-Invariant Statistical Due Diligence}{section.5}% 33
-\BOOKMARK [2][-]{subsection.5.11}{The Reticulation Fidelity Scoring Framework}{section.5}% 34
+\BOOKMARK [2][-]{subsection.3.4}{Deconvolution of Multi-Way Mosaic Swarms}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.5}{Unsampled Ghost Lineage Introgression and Biological Mosaics}{section.3}% 18
+\BOOKMARK [2][-]{subsection.3.6}{Computational Scalability and Real-Time Genomic Surveillance}{section.3}% 19
+\BOOKMARK [1][-]{section.4}{Discussion and Algorithmic Scaling}{}% 20
+\BOOKMARK [2][-]{subsection.4.1}{Linear Manifold Geometry vs. Combinatorial Triplet Search}{section.4}% 21
+\BOOKMARK [2][-]{subsection.4.2}{Theoretical Boundaries: Pervasive Recombination and the Limits of Parental Attribution}{section.4}% 22
+\BOOKMARK [2][-]{subsection.4.3}{Data Governance and Biosafety Compliance}{section.4}% 23
+\BOOKMARK [1][-]{section.5}{Materials and Methods}{}% 24
+\BOOKMARK [2][-]{subsection.5.1}{Farthest-Point Landmark Sampling and Metric Basis Construction}{section.5}% 25
+\BOOKMARK [3][-]{section*.10}{Full-Cohort Representation \(M 64\) and Two-Pass Clonal Backbone Re-Anchoring \(M > 64\).}{subsection.5.1}% 26
+\BOOKMARK [2][-]{subsection.5.2}{Analytical Gower Out-of-Sample Trajectory Projection}{section.5}% 27
+\BOOKMARK [2][-]{subsection.5.3}{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}{section.5}% 28
+\BOOKMARK [2][-]{subsection.5.4}{Unpolarized Root Sink Architecture and Autapomorphy Absorption}{section.5}% 29
+\BOOKMARK [2][-]{subsection.5.5}{Continuous Trajectory Integration and Brownian Bridge Inference}{section.5}% 30
+\BOOKMARK [2][-]{subsection.5.6}{Dyadic Scale-Space Matched Filtering and Running Drawdown}{section.5}% 31
+\BOOKMARK [2][-]{subsection.5.7}{Physical Force Field Deconvolution and Random Matrix Halting}{section.5}% 32
+\BOOKMARK [2][-]{subsection.5.8}{Profile Maximum Likelihood Breakpoint Polishing}{section.5}% 33
+\BOOKMARK [3][-]{section*.11}{Continuous Gap Bridging Across Stochastic Non-Informative Dips.}{subsection.5.8}% 34
+\BOOKMARK [2][-]{subsection.5.9}{Reticulation Graph Adjudication, Transitive Chains, and Ancestral Event Grouping}{section.5}% 35
+\BOOKMARK [3][-]{section*.12}{Intra-Swarm Sister Isolation, Donor Clade Deduplication, and Sister Preservation.}{subsection.5.9}% 36
+\BOOKMARK [2][-]{subsection.5.10}{Outgroup-Invariant Statistical Due Diligence}{section.5}% 37
+\BOOKMARK [2][-]{subsection.5.11}{The Reticulation Fidelity Scoring Framework}{section.5}% 38
+\BOOKMARK [2][-]{subsection.5.12}{Synthetic Benchmark Protocols: Epidemic Clonal Expansions and Multi-Way Mosaics}{section.5}% 39
+\BOOKMARK [3][-]{section*.13}{Scenario 1.1: Epidemic Clonal Expansion Suite.}{subsection.5.12}% 40
+\BOOKMARK [4][-]{section*.14}{Scenario 1.2: Multi-Way Mosaic Swarms Suite.}{section*.13}% 41

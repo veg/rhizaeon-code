@@ -291,14 +291,37 @@ impl CumulativeTrajectoryPolisher {
             (false, donor_ch, home_ch)
         };
 
-        let donor_segments: Vec<(usize, usize)> = merged_segments
+        let raw_donor_segments: Vec<(usize, usize)> = merged_segments
             .into_iter()
             .filter(|&(_, _, is_d)| is_d == target_polarity)
             .map(|(s, e, _)| (s, e))
             .collect();
 
-        if donor_segments.is_empty() {
+        if raw_donor_segments.is_empty() {
             return Vec::new();
+        }
+
+        // Bridge adjacent donor segments across short non-informative gaps (<= 150 bp)
+        // In low-divergence regimes (d <= 0.02), stochastic intervals of 50-100 bp within a true
+        // cassette can lack mutations, causing temporary zero-flux dips. Bridging ensures the full
+        // continuous introgression cassette is evaluated as a single coherent tract.
+        let mut donor_segments: Vec<(usize, usize)> = Vec::new();
+        for (s, e) in raw_donor_segments {
+            if let Some(last) = donor_segments.last_mut() {
+                let gap = s.saturating_sub(last.1 + 1);
+                if gap <= 150 {
+                    let combined_s = last.0;
+                    let combined_e = e;
+                    let comb_len = (combined_e - combined_s + 1) as f64;
+                    let comb_sum: f64 = x[(combined_s - 1)..combined_e].iter().sum();
+                    let comb_mean = comb_sum / comb_len;
+                    if comb_mean > 0.0 {
+                        last.1 = e;
+                        continue;
+                    }
+                }
+            }
+            donor_segments.push((s, e));
         }
 
         // 6. Build PhysicalTracts for surviving donor segments

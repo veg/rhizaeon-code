@@ -67,6 +67,8 @@ The secondary axis $Z_2$ (21.4\% of variance) provides the orthogonal freedom ne
 \paragraph{Informational Capacity and the Landmark Identifiability Assumption.}
 The geometric validity of the Buneman metric frame relies on an implicit information-theoretic condition: the global distance matrix $\mathbf{D}_{\text{glob}}$ must reflect structured, tree-like phylogenetic divergence across at least a core subset of the cohort.
 Farthest-Point Minimax Sampling reliably extracts landmarks that span these principal cladogenetic divides when clonal backbones exist.
+For cohorts with $M \le 64$ genomes, \RhizAeon retains the full cohort ($N = M$) to prevent downsampling loss.
+For larger cohorts ($M > 64$), \RhizAeon couples landmark selection with two-pass clonal backbone re-anchoring, purging candidate recombinant swarms from the landmark pool to eliminate self-masking (see Materials and Methods, Section~\ref{subsec:methods_landmark_sampling}).
 However, if a population has undergone pervasive, fine-scale homologous recombination such that the recombination rate vastly outpaces mutation ($r/\mu \gg 1$, as in panmictic bacterial populations or dense viral quasispecies), every sampled genome is itself a mosaic of mosaics.
 In this hyper-recombinant regime, global pairwise distances collapse into uniform spatial averages of scrambled ancestries, and the leading MDS eigenvalues fail to separate into discrete bipartition axes, flattening into an isotropic high-dimensional sphere.
 Under these conditions, discrete parental attribution is fundamentally ill-posed: when unadmixed parental lineages no longer exist in the contemporary sample, resolving discrete ``donor'' and ``home'' backbones exceeds the informational capacity of the alignment.

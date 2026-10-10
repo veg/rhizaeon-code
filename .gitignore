@@ -26,3 +26,6 @@ venv/
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+
+# 3SEQ scratch files
+*.3s.*

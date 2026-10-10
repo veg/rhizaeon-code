@@ -398,8 +398,8 @@ impl SequenceDueDiligence {
 
         let p_fisher = self.fisher_exact_2x2(a, b, c, d);
 
-        // Bonferroni critical threshold over candidate triplets in alignment
-        let num_triplets = (((aln.num_taxa * (aln.num_taxa - 1) / 2) * aln.num_taxa.saturating_sub(2).max(1)).max(1)) as f64;
+        // Bonferroni critical threshold over candidate triplets in alignment: alpha / binom(N, 3)
+        let num_triplets = (((aln.num_taxa * aln.num_taxa.saturating_sub(1) * aln.num_taxa.saturating_sub(2)) / 6).max(1)) as f64;
         let p_crit = self.alpha / num_triplets;
 
         let d_tract_donor = if valid_tract > 0 { (mismatch_tract_donor as f64) / (valid_tract as f64) } else { 0.0 };
@@ -458,6 +458,25 @@ impl SequenceDueDiligence {
                         if sum_d > max_out_div {
                             max_out_div = sum_d;
                             best_outgroup = Some(o_idx);
+                        }
+                    }
+                }
+
+                if best_outgroup.is_none() {
+                    let mut max_out_div_fallback = -1.0;
+                    for o_idx in 0..aln.num_taxa {
+                        if o_idx != cand_idx
+                            && o_idx != home_global
+                            && o_idx != donor_global
+                            && !rate_burst_indices.contains(&o_idx)
+                        {
+                            let d_oh = crate::landmarks::compute_pairwise_distance(aln, o_idx, home_global);
+                            let d_od = crate::landmarks::compute_pairwise_distance(aln, o_idx, donor_global);
+                            let sum_d = d_oh + d_od;
+                            if sum_d > max_out_div_fallback {
+                                max_out_div_fallback = sum_d;
+                                best_outgroup = Some(o_idx);
+                            }
                         }
                     }
                 }
@@ -667,6 +686,24 @@ impl SequenceDueDiligence {
 
                 if c1_name == c2_name {
                     continue;
+                }
+
+                // Co-recombinant sisters share the same Home parent and Donor parent.
+                // They descend from the same ancestral event and NEVER form a mutual 2-cycle reflection!
+                let d_inter = match (e1.home_idx, e1.donor_idx) {
+                    (Some(h), Some(d)) => crate::landmarks::compute_pairwise_distance(_aln, h, d),
+                    _ => 0.05,
+                };
+                let same_home = e1.home_name == e2.home_name || match (e1.home_idx, e2.home_idx) {
+                    (Some(h1), Some(h2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, h1, h2) < 0.5 * d_inter,
+                    _ => false,
+                };
+                let same_donor = e1.donor_name == e2.donor_name || match (e1.donor_idx, e2.donor_idx) {
+                    (Some(d1), Some(d2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, d1, d2) < 0.5 * d_inter,
+                    _ => false,
+                };
+                if same_home && same_donor {
+                    continue; // Co-recombinant sisters; preserve for group_ancestral_events
                 }
 
                 // Mutual cycle adjudication requires the two events to be homologous in genomic space:

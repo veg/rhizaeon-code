@@ -147,4 +147,3 @@ fn test_bacterial_snp_compression_scenario() {
     assert!(ev.tract_length >= 19_000 && ev.tract_length <= 21_000, "Tract length should be ~20,000 bp, got {}", ev.tract_length);
     assert!(ev.p_fisher < 1e-20, "Significant p-value required");
 }
-

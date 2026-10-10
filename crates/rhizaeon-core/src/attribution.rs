@@ -40,6 +40,7 @@ impl TrajectoryParentalResolver {
         l: usize,
         n: usize,
         landmarks: &LandmarkSet,
+        aln: &crate::types::Alignment,
     ) -> TrajectoryParentalPair {
         let all_pairs = self.resolve_all_reticulation_channels(
             candidate_idx,
@@ -48,6 +49,7 @@ impl TrajectoryParentalResolver {
             l,
             n,
             landmarks,
+            aln,
         );
         all_pairs.into_iter().next().unwrap()
     }
@@ -62,6 +64,7 @@ impl TrajectoryParentalResolver {
         l: usize,
         n: usize,
         landmarks: &LandmarkSet,
+        aln: &crate::types::Alignment,
     ) -> Vec<TrajectoryParentalPair> {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -111,11 +114,20 @@ impl TrajectoryParentalResolver {
         }
 
         // 4. Eligible contemporary landmark channels
+        // Exclude candidate itself AND any sister isolate within within-swarm drift (d < 0.010)
         let mut contemporary_channels = Vec::new();
         for p in 0..k {
             let l_global = landmarks.indices[p];
-            if l_global != candidate_idx {
+            let d_to_cand = crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_global);
+            if l_global != candidate_idx && d_to_cand >= 0.010 {
                 contemporary_channels.push(p + 1);
+            }
+        }
+        if contemporary_channels.is_empty() {
+            for p in 0..k {
+                if landmarks.indices[p] != candidate_idx {
+                    contemporary_channels.push(p + 1);
+                }
             }
         }
         if contemporary_channels.is_empty() {
@@ -201,8 +213,8 @@ impl TrajectoryParentalResolver {
             // Donor selection criterion:
             // Needs meaningful contrast with Home and non-trivial attention/swing
             if score_d >= 0.05 * best_score.max(1e-6)
-                && (mean_a[d] >= 0.010 || swings[d] >= 1.5)
-                && swings[d] >= 0.80
+                && (mean_a[d] >= 0.010 || swings[d] >= 1.0)
+                && swings[d] >= 0.35
             {
                 candidate_donors.push(CandidateDonor {
                     channel: d,
@@ -217,8 +229,32 @@ impl TrajectoryParentalResolver {
 
         // Sort candidate donors by score descending
         candidate_donors.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
-        // Limit to top 4 active donors to preserve efficiency and eliminate spurious noise
-        candidate_donors.truncate(4);
+
+        // Deduplicate candidate donors across sister lineages (d < 0.010)
+        // so multiple sisters from the primary donor clade don't crowd out secondary donor clades in multi-way mosaicism.
+        let mut distinct_donors: Vec<CandidateDonor> = Vec::new();
+        for cd in candidate_donors {
+            let dk = cd.channel.saturating_sub(1);
+            if let Some(dg) = landmarks.indices.get(dk).copied() {
+                let is_sister = distinct_donors.iter().any(|existing| {
+                    let ex_k = existing.channel.saturating_sub(1);
+                    if let Some(ex_g) = landmarks.indices.get(ex_k).copied() {
+                        crate::landmarks::compute_pairwise_distance(aln, dg, ex_g) < 0.010
+                    } else {
+                        false
+                    }
+                });
+                if !is_sister {
+                    distinct_donors.push(cd);
+                }
+            } else {
+                distinct_donors.push(cd);
+            }
+            if distinct_donors.len() >= 4 {
+                break;
+            }
+        }
+        let candidate_donors = distinct_donors;
 
         // 7. Construct TrajectoryParentalPairs
         let home_k = home_ch.saturating_sub(1);
