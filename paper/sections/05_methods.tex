@@ -219,7 +219,6 @@ Y_{i, m}(u) = C_{i, m}(u) - C_{i, m_{\text{home}}}(u).
 \end{equation}
 Under clonal evolution within the parental background, attention to the home clade exceeds donor attention at nearly all sites ($A_v(i \to \text{home}) > A_v(i \to m)$), causing $Y_{i, m}(u)$ to drift monotonically downward with negative slope.
 Recombination reverses the derivative: within a converted donor tract $[u_1, u_2]$, donor attention dominates, producing a positive slope ($dY/du > 0$) and a prominent upward excursion.
-Bridges bound excursions.
 
 To test the clonal null hypothesis $H_0$, we construct the centered Brownian bridge process $B_{i, m}(u)$ by subtracting the chromosome-wide linear drift:
 \begin{equation}
@@ -267,7 +266,6 @@ h_\tau(s) = \begin{cases} +1, & 0 \le s < \tau/2 \\ -1, & \tau/2 \le s < \tau \\
 \label{eq:methods_wavelet}
 \end{equation}
 The discrete convolution $(dY * h_\tau)(u) = \sum_{s=0}^\tau \Delta Y(u - s) h_\tau(s)$ isolates rapid step transitions across dyadic scale space.
-Wavelets isolate tracts.
 
 Concurrently, \RhizAeon tracks the running high-water mark $M(u)$ and running drawdown $\text{DD}(u)$:
 \begin{equation}
@@ -283,6 +281,12 @@ To distinguish single crossovers from intercalary cassette swaps, we evaluate th
 where $Y_{\text{base}}$ denotes the linear baseline drift.
 A single crossover spans half the chromosome, producing high residual energy across the alignment ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
 In contrast, an intercalary cassette returns cleanly to baseline on both flanks, characterized by $\mathcal{E}_{\text{ratio}} < 0.15$.
+Complementing the trajectory energy ratio, for decomposed spatial modes $\mathbf{u}_m$, \RhizAeon computes the continuous spatial mode polarity ratio:
+\begin{equation}
+p_{\text{mono}} = \frac{\left| \sum_{u=1}^L u_m(u) \right|}{\sum_{u=1}^L |u_m(u)|}.
+\label{eq:methods_polarity_ratio}
+\end{equation}
+A monopolar arch maintaining uniform sign across the alignment yields $p_{\text{mono}} \approx 1.0$ (characterizing single crossovers and tree backbones), whereas a localized bipolar pulse returning to baseline on both flanks yields $p_{\text{mono}} \le 0.50$ (characterizing intercalary cassette swaps; Figure~\ref{fig:theory_force_field}D).
 
 \subsection{Physical Force Field Deconvolution and Random Matrix Halting}
 \label{subsec:methods_force_field}
@@ -301,7 +305,6 @@ The dynamic velocity reversal score is defined as:
 R = v_{\text{step}} (1 - \cos \theta).
 \label{eq:methods_velocity_reversal}
 \end{equation}
-Forces deconvolve modes.
 To achieve scale-invariance across cohorts of varying divergence, we standardize the velocity reversal along the unit parental dipole axis $\mathbf{d}_{\text{hat}} = \frac{\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}}{\|\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}\|}$:
 \begin{equation}
 Z_{\text{flip}} = \frac{\left| (\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}) \cdot \mathbf{d}_{\text{hat}} \right|}{\sqrt{\frac{\sigma_{\text{left}}^2}{L_{\text{left}}} + \frac{\sigma_{\text{right}}^2}{L_{\text{right}}}}},
@@ -320,10 +323,10 @@ To prevent over-segmentation and halt peeling when residual variation reflects n
 Under the unreticulated null hypothesis, the singular values of an $N \times L$ random noise matrix follow the Marchenko-Pastur distribution \cite{marchenko1967distribution}.
 The theoretical upper boundary of the bulk spectral noise edge is:
 \begin{equation}
-s_{\text{bulk}} = \sigma \sqrt{L} \left( 1 + \sqrt{\frac{N}{L}} \right),
+s_{\text{bulk}} = \frac{L}{\pi} \sigma_{\text{noise}} \left( 1 + \sqrt{\frac{P}{L}} \right),
 \label{eq:methods_marchenko_pastur}
 \end{equation}
-where $\sigma$ represents the baseline standard deviation of empirical force increments.
+where $P = \min(N, d)$ denotes the metric projection dimension and $\sigma_{\text{noise}}$ represents the baseline standard deviation of empirical force increments.
 Mode peeling halts when the leading residual singular value satisfies $s_m \le s_{\text{bulk}}$, terminating iteration without manual parameter tuning.
 
 \subsection{Profile Maximum Likelihood Breakpoint Polishing}
@@ -346,3 +349,145 @@ Rather than reporting an arbitrary midpoint, \RhizAeon reports the exact informa
 where $\Delta_{\text{thresh}} = 1.92$ corresponds to the 95\% confidence interval under a $\chi_1^2$ likelihood ratio test.
 The boundary coordinates $c_{\text{left}}$ and $c_{\text{right}}$ demarcate the exact flanking informative polymorphisms that physically bound the genetic exchange.
 Plateaus bound breakpoints.
+
+\subsection{Reticulation Graph Adjudication, Transitive Chains, and Ancestral Event Grouping}
+\label{subsec:methods_adjudication_grouping}
+
+In pairwise and triplet sequence scans, an intrinsic topological ambiguity arises: if a recombinant isolate $C$ inherits a genomic tract from donor $D$ into a parental home background $H$, reciprocal tests frequently evaluate $D$ as recombinant between $C$ and $H$.
+This reciprocal false alarm creates a mutual two-cycle in candidate reticulation graphs ($C \leftrightarrow D$).
+To orient parental lineages versus genuine recombinant isolates without combinatorial tree searches, \RhizAeon inspects candidate events across homologous intervals.
+Homologous candidates share overlapping tracts ($\ge 25\%$ of the shorter tract) or form complementary crossover partitions ($u_2^{(1)} \approx u_1^{(2)}$).
+
+The algorithm evaluates external donor authenticity.
+If candidate $C_1$ identifies an external donor while candidate $C_2$ only cites $C_1$, the algorithm prunes $C_2$ as the non-recombinant parental donor.
+When candidates cite each other reciprocally, \RhizAeon computes physical transition contrast and home backbone disruption across the breakpoint boundaries.
+The contrast metrics measure differential divergence inside versus outside the candidate tract:
+\begin{align}
+\Delta d_{\text{home}} &= \max\left(0, \, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank})\right), \label{eq:methods_delta_home} \\
+\Delta d_{\text{donor}} &= \max\left(0, \, d(C, D \mid \text{flank}) - d(C, D \mid \text{tract})\right). \label{eq:methods_delta_donor}
+\end{align}
+A true recombinant child experiences substantial home backbone disruption ($\Delta d_{\text{home}} \gg 0$) by departing from its parental home basin during the conversion tract.
+In contrast, a stationary clonal parent remains within its home background throughout the alignment ($\Delta d_{\text{home}} \approx 0$).
+Comparing total transition contrast $\Delta_{\text{trans}} = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$ and mosaic reconstruction residual $d(C, D \mid \text{tract}) + d(C, H \mid \text{flank})$ unambiguously orients the recombinant isolate and purges reciprocal parent false alarms.
+
+To prevent co-recombinant sister isolates from competing with true parental donors during attribution, \RhizAeon screens flanking sequence divergence $d_{\text{flank}}$ between the candidate child and prospective donor channels.
+Sister isolates descending from a shared recombinant ancestor carry identical flanking sequence backgrounds ($d_{\text{flank}} < 0.008$); the algorithm disqualifies such sisters from acting as donor channels, while preserving authentic parental donor candidates from the opposite clade ($d_{\text{flank}} \ge 0.008$).
+
+In surveillance cohorts containing multiple related recombinants, an isolate $A$ may acquire a tract from an ancestral recombinant $B$ before $B$ further diverged or was sampled.
+Under these conditions, isolate $A$ cites $B$ as its donor or home.
+If $B$ was itself introgressed from donor $C$, this dependency creates a transitive donor chain ($A \to B \to C$).
+\RhizAeon iteratively traverses donor and home dependency chains across overlapping tracts sharing $\ge 50\%$ tract overlap.
+When isolate $A$ cites $B$ as donor, and $B$ (or its co-recombinant cluster) cites external donor $C$ with a compatible home lineage, the algorithm reassigns $A$ donor to $C$, updating tract and flanking divergences $d(A, C \mid \text{tract})$ and $d(A, C \mid \text{flank})$.
+Symmetrically, if $A$ cites $B$ as home and $B$ cites $C$ as home with a compatible donor, $A$ inherits home $C$.
+The chain traversal forbids cyclic attributions ($A \to B \to A$), resolving transitive co-recombinant cascades into primary evolutionary transfers.
+
+When an ancestral recombination event precedes clonal expansion, multiple descendant isolates inherit the identical mosaic tract.
+Reporting each isolate as an independent recombination event inflates event counts and misrepresents epidemic transmission.
+\RhizAeon clusters verified events into shared ancestral recombination events using an interval overlap criterion.
+Events sharing identical resolved Home and Donor lineages whose breakpoint intervals overlap by $\ge 50\%$ of the shorter tract:
+\begin{equation}
+\frac{\min(u_2^{(1)}, u_2^{(2)}) - \max(u_1^{(1)}, u_1^{(2)}) + 1}{\min(u_2^{(1)} - u_1^{(1)} + 1, \, u_2^{(2)} - u_1^{(2)} + 1)} \ge 0.50,
+\label{eq:methods_ancestral_overlap}
+\end{equation}
+are collapsed into a single ancestral event.
+The grouped event aggregates the complete roster of co-recombinant descendant isolates ($\mathcal{I} = \{s_1, \dots, s_k\}$).
+The consensus breakpoint interval spans the outer envelope $[ \min_k u_{1, k}, \, \max_k u_{2, k} ]$, while preserving the maximal statistical support across member isolates ($\min p_{\text{Fisher}}$, $\max Z_{\text{phys}}$, $\max S_{\text{informative}}$).
+Each event receives a persistent sequential identifier ($1, 2, \dots$), reporting both the count of unique evolutionary events and total recombinant isolates across the alignment inventory.
+
+\subsection{Outgroup-Invariant Statistical Due Diligence}
+\label{subsec:methods_due_diligence}
+
+Candidate reticulations pass through a multi-tier statistical verification filter to eliminate spurious false discoveries induced by mutational rate heterogeneity or alignment noise.
+In cohorts with $N \ge 4$ taxa, \RhizAeon searches for an unrooted quartet outgroup $O$ that maximizes divergence to candidate and home lineages ($d(O, H) + d(O, D)$), strictly disqualifying candidate recombinants and rate-burst leaves from selection to prevent outgroup poisoning.
+When an authentic external outgroup exists, the engine tests the unrooted Buneman four-point condition across tract and flank partitions:
+\begin{align}
+S_1 &= d(C, H) + d(D, O), \label{eq:methods_buneman_s1} \\
+S_2 &= d(C, D) + d(H, O), \label{eq:methods_buneman_s2} \\
+S_3 &= d(C, O) + d(H, D). \label{eq:methods_buneman_s3}
+\end{align}
+Under genuine recombination, the minimal parsimony split flips from $S_1$ (grouping $C$ with $H$ on flanks) to $S_2$ (grouping $C$ with $D$ in tract), with the topological difference exceeding the neutral binomial standard error ($z \ge z_{\text{crit}}$).
+
+In two-clade epidemic expansions where all sampled sequences belong to parental clades or recombinant progeny, no authentic phylogenetic outgroup exists.
+Under this regime, \RhizAeon falls back onto outgroup-invariant triplet criteria:
+\begin{enumerate}
+\item \textbf{Hypergeometric Contingency}: Fisher's exact test across informative sites within versus outside the tract ($p \le \alpha / \binom{N}{3}$).
+\item \textbf{Poisson Informative Floor}: A minimal count of distinguishing mutations donated by the minor parent ($s_{\text{donor}} \ge 3$).
+\item \textbf{Directional Recoil Significance}: Standardized transition displacement along the parental dipole axis exceeding Gaussian extreme-value bounds ($\Delta_{\text{net}} \ge z_{\text{crit}} \cdot \text{SE}$).
+\item \textbf{Private Autapomorphy Sieve}: Bounding private autapomorphic mutations along the candidate branch ($\rho_{\text{priv}} < 0.50$) to reject localized heterotachy spikes.
+\end{enumerate}
+This invariant fallback guarantees rigorous false positive control without requiring external reference taxa or inducing false negatives in closed outbreak cohorts.
+
+\subsection{The Reticulation Fidelity Scoring Framework}
+\label{subsec:methods_scoring_framework}
+
+A simulated ground-truth recombination event is formalized as an oriented tuple:
+\begin{equation}
+E = (C, H, D, \mathcal{I}),
+\label{eq:methods_event_tuple}
+\end{equation}
+where $C \in \{1, \dots, N\}$ denotes the recombinant child isolate, $H \in \{1, \dots, N\}$ denotes the major parental recipient lineage (home), $D \in \{1, \dots, N\} \cup \{\text{Ghost}\}$ denotes the minor parental donor lineage, and $\mathcal{I} \subset [1, L]$ denotes the genomic interval of horizontal genetic exchange.
+An inferred event is denoted $\hat{E} = (\hat{C}, \hat{H}, \hat{D}, \hat{\mathcal{I}})$.
+
+Let $\mathcal{S}_{\text{inf}}(H, D) \subset \{1, \dots, L\}$ denote the set of informative polymorphisms distinguishing parental lineages $H$ and $D$:
+\begin{equation}
+\mathcal{S}_{\text{inf}}(H, D) = \{s \in \{1, \dots, L\} \mid H[s] \neq D[s]\}.
+\label{eq:methods_inf_set}
+\end{equation}
+For true exchange interval $\mathcal{I}$ and inferred interval $\hat{\mathcal{I}}$, the sets of true and inferred transferred informative polymorphisms are:
+\begin{equation}
+\mathcal{S}_{\text{true}} = \{s \in \mathcal{S}_{\text{inf}}(H, D) \mid s \in \mathcal{I}\}, \qquad \mathcal{S}_{\text{inferred}} = \{s \in \mathcal{S}_{\text{inf}}(H, D) \mid s \in \hat{\mathcal{I}}\}.
+\end{equation}
+The spatial accuracy score is formulated as the Jaccard similarity over informative sites:
+\begin{equation}
+J_{\text{SNP}}(\mathcal{I}, \hat{\mathcal{I}}) = \frac{|\mathcal{S}_{\text{true}} \cap \mathcal{S}_{\text{inferred}}|}{|\mathcal{S}_{\text{true}} \cup \mathcal{S}_{\text{inferred}}|}.
+\label{eq:methods_j_snp}
+\end{equation}
+Alignments contain zero phylogenetic signal between adjacent informative sites.
+Consequently, the likelihood profile forms an exact mathematical plateau.
+Whenever predicted boundaries fall within the flanking uninformative plateaus of the true exchange ($E_{\text{SNP}} = 0$), the informative sets coincide ($\mathcal{S}_{\text{inferred}} \equiv \mathcal{S}_{\text{true}}$), yielding $J_{\text{SNP}} = 1.00$.
+The metric naturally scales across evolutionary regimes, penalizing predictions that traverse contradictory mutations without imposing arbitrary nucleotide distance thresholds.
+
+Lineage identification requires genealogical discipline.
+To evaluate parental attribution without penalizing close sister isolates or framing innocent taxa, we define genealogical kinship affinity.
+Let $d_{\text{tree}}(X, Y)$ denote the patristic distance between taxa $X$ and $Y$ on the reference phylogeny.
+The genealogical affinity kernel is defined as:
+\begin{equation}
+w(X, Y) = \exp\left(-\frac{d_{\text{tree}}(X, Y)}{\sigma_{\text{clade}}}\right),
+\label{eq:methods_patristic_kernel}
+\end{equation}
+where $\sigma_{\text{clade}}$ denotes the characteristic divergence scale of the surrounding monophyletic sublineage.
+The directed triad attribution score is formulated as:
+\begin{equation}
+S_{\text{triad}}(C, H, D;\, \hat{C}, \hat{H}, \hat{D}) = w(C, \hat{C}) \times \left( \frac{w(H, \hat{H}) + w(D, \hat{D})}{2} \right).
+\label{eq:methods_s_triad}
+\end{equation}
+The child affinity $w(C, \hat{C})$ operates as an outer multiplicative gate.
+If an algorithm misidentifies an unreticulated background isolate as the recombinant child, $w(C, \hat{C}) \approx 0$, collapsing the triad score.
+Symmetrically, if an algorithm inverts the reticulation direction by swapping child and donor ($\hat{C} \approx D$), the deep divergence between recombinant and donor lineages extinguishes $w(C, D)$, purging inverted calls without ad-hoc rules.
+When the true donor represents an unsampled ghost lineage ($D = \text{Ghost}$), identifying an unsampled donor awards full credit ($w(D, \hat{D}) = 1.00$ for $\hat{D} = \text{Ghost}$), while naming a sampled sister lineage receives partial credit proportional to its patristic distance to the introgression node.
+
+For each pair of true event $E_i$ and inferred event $\hat{E}_j$, the composite event affinity is the product of lineage fidelity and spatial accuracy:
+\begin{equation}
+s(E_i, \hat{E}_j) = S_{\text{triad}}(E_i, \hat{E}_j) \times J_{\text{SNP}}(E_i, \hat{E}_j).
+\label{eq:methods_event_affinity}
+\end{equation}
+To evaluate reticulations under strict cardinality discipline, we construct the pairwise cost matrix $C_{ij} = 1 - s(E_i, \hat{E}_j)$ for all $i \in \{1, \dots, K\}$ and $j \in \{1, \dots, \hat{K}\}$.
+We compute the optimal bijective bipartite matching $\mathcal{M}$ using the Hungarian algorithm \cite{kuhn1955hungarian}.
+Every unmatched true event counts as a false negative, while every unmatched predicted event counts as an ungrounded false alarm.
+
+Across the optimal matching $\mathcal{M}$, reticulation precision and recall are defined as:
+\begin{align}
+\text{PPV}_{\mathcal{R}} &= \frac{1}{\hat{K}} \sum_{(E_i, \hat{E}_j) \in \mathcal{M}} s(E_i, \hat{E}_j), \label{eq:methods_ppv_r} \\
+\text{TPR}_{\mathcal{R}} &= \frac{1}{K} \sum_{(E_i, \hat{E}_j) \in \mathcal{M}} s(E_i, \hat{E}_j). \label{eq:methods_tpr_r}
+\end{align}
+The harmonic mean of precision and recall defines the composite Reticulation Fidelity Index:
+\begin{equation}
+\mathcal{R}_{F_1} = \frac{2 \cdot \text{PPV}_{\mathcal{R}} \cdot \text{TPR}_{\mathcal{R}}}{\text{PPV}_{\mathcal{R}} + \text{TPR}_{\mathcal{R}}} = \frac{2 \sum_{(E_i, \hat{E}_j) \in \mathcal{M}} s(E_i, \hat{E}_j)}{K + \hat{K}}.
+\label{eq:methods_rf1}
+\end{equation}
+On non-recombinant clonal null alignments ($K = 0$), the index evaluates to $\mathcal{R}_{F_1} = 1.00$ if $\hat{K} = 0$, and $\mathcal{R}_{F_1} = 0.00$ if any false positive event is declared ($\hat{K} > 0$), with alignment-level false positive rate $\text{FPR} = \mathbb{I}(\hat{K} > 0)$.
+To summarize performance across all four biological axes, benchmarks report the multi-dimensional evaluation profile:
+\begin{equation}
+\mathbf{S}_{\mathcal{R}} = \left(\text{TPR}_{\mathcal{R}},\, \text{PPV}_{\mathcal{R}},\, \overline{S}_{\text{triad}},\, \overline{J}_{\text{SNP}}\right).
+\label{eq:methods_score_profile}
+\end{equation}

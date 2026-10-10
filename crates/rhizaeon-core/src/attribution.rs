@@ -287,6 +287,7 @@ impl TrajectoryParentalResolver {
         aln: &crate::types::Alignment,
         preferred_home_ch: Option<usize>,
         preferred_donor_ch: Option<usize>,
+        candidate_indices: &[usize],
     ) -> TrajectoryParentalPair {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -333,11 +334,9 @@ impl TrajectoryParentalResolver {
         // Test for Ghost Donor
         let mut is_ghost = false;
         let mut max_w_tr_cont = f64::NEG_INFINITY;
-        let mut best_cont_donor = contemporary_channels[0];
         for &ch in &contemporary_channels {
             if w_tract[ch] > max_w_tr_cont {
                 max_w_tr_cont = w_tract[ch];
-                best_cont_donor = ch;
             }
         }
 
@@ -413,23 +412,86 @@ impl TrajectoryParentalResolver {
             };
         }
 
-        // Contemporary Donor Resolution
+        // Contemporary Donor Resolution:
+        // By physical definition of a reticulation dipole, an authentic donor landmark must exhibit
+        // positive recoil contrast relative to the candidate (d_flank > d_tract).
+        // Channels with d_flank <= d_tract (such as co-recombinant sisters or Home sisters) do not
+        // diverge in the flanks and cannot act as external donor parents.
+        let cand_row = aln.row(candidate_idx);
+        let mut recoil_channels = Vec::new();
+        for &ch in &contemporary_channels {
+            let k_idx = ch - 1;
+            let t_idx = landmarks.indices[k_idx];
+            let t_row = aln.row(t_idx);
+            let mut df = 0usize;
+            let mut vf = 0usize;
+            let mut dt = 0usize;
+            let mut vt = 0usize;
+            for u in 0..l {
+                let rc = cand_row[u];
+                let rt = t_row[u];
+                if rc > 0 && rt > 0 {
+                    if u < s_idx || u > e_idx {
+                        vf += 1;
+                        if rc != rt { df += 1; }
+                    } else {
+                        vt += 1;
+                        if rc != rt { dt += 1; }
+                    }
+                }
+            }
+            let d_fl = if vf > 0 { (df as f64) / (vf as f64) } else { 0.0 };
+            let d_tr = if vt > 0 { (dt as f64) / (vt as f64) } else { 1.0 };
+            if d_fl > d_tr {
+                recoil_channels.push((ch, d_fl));
+            }
+        }
+
+        let mut non_candidate_recoil = Vec::new();
+        for &(ch, d_fl) in &recoil_channels {
+            let k_idx = ch - 1;
+            let t_idx = landmarks.indices[k_idx];
+            // Disqualify co-recombinant sisters sharing the candidate's home flank (d_fl < 0.008),
+            // while allowing authentic donor parents from the opposite clade:
+            let is_corecombinant_sister = candidate_indices.contains(&t_idx) && d_fl < 0.008;
+            if !is_corecombinant_sister {
+                non_candidate_recoil.push(ch);
+            }
+        }
+
+        let eligible_donor_channels = if !non_candidate_recoil.is_empty() {
+            non_candidate_recoil
+        } else if !recoil_channels.is_empty() {
+            recoil_channels.into_iter().map(|(c, _)| c).collect()
+        } else {
+            contemporary_channels.clone()
+        };
+
+        let mut max_w_tr_elig = f64::NEG_INFINITY;
+        let mut best_elig_donor = eligible_donor_channels[0];
+        for &ch in &eligible_donor_channels {
+            if w_tract[ch] > max_w_tr_elig {
+                max_w_tr_elig = w_tract[ch];
+                best_elig_donor = ch;
+            }
+        }
+
         let best_donor_ch = if let Some(pref_d) = preferred_donor_ch {
-            if pref_d > 0 && contemporary_channels.contains(&pref_d) && w_tract[pref_d] >= 0.5 * max_w_tr_cont {
+            if pref_d > 0 && eligible_donor_channels.contains(&pref_d) && w_tract[pref_d] >= 0.5 * max_w_tr_elig {
                 pref_d
             } else {
-                best_cont_donor
+                best_elig_donor
             }
         } else {
-            best_cont_donor
+            best_elig_donor
         };
 
         // Intra-Clade Sister Disambiguation via normalized Hamming distance inside tract
         let mut final_donor_ch = best_donor_ch;
-        if contemporary_channels.len() > 1 {
+        if eligible_donor_channels.len() > 1 {
             let best_w = w_tract[best_donor_ch];
             let mut runner_ups = Vec::new();
-            for &ch in &contemporary_channels {
+            for &ch in &eligible_donor_channels {
                 if (best_w - w_tract[ch]) < 0.25 * best_w.abs().max(1.0) {
                     runner_ups.push(ch);
                 }

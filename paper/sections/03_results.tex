@@ -1,6 +1,185 @@
 \section{Empirical Benchmarks and Real-World Validation}
 \label{sec:results}
 
+Empirical validation must bridge mathematical theory to biological reality.
+Benchmarking recombination algorithms requires evaluating multiple distinct biological dimensions across the complete reticulation event.
+Binary alerts conceal structural errors.
+An algorithm can easily trigger alarms on mutational rate variation, invert parental polarity, or fragment a single conversion tract into multiple spurious breakpoints while claiming high empirical sensitivity.
+Objective standards prevent metric gaming.
+We formalize performance across four foundational dimensions: alignment-level detection on clonal nulls, breakpoint cardinality, informational spatial accuracy, and directed sequence identity (Table~\ref{tab:evaluation_framework}).
+
+\begin{table*}[t!]
+\caption{Formal benchmark scoring framework across reticulation dimensions. Performance is evaluated across four primary biological dimensions to prevent methodological gaming: alignment-level classification under non-recombinant nulls, breakpoint cardinality, spatial boundary accuracy under sequence information bounds, directed triad attribution, ghost donor introgression, and ancestral event consolidation.}
+\label{tab:evaluation_framework}
+\centering
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{3.2cm} Y Y}
+\toprule
+\textit{Dimension} & \textit{Biological Question} & \textit{Formal Benchmark Criterion} & \textit{Mathematical Scoring Metric} \\
+\midrule
+Alignment-Level Detection & Does the alignment contain authentic horizontal genetic exchange? & Complete rejection of non-recombinant clonal nulls under heterotachy, APOBEC bursts, Darwinian selection, and molecular clock evolution. High sensitivity on true mosaics. & Binary classification with false positive rate $\text{FPR} = \text{FP} / N_{\text{null}} = 0.00\%$ at $\alpha = 0.05$ and sensitivity $\text{TPR} = \text{TP} / N_{\text{rec}}$. \\
+\addlinespace
+Breakpoint Cardinality & How many recombination breakpoints occurred along the chromosome? & Strict agreement between predicted and true changepoint counts. Over-splitting and spurious fragmentation are penalized as false alarms. & Bijective bipartite matching via Hungarian algorithm on cost $C_{ij} = 1 - s(E_i, \hat{E}_j)$ with cardinality penalty $\Delta K = |\hat{K} - K_{\text{true}}|$. \\
+\addlinespace
+Breakpoint Localization & Where are the boundaries of horizontal genetic exchange located? & Informative SNP Jaccard Index ($J_{\text{SNP}}$) over flanking informative polymorphisms $[u_{\text{inf, left}}, u_{\text{inf, right}}]$. Contradictory SNP distance outside the plateau. & $J_{\text{SNP}} = \frac{|\mathcal{S}_{\text{true}} \cap \mathcal{S}_{\text{inferred}}|}{|\mathcal{S}_{\text{true}} \cup \mathcal{S}_{\text{inferred}}|}$; exact plateau containment ($E_{\text{SNP}} = 0 \iff J_{\text{SNP}} = 1.00$). \\
+\addlinespace
+Sequence Identity and Direction & Which sequence is the recombinant, which is the major parent, and which is the donor? & Directed triad attribution $(C, H, D)$ distinguishing recombinant child $C$, home recipient $H$, and donor parent $D$. Rejection of reciprocal 2-cycle cheats ($C \leftrightarrow D$). & Triad fidelity $S_{\text{triad}}$ with phylogenetic partial credit $w(X, Y)$ and physical transition contrast $\Delta d_{\text{home}} > 0, \Delta d_{\text{donor}} > 0$. \\
+\addlinespace
+Ghost Donor Introgression & Does the transferred sequence originate from an unsampled or extinct lineage? & Correct identification of unsampled donor ($D = \varnothing$) without framing innocent background outgroup sequences as false recombinant children. & Ghost recall $\mathbb{I}(\hat{D} = \text{Ghost})$ with background false alarm rate $\text{FPR}_{\text{bg}} = \text{FP}_{\text{bg}} / N_{\text{bg}} = 0.00\%$. \\
+\addlinespace
+Ancestral Event Consolidation & How many independent historical recombination events occurred in the cohort? & Grouping epidemiologically related descendant isolates sharing homologous parental lineages and overlapping breakpoints into a single ancestral event. & Interval overlap $\ge 50\%$ with compatible parental pair $(H, D)$ and consolidated event ratio $K_{\text{events}} / N_{\text{isolates}}$. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+Spatial precision demands metrics grounded in sequence information content instead of arbitrary distance thresholds.
+Information bounds resolution.
+Between adjacent informative polymorphisms that distinguish parental lineages, alignments contain zero phylogenetic signal, causing the log-likelihood profile to form an exact mathematical plateau.
+Judging breakpoint accuracy through fixed nucleotide windows creates a false standard.
+A rigid threshold penalizes exact calls in conserved regions while forgiving predictions that cross dozens of contradictory mutations in divergent genomes.
+Instead, we evaluate spatial accuracy through the Informative SNP Jaccard Index ($J_{\text{SNP}}$), measuring the fraction of true informative polymorphisms recovered within the inferred boundary.
+Whenever a predicted coordinate lands anywhere within the flanking informative plateau of the true exchange, the traversed SNP error is zero ($E_{\text{SNP}} = 0$), yielding $J_{\text{SNP}} = 1.00$.
+
+Lineage attribution requires equal discipline.
+Calling recombination on the wrong sequence or inverting the reticulation arrow represents total biological failure.
+We evaluate directed triad fidelity ($S_{\text{triad}}$), requiring accurate identification of the recombinant child, the home recipient, and the donor parent.
+Phylogenetic partial credit accounts for genealogical proximity, awarding proportional affinity when an algorithm identifies a close sister isolate within the same monophyletic clade.
+Transposed child-donor cycles collapse to zero because deep inter-clade divergence extinguishes affinity.
+To penalize over-splitting, predicted events are paired to ground truth through bijective bipartite matching via the Hungarian algorithm.
+Unmatched predictions deflate precision ($\text{PPV}_{\mathcal{R}}$), while undetected exchanges depress recall ($\text{TPR}_{\mathcal{R}}$).
+The individual dimensions unite into the composite Reticulation Fidelity Index ($\mathcal{R}_{F_1}$), providing an un-gameable benchmark standard (Materials and Methods, Section~\ref{subsec:methods_scoring_framework}).
+
+\subsection{Coalescent Benchmarks: The Hyper-Recombination Paradox and Spatial Observability}
+\label{subsec:posada_crandall_benchmark}
+
+When recombination rates escalate toward the hyper-recombinant limit ($\rho \to \infty$), conventional intuition assumes that mosaic events should become trivial to detect.
+The opposite is true.
+Too much recombination looks like no recombination.
+When an ancestral recombination graph shatters a chromosome into micro-tracts shorter than the distance between informative mutations, the spatial autocorrelation of phylogenetic affinity vanishes.
+Lineages exchange identical alleles.
+The sequence of pairwise differences collapses into an uncorrelated Poisson point process with constant rate $\bar{d}$.
+Physically and mathematically, hyper-recombinant evolution becomes indistinguishable from clonal evolution under a molecular clock with site-to-site homoplasy.
+Every changepoint detector searching for spatial clustering of affinity finds white noise.
+The signal is not missed by imperfect heuristics.
+The signal does not exist in the alignment.
+
+Under Kingman's coalescent with recombination, ancestral partitions scale harmonically as $\mathbb{E}[N_{\text{part}}] \approx 1 + \rho \sum_{k=1}^{n-1} k^{-1}$.
+For $n=10$ taxa at $\rho=64$, this shatters a 1,000-nucleotide alignment into $\sim 160$ independent genealogical segments.
+Mean tract length compresses to $\bar{L}_{\text{tract}} \approx 6.25\text{ nt}$ (barely two codons).
+In contrast, at population mutation rate $\theta = 10$ (pairwise divergence $p \approx 1\%$), informative polymorphisms occur roughly once every $\bar{\Delta}_{\text{SNP}} \approx 100\text{ nt}$.
+Tract length is sixteen times smaller than mutational spacing ($\bar{L}_{\text{tract}} / \bar{\Delta}_{\text{SNP}} \approx 0.06$).
+Over 94\% of simulated coalescent segments contain zero segregating sites.
+The tract length sits far below the spatial Nyquist sampling rate of the mutational process.
+As $\rho \to \infty$, the genealogical correlation length $L_{\text{corr}} \sim 1/\rho \to 0$, destroying sequence memory.
+Penalizing algorithms for omitting silent micro-tracts mistakes unmutated genealogical history for observable data.
+
+This physical boundary requires classifying analysis difficulty across three independent planes rather than tracking crude binary alerts.
+In Plane 1 (Detection Identifiability), statistical power depends on informative polymorphism density ($\delta_{\text{inf}} = S_{\text{inf}} / L$) and four-gamete incompatibility prevalence ($\Upsilon_{4G}$).
+Alignments with $S_{\text{inf}} < 3$ are informationally sterile.
+The data cannot reject tree space.
+In Plane 2 (Breakpoint Localization), spatial accuracy is bounded by the physical Shannon limit ($\Delta \tau_{\text{lim}} = s_{\text{right}} - s_{\text{left}}$), representing the interval between parental distinguishing polymorphisms flanking the exchange.
+Predictions inside $[\tau - \Delta_{\text{left}}, \tau + \Delta_{\text{right}}]$ achieve optimal zero-error containment ($J_{\text{SNP}} = 1.00$).
+Tracts lacking distinguishing mutations ($N_{\text{inf}}(\mathcal{I}) = 0$) represent unobservable ghost exchanges.
+In Plane 3 (Lineage Attribution), parental contrast depends on patristic divergence ($d_{H, D} = d_{\text{tree}}(H, D)$) and donor clade uniqueness margin ($\mu_{\text{donor}}$).
+Midpoint crossovers ($\eta_{\text{pol}} \approx 1.0$) introduce mathematical role symmetry, whereas asymmetric cassettes ($\eta_{\text{pol}} \ll 1.0$) unambiguously orient the home chromosome.
+
+To test this principle empirically and evaluate structural performance, we replicated the 32-scenario coalescent benchmark introduced by Posada and Crandall \cite{posada2001evaluation}.
+We evaluated \RhizAeon alongside the field-standard triplet mosaic scanner 3SEQ across the exact same 3,200 simulated alignments (100 replicates per condition, 6,400 runs total).
+All alignments evolved under continuous-time HKY85 substitution dynamics ($\kappa = 2.0$, $\bm{\pi} = [0.4, 0.2, 0.3, 0.1]$) across 10-taxon cohorts ($L = 1,000\text{ nt}$).
+Simulations I (Power Grid) crossed population mutation rates $\theta \in \{10, 50, 100, 200\}$ with recombination intensities $\rho \in \{0, 1, 4, 16, 64\}$ under homogeneous rates.
+Simulations II (Heterotachy Grid) evaluated strict clonal nulls ($\rho = 0.0$) against continuous Gamma site-rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$).
+Both tools were scored using identical bipartite Hungarian matching and informative SNP boundaries (Table~\ref{tab:posada_crandall_results}).
+
+\begin{table*}[t!]
+\caption{Paired replication benchmark of the Posada and Crandall (2001) simulation suite evaluating \RhizAeon versus 3SEQ across 32 experimental conditions (100 replicates each, 3,200 trials per engine, 6,400 runs total). Simulations I evaluate detection power and structural reticulation fidelity across population mutation rates ($\theta$) and recombination rates ($\rho$) under uniform rates ($\alpha = \text{None}$). Simulations II evaluate false positive rate control under strict clonal nulls ($\rho = 0.0$) with continuous Gamma site-rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Evaluated columns report ground-truth reticulations ($K_{\text{true}}$), detection rate (Power or FPR, \%), inferred reticulation count ($\hat{K}$), Reticulation Precision ($\text{PPV}_{\mathcal{R}}$), Triad Fidelity ($S_{\text{triad}}$), Informative SNP Jaccard ($J_{\text{SNP}}$), and execution runtime (ms).}
+\label{tab:posada_crandall_results}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l c c r rrrrrr rrrrrr @{}}
+\toprule
+\textit{Condition} & $\theta$ & $\rho$ / $\alpha$ & $K_{\text{true}}$ & \multicolumn{6}{c}{\textbf{\RhizAeon (Continuous Manifold)}} & \multicolumn{6}{c}{\textbf{3SEQ (Discrete Triplets)}} \\
+\cmidrule(lr){5-10} \cmidrule(lr){11-16}
+& & & & \textit{Det} & $\hat{K}$ & $\text{PPV}$ & $S_{\text{triad}}$ & $J_{\text{SNP}}$ & \textit{ms} & \textit{Det} & $\hat{K}$ & $\text{PPV}$ & $S_{\text{triad}}$ & $J_{\text{SNP}}$ & \textit{ms} \\
+\midrule
+\multicolumn{16}{l}{\textbf{Simulations I: Power Grid under Homogeneous Rates ($\alpha = \text{None}$)}} \\
+\textit{Theta 10} & 10 & $\rho = 0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 13.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 59.7 \\
+& 10 & $\rho = 1$ & 0.8 & 3.0\% & 0.04 & 0.550 & 0.551 & 0.564 & 10.4 & 2.0\% & 0.04 & 0.540 & 0.542 & 0.540 & 41.1 \\
+& 10 & $\rho = 4$ & 3.7 & 10.0\% & 0.11 & 0.239 & 0.241 & 0.276 & 12.2 & 16.0\% & 0.40 & 0.201 & 0.212 & 0.251 & 37.3 \\
+& 10 & $\rho = 16$ & 11.1 & 23.0\% & 0.24 & 0.065 & 0.083 & 0.146 & 17.9 & 22.0\% & 0.58 & 0.021 & 0.032 & 0.112 & 23.2 \\
+& 10 & $\rho = 64$ & 26.0 & 1.0\% & 0.01 & 0.007 & 0.008 & 0.009 & 21.8 & 1.0\% & 0.03 & 0.002 & 0.003 & 0.006 & 23.7 \\
+\addlinespace
+\textit{Theta 50} & 50 & $\rho = 0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 16.9 & 2.0\% & 0.03 & 0.980 & 0.980 & 0.980 & 30.3 \\
+& 50 & $\rho = 1$ & 1.6 & 22.0\% & 0.27 & 0.532 & 0.543 & 0.583 & 15.0 & 38.0\% & 2.14 & 0.410 & 0.485 & 0.486 & 31.7 \\
+& 50 & $\rho = 4$ & 5.1 & 48.0\% & 0.78 & 0.351 & 0.383 & 0.430 & 19.9 & 73.0\% & 5.18 & 0.070 & 0.170 & 0.289 & 28.9 \\
+& 50 & $\rho = 16$ & 17.7 & 76.0\% & 1.71 & 0.326 & 0.423 & 0.511 & 25.6 & 96.0\% & 9.75 & 0.064 & 0.191 & 0.338 & 24.5 \\
+& 50 & $\rho = 64$ & 51.8 & 93.0\% & 2.65 & 0.401 & 0.593 & 0.592 & 20.5 & 100.0\% & 10.82 & 0.119 & 0.338 & 0.382 & 25.4 \\
+\addlinespace
+\textit{Theta 100} & 100 & $\rho = 0$ & 0.0 & 1.0\% & 0.01 & 0.990 & 0.990 & 0.990 & 14.2 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 33.4 \\
+& 100 & $\rho = 1$ & 1.4 & 20.0\% & 0.26 & 0.507 & 0.525 & 0.559 & 14.4 & 52.0\% & 3.84 & 0.349 & 0.469 & 0.503 & 36.7 \\
+& 100 & $\rho = 4$ & 5.7 & 59.0\% & 1.06 & 0.416 & 0.461 & 0.576 & 15.1 & 85.0\% & 8.38 & 0.063 & 0.179 & 0.312 & 31.8 \\
+& 100 & $\rho = 16$ & 19.4 & 89.0\% & 2.24 & 0.381 & 0.499 & 0.599 & 22.0 & 100.0\% & 14.17 & 0.054 & 0.194 & 0.292 & 27.8 \\
+& 100 & $\rho = 64$ & 63.7 & 98.0\% & 3.53 & 0.404 & 0.592 & 0.608 & 16.2 & 100.0\% & 14.54 & 0.103 & 0.335 & 0.342 & 28.4 \\
+\addlinespace
+\textit{Theta 200} & 200 & $\rho = 0$ & 0.0 & 1.0\% & 0.01 & 0.990 & 0.990 & 0.990 & 14.2 & 1.0\% & 0.06 & 0.990 & 0.990 & 0.990 & 36.3 \\
+& 200 & $\rho = 1$ & 1.2 & 23.0\% & 0.25 & 0.596 & 0.610 & 0.656 & 14.6 & 43.0\% & 4.05 & 0.465 & 0.551 & 0.580 & 39.6 \\
+& 200 & $\rho = 4$ & 5.3 & 60.0\% & 1.05 & 0.378 & 0.448 & 0.508 & 15.5 & 89.0\% & 10.92 & 0.046 & 0.167 & 0.305 & 37.0 \\
+& 200 & $\rho = 16$ & 19.7 & 93.0\% & 2.59 & 0.419 & 0.553 & 0.633 & 18.2 & 100.0\% & 17.25 & 0.056 & 0.212 & 0.283 & 37.3 \\
+& 200 & $\rho = 64$ & 69.0 & 96.0\% & 3.96 & 0.384 & 0.565 & 0.606 & 19.6 & 100.0\% & 16.26 & 0.089 & 0.326 & 0.318 & 33.3 \\
+\midrule
+\multicolumn{16}{l}{\textbf{Simulations II: Heterotachy \& Rate Variation Nulls ($\rho = 0.0$, False Positive Calibration)}} \\
+\textit{Theta 10} & 10 & $\alpha = 2.0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 16.3 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 26.6 \\
+& 10 & $\alpha = 0.5$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 17.4 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 28.4 \\
+& 10 & $\alpha = 0.05$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 15.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 29.7 \\
+\addlinespace
+\textit{Theta 50} & 50 & $\alpha = 2.0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 15.5 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 28.2 \\
+& 50 & $\alpha = 0.5$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 16.2 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 24.5 \\
+& 50 & $\alpha = 0.05$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 14.9 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 27.0 \\
+\addlinespace
+\textit{Theta 100} & 100 & $\alpha = 2.0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 14.3 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 28.1 \\
+& 100 & $\alpha = 0.5$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 15.5 & 1.0\% & 0.01 & 0.990 & 0.990 & 0.990 & 27.5 \\
+& 100 & $\alpha = 0.05$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 14.7 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 26.7 \\
+\addlinespace
+\textit{Theta 200} & 200 & $\alpha = 2.0$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 18.2 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 30.6 \\
+& 200 & $\alpha = 0.5$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 15.4 & 1.0\% & 0.01 & 0.990 & 0.990 & 0.990 & 30.6 \\
+& 200 & $\alpha = 0.05$ & 0.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 15.0 & 0.0\% & 0.00 & 1.000 & 1.000 & 1.000 & 26.4 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+The empirical results decisively confirm the hyper-recombination paradox.
+At $\theta = 10$ and $\rho = 64$, detection collapsed to exactly 1.0\% for \RhizAeon and 1.0\% for 3SEQ ($\hat{K} = 0.01$ and $0.03$, respectively).
+Both algorithms independently prove that hyper-recombinant sequence data lack observable signal when tract lengths fall below mutational spacing.
+In their original 2001 study, Posada and Crandall reported that twelve of fourteen evaluated methods failed completely in this regime \cite{posada2001evaluation}.
+The only tool reporting high nominal detection was Maynard Smith's Homoplasy Test (95\%).
+However, Posada and Crandall demonstrated that the Homoplasy Test was a pathological false-alarm machine, screaming 28\% to 90\% false positives on non-recombinant alignments under rate variation.
+The Homoplasy Test did not detect reticulation tracts.
+It simply detected unlinked homoplasy.
+When mutational spacing exceeds tract length, authentic changepoint detection is mathematically impossible.
+
+As mutational depth expands into well-powered regimes ($\theta \ge 50$), informative polymorphisms become dense ($\bar{\Delta}_{\text{SNP}} \approx 10\text{ nt}$).
+Stochastic coalescent clustering consolidates adjacent fragments into compound macroscopic blocks ($50$--$100\text{ nt}$) that contain distinguishing mutations.
+Here, both engines detect recombination, but their architectural behaviors diverge sharply.
+3SEQ succumbs to the triplet inflation trap.
+Because 3SEQ evaluates each of the $\binom{10}{3} = 120$ triplets in isolation, an exchange in one lineage triggers statistical alarms across dozens of overlapping triplets.
+At $\theta = 200, \rho = 64$, 3SEQ emitted an average of $\hat{K} = 16.26$ candidate triplets per alignment, collapsing its precision to $\text{PPV}_{\mathcal{R}} = 0.0895$ (8.9\% precision).
+Its triad fidelity fell to $S_{\text{triad}} = 0.326$, and its spatial accuracy declined to $J_{\text{SNP}} = 0.318$.
+In contrast, \RhizAeon executes joint manifold deconvolution.
+By tracking continuous trajectory excursions across the unified Buneman metric space, \RhizAeon resolves the dominant macroscopic reticulations that carry coherent phylogenetic polarity ($\hat{K} = 3.96$).
+Manifold deconvolution preserves structural coherence.
+\RhizAeon achieved more than fourfold higher precision ($\text{PPV}_{\mathcal{R}} = 0.384$ versus $0.089$), higher triad fidelity ($S_{\text{triad}} = 0.565$ versus $0.326$), and superior spatial accuracy ($J_{\text{SNP}} = 0.606$ versus $0.318$), while reaching 96.0\% detection power at $\theta = 200$ and 98.0\% at $\theta = 100$.
+Triplet scanning fractures the global topology.
+
+Simulations II establish absolute false positive rate control under severe heterotachy.
+Across all 1,200 trials with continuous Gamma site-rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$), \RhizAeon maintained an exact 0.00\% false positive rate ($0/1,200$ false alarms).
+Sink absorption neutralizes autapomorphic rate spikes.
+Under homogeneous clonal nulls ($\rho = 0.0$ in Simulations I), \RhizAeon restricted false calls to 0.50\% ($2/400$ trials), yielding an aggregate false positive rate of 0.12\% ($2/1,600$ trials) across all non-recombinant alignments.
+In contrast, 3SEQ produced false alarms across multiple non-recombinant conditions (up to 2.0\% at $\theta = 50, \rho = 0$, and 1.0\% under $\alpha = 0.5$).
+False alarms destroy surveillance trust.
+Finally, \RhizAeon demonstrated exceptional computational efficiency.
+Even at $N=10$ taxa---where triplet combinations are minimized---\RhizAeon executed in an average of 16.4 milliseconds per alignment across all 32 scenarios, operating nearly twice as fast as 3SEQ (31.3 ms).
+On larger cohorts, this performance advantage expands by orders of magnitude.
+
 \subsection{Adversarial Null Calibration and Immunity to Biological Heterotachy}
 \label{subsec:null_calibration}
 
@@ -24,6 +203,99 @@ Recombination in mammalian mitochondria remains biologically controversial and e
 \RhizAeon processed the 78-taxon cohort in 236.8 milliseconds.
 Zero reticulation events crossed the Dunn-Sidak boundary.
 The tool confirmed the global null hypothesis ($H_0$), verifying that maternal mitochondrial genomes maintain unreticulated clonal integrity across deep population divergence.
+
+\subsection{Epidemic Clonal Expansion: Triplet Redundancy and Event Consolidation}
+\label{subsec:epidemic_clonal_expansion}
+
+Natural pathogen outbreaks violate coalescent assumptions of independent sampling.
+Surveillance cohorts capture clonal expansions.
+When an ancestral recombination event establishes an epidemiologically successful lineage---such as the emergence of SARS-CoV-2 recombinant lineage XBB from BJ.1 and BM.1.1.1 or HIV-1 circulating recombinant form CRF02\_AG---public health laboratories sequence dozens or hundreds of descendant isolates carrying the identical historical crossover.
+Each isolate accumulates subsequent private transmission drift.
+Clonal transmission uncovers an intrinsic failure mode of atomistic triplet scanners.
+
+Triplet methods lack an ancestral consolidation manifold.
+Because scanners such as 3SEQ evaluate each sequence triplet independently, an expanding recombinant lineage triggers severe combinatorial alert redundancy.
+A single reticulation produces redundant alerts across multiple descendant isolates.
+When 3SEQ evaluates triplets containing two recombinant isolates and a parental reference, or one recombinant isolate and two parental references, the tool detects authentic mosaicism on each individual leaf.
+However, because 3SEQ evaluates subgraphs in isolation without phylogenetic regularization, it cannot synthesize these redundant detections into one ancestral event.
+The tool emits dozens of unlinked candidate triplets for a single historical crossover, fragmenting one biological lineage into dozens of independent alerts.
+
+Redundancy is only the first failure mode.
+Triplet scanning also creates severe false positive discovery on non-recombinant background leaves.
+Because sister leaves within parental clades accumulate minor private transmission drift, testing triplets across background parents and recombinant isolates generates unpolarizable phylogenetic contrast.
+3SEQ frequently mistakes stationary background parents for recombinant children.
+This parental false discovery rate escalates with evolutionary divergence.
+
+To evaluate this dynamic rigorously, we simulated a 15-condition benchmark grid replicating epidemic clonal expansion (Table~\ref{tab:epidemic_expansion_results}).
+We evaluated 300 alignments across parental divergences $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and clonal expansion sizes $K \in \{2, 5, 8, 10, 15\}$ descendant isolates with $N_{P1} = 20$ and $N_{P2} = 20$ background parents ($L = 5,000\text{ nt}$, 20 replicates each).
+All alignments contained exactly one true ancestral recombination event spanning nucleotides 1,500--3,000 ($K_{\text{true}} = 1.00$).
+
+\begin{table*}[t!]
+\caption{Epidemic Clonal Expansion benchmark evaluating \RhizAeon versus 3SEQ across 15 experimental conditions (20 replicates each, 300 alignments total, $L = 5,000\text{ nt}$). A single ancestral recombination event ($K_{\text{true}} = 1.00$, tract $[1500, 3000]$) expands into $K$ descendant isolates with transmission drift ($\bar{d} = 0.002$), alongside $N_{P1} = 20$ and $N_{P2} = 20$ background parental isolates. Columns report parental divergence ($d_{\text{parent}}$), cohort size ($K$), and total taxa ($N$). Performance metrics include inferred unique events ($\hat{K}_{\text{unique}}$), background parental false positive rate ($\text{FPR}_{\text{parent}}$), member recall, precision, Informative Jaccard index ($J$), and execution runtime in milliseconds.}
+\label{tab:epidemic_expansion_results}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} c c c rrr rrrrrr @{}}
+\toprule
+& & & \multicolumn{3}{c}{\textbf{3SEQ (Triplet Mosaic Scanner)}} & \multicolumn{6}{c}{\textbf{\RhizAeon (Metric Manifold Tracking)}} \\
+\cmidrule(lr){4-6} \cmidrule(lr){7-12}
+$d_{\text{parent}}$ & $K$ & $N$ & $\hat{K}_{\text{unique}}$ & $\text{FPR}_{\text{parent}}$ & Runtime & $\hat{K}_{\text{unique}}$ & Recall & $\text{FPR}_{\text{parent}}$ & Precision & Jaccard & Runtime \\
+\midrule
+0.02 & 2 & 42 & 9.4 & 18.6\% & 846 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.929 & 275 \\
+0.02 & 5 & 45 & 10.7 & 14.1\% & 1,145 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.914 & 224 \\
+0.02 & 8 & 48 & 25.6 & 44.1\% & 1,479 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.910 & 309 \\
+0.02 & 10 & 50 & 21.8 & 29.5\% & 1,610 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.914 & 280 \\
+0.02 & 15 & 55 & 30.5 & 38.8\% & 2,276 & 1.05 & 100.0\% & 0.0\% & 100.0\% & 0.941 & 425 \\
+\addlinespace
+0.05 & 2 & 42 & 26.6 & 61.4\% & 1,201 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.974 & 166 \\
+0.05 & 5 & 45 & 38.8 & 84.5\% & 1,501 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.977 & 211 \\
+0.05 & 8 & 48 & 45.9 & 94.6\% & 1,952 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.962 & 291 \\
+0.05 & 10 & 50 & 49.7 & 99.2\% & 2,140 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.966 & 320 \\
+0.05 & 15 & 55 & 54.0 & 97.4\% & 2,922 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.972 & 456 \\
+\addlinespace
+0.10 & 2 & 42 & 36.8 & 86.9\% & 1,492 & 1.20 & 100.0\% & 3.5\% & 89.9\% & 0.983 & 202 \\
+0.10 & 5 & 45 & 44.9 & 99.6\% & 1,937 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.983 & 213 \\
+0.10 & 8 & 48 & 48.0 & 100.0\% & 2,480 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.984 & 288 \\
+0.10 & 10 & 50 & 50.0 & 100.0\% & 2,780 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.985 & 285 \\
+0.10 & 15 & 55 & 55.0 & 100.0\% & 3,751 & 1.00 & 100.0\% & 0.0\% & 100.0\% & 0.984 & 446 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+The paired benchmark reveals sharp divergence in event cardinality and parental specificity.
+At $d_{\text{parent}} = 0.05$, 3SEQ reported between 26.6 and 54.0 uncollapsed recombinant children per alignment, emitting up to 54.0 statistically significant triplets.
+Many of these triplets detect genuine mosaicism on individual leaves.
+Yet 3SEQ falsely declared between 61.4\% and 99.2\% of all strictly non-recombinant background parents as recombinant children.
+At $d_{\text{parent}} = 0.10$, 3SEQ's false positive rate on background parents reached 100.0\% ($40/40$ non-recombinant parental isolates falsely classified as recombinants).
+Its precision collapsed to 5.8\%--27.3\%.
+Clonal expansion broke the scanner.
+
+In contrast, \RhizAeon maintains strict event consolidation and parental discipline.
+Across all 300 trials, \RhizAeon reconstructed an average of 1.00 to 1.20 unique consolidated events (mean $\hat{K} = 1.02$, matching $K_{\text{true}} = 1.00$).
+Continuous trajectory embedding groups co-recombinant isolates into a unified bundle.
+Cohort roster recruitment achieved flawless recovery of true descendant isolates, reaching 100.0\% true positive recall ($300/300$ trials) across all 15 experimental regimes without a single false negative.
+The algorithm avoids the single-isolate bottleneck without inflating event cardinality.
+Trajectory geometry scales cleanly.
+\RhizAeon suppressed parental false alarms effectively, maintaining a background false positive rate of 0.0\% across 14 regimes and 3.5\% at $d_{\text{parent}} = 0.10, K = 2$ (overall mean $\text{FPR}_{\text{parent}} = 0.23\%$, versus 71.25\% for 3SEQ).
+Overall precision reached 99.33\% (attaining 100.0\% in 14 of 15 regimes).
+Both methods achieved high spatial localization across the 1,500 nt cassette, with \RhizAeon reaching informative Jaccard indices of $J = 0.910$ to $0.985$ (mean $J = 0.959$).
+\RhizAeon executed in 166 to 456 milliseconds per alignment (mean 293 ms), accelerating analysis up to 8.4-fold over 3SEQ (846 to 3,751 ms, mean 1,967 ms).
+
+Two architectural innovations ensure this flawless detection discipline in epidemic regimes.
+First, \RhizAeon resolves the outgroup dilemma.
+In two-clade epidemic outbreaks where an alignment contains only parental lineages and recombinant progeny, no authentic phylogenetic outgroup exists.
+Naive quartet algorithms that greedily select the most divergent sequence inevitably select a co-recombinant sister or an opposite parental isolate, contaminating topological tests and triggering false negative suppression.
+\RhizAeon strictly disqualifies candidate recombinants and rate-burst isolates from outgroup selection, falling back onto robust outgroup-invariant triplet criteria when no external reference exists.
+By evaluating Bonferroni-corrected Fisher's exact tests ($p \le \alpha / \binom{N}{3}$), Poisson informative site floors ($s_{\text{donor}} \ge 3$), directional recoil significance, and the private autapomorphy sieve, \RhizAeon achieves 100.0\% true positive recall ($300/300$ trials) without relying on artificial outgroup assumptions.
+Invariants replace arbitrary references.
+
+Second, \RhizAeon prevents co-recombinant sister competition during parental attribution.
+When an ancestral crossover expands into a transmission cluster, sister isolates share both the introgressed cassette and the parental home background.
+Unconstrained attribution algorithms mistake co-recombinant sisters for donors, triggering mutual suppression.
+\RhizAeon screens flanking divergence ($d_{\text{flank}}$), disqualifying co-recombinant sister isolates ($d_{\text{flank}} < 0.008$) from acting as donor channels while preserving authentic parental donors from the opposite clade ($d_{\text{flank}} \ge 0.008$).
+Flanking contrast preserves parental identity.
+Together, these safeguards suppress non-recombinant parental false alarms to 0.23\% across all 300 trials (compared to 71.25\% for 3SEQ), delivering 99.33\% precision across expanding lineages.
 
 \subsection{Multi-Way Mosaicism and Unsampled Lineage Introgression}
 \label{subsec:multiway_mosaicism}

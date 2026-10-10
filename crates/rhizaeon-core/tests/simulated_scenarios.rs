@@ -33,7 +33,6 @@ fn test_synthetic_crossover() {
     let aln = parse_fasta(&fasta).expect("Parse fasta failed");
     let engine = RhizAeonEngine::new().with_landmarks(16);
     let result = engine.scan(&aln);
-
     assert!(!result.events.is_empty(), "Should detect synthetic crossover");
     let ev = &result.events[0];
     assert_eq!(ev.candidate_name, "R", "R must be identified as recombinant");
@@ -72,7 +71,6 @@ fn test_synthetic_heterotachy_null() {
     let aln = parse_fasta(&fasta).expect("Parse fasta failed");
     let engine = RhizAeonEngine::new().with_landmarks(16);
     let result = engine.scan(&aln);
-
     assert!(result.events.is_empty(), "Private heterotachy burst must NOT trigger false positive recombination");
 }
 

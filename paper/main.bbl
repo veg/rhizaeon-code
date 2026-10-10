@@ -96,6 +96,11 @@ Sergei~L Kosakovsky~Pond, David Posada, Michael~B Gravenor, Christopher~H
   algorithm.
 \newblock {\em Molecular Biology and Evolution}, 23(10):1891--1901, 2006.
 
+\bibitem{kuhn1955hungarian}
+Harold~W. Kuhn.
+\newblock The hungarian method for the assignment problem.
+\newblock {\em Naval Research Logistics Quarterly}, 2(1--2):83--97, 1955.
+
 \bibitem{lam20183seq}
 H~M Lam, O~Ratmann, and M~F Boni.
 \newblock Improved algorithmic complexity for the {3SEQ} recombination

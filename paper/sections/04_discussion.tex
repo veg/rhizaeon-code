@@ -27,6 +27,33 @@ By tracking continuous trajectory tensors across the entire cohort simultaneousl
 The framework detects interleaved parental contributions without prior constraints on parental cardinality.
 Furthermore, metric isolation prevents unsampled ghost donors from triggering combinatorial false alarms across innocent contemporary clades.
 
+\subsection{Theoretical Boundaries: Pervasive Recombination and the Limits of Parental Attribution}
+\label{subsec:discussion_limits}
+
+Every algorithmic framework for detecting genetic recombination operates under an implicit information-theoretic premise: reticulation events are sparse relative to the tempo of clonal divergence.
+Trees require coherence.
+When recombination occurs as episodic introgression, distinct parental lineages maintain extended tracts of linkage disequilibrium, providing the mutual information necessary to distinguish an introgressed cassette from its clonal background.
+Under these conditions, Farthest-Point Minimax Sampling reliably extracts non-recombinant backbone genomes that span the fundamental cladogenetic divides of the population.
+
+This geometric premise breaks down when genetic exchange becomes pervasive.
+In panmictic bacterial populations (\textit{e.g.}, \textit{Helicobacter pylori}, \textit{Streptococcus pneumoniae}) or dense viral quasispecies where the recombination rate far exceeds the mutation rate ($r/\mu \gg 1$), linkage disequilibrium decays over distances shorter than the typical spacing between informative single-nucleotide polymorphisms ($\ell_{\text{LD}} \ll s_{\text{SNP}}$).
+Genomes become fine-scale mosaics of mosaics.
+In this hyper-recombinant regime, no sampled isolate represents an intact ancestral parent; every candidate landmark is itself a mosaic composite of fragmented ancestries.
+Global pairwise evolutionary distances collapse toward a uniform spatial mean, washing out the discrete bipartitions of Buneman metric space.
+
+How detection methods respond to this informational collapse defines their statistical integrity.
+Classical triplet-scanning tools (such as 3SEQ, RDP, and GENECONV) fail silently in this regime.
+Because they evaluate three-sequence alignments in isolation without reference to global manifold structure, triplet methods mistake fine-scale stochastic fluctuations for macroscopic gene conversion.
+The result is combinatorial hallucination: triplet tools infer dense, circular webs of spurious reticulation where nearly every sequence is designated both parent and recombinant child to every other isolate.
+
+Metric manifold geometry confronts this informational boundary directly.
+When alignments lack identifiable parental backbones, the leading eigenvalues of the landmark Gram matrix $\mathbf{B}$ fail to separate, collapsing into an isotropic hypersphere.
+In Tier~3 force field deconvolution, this spatial degeneracy manifests as the total suppression of singular values beneath the Marchenko--Pastur bulk noise edge ($s_{\text{bulk}}$).
+The engine terminates parameter-free.
+Parental attribution in a thoroughly scrambled population is not an algorithmic difficulty awaiting more refined heuristics; it is an ill-posed informational category error.
+When unadmixed ancestral lineages no longer exist in the contemporary sample, attempting to designate discrete ``donors'' and ``recipients'' exceeds the physical capacity of the alignment.
+By halting inference when reticulate forces merge into the random spectral bulk, \RhizAeon provides a principled boundary against the algorithmic over-interpretation of panmictic noise.
+
 \subsection{Data Governance and Biosafety Compliance}
 \label{subsec:biosafety}
 

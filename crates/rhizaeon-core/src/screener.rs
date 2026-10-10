@@ -243,7 +243,8 @@ impl LocalFluxScreener {
         for i in 0..n {
             let z_r = (logit_r[i] - med_logit) / scale_logit;
 
-            if z_r > z_alpha_r && gamma_root[i] <= self.spatial_coherence_threshold {
+            let is_isolated_leaf = !(0..n).any(|j| j != i && crate::landmarks::compute_pairwise_distance(aln, i, j) < 0.008);
+            if z_r > z_alpha_r && r_root[i] >= 0.05 && gamma_root[i] <= self.spatial_coherence_threshold && is_isolated_leaf {
                 is_rate_burst[i] = true;
                 rate_burst_indices.push(i);
             } else if (z_r > z_alpha_r || r_dim[i] > self.root_ratio_threshold)
@@ -269,31 +270,32 @@ impl LocalFluxScreener {
         let lower_v: Vec<f64> = pool_v.iter().cloned().filter(|&x| x <= med_v).collect();
         let lower_pulse: Vec<f64> = pool_pulse.iter().cloned().filter(|&x| x <= med_pulse).collect();
 
-        let mad_v = if !lower_v.is_empty() {
+        let (med_low_v, mad_v) = if !lower_v.is_empty() {
             let med_low = median(&lower_v);
-            median(&lower_v.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>())
+            let mad = median(&lower_v.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
+            (med_low, mad)
         } else {
-            0.0
+            (med_v, 0.0)
         };
-        let mad_pulse = if !lower_pulse.is_empty() {
+        let (med_low_pulse, mad_pulse) = if !lower_pulse.is_empty() {
             let med_low = median(&lower_pulse);
-            median(&lower_pulse.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>())
+            let mad = median(&lower_pulse.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
+            (med_low, mad)
         } else {
-            0.0
+            (med_pulse, 0.0)
         };
 
-        // Gumbel extreme value critical threshold
-        let alpha_fwer = 0.05;
-        let z_crit_ev = normal_ppf(1.0 - alpha_fwer / (n as f64));
+        // Robust baseline scaling from uncontaminated lower quartile:
+        let z_crit_cand = 2.0f64;
 
-        let floor_v = med_v / (l as f64).sqrt();
-        let floor_pulse = med_pulse / (l as f64).sqrt();
+        let floor_v = med_low_v / (l as f64).sqrt();
+        let floor_pulse = med_low_pulse / (l as f64).sqrt();
 
         let scale_v = (1.4826 * mad_v).max(floor_v);
         let scale_pulse = (1.4826 * mad_pulse).max(floor_pulse);
 
-        let thresh_v = med_v + z_crit_ev * scale_v;
-        let thresh_pulse = med_pulse + z_crit_ev * scale_pulse;
+        let thresh_v = med_low_v + z_crit_cand * scale_v;
+        let thresh_pulse = med_low_pulse + z_crit_cand * scale_pulse;
 
         let mut candidate_mask = vec![false; n];
         for &i in &pool_indices {

@@ -20,3 +20,7 @@ path = "src/main.rs"
 name = "export_figure1_data"
 path = "src/bin/export_figure1_data.rs"
 
+[[bin]]
+name = "export_figure2_data"
+path = "src/bin/export_figure2_data.rs"
+
