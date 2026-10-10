@@ -114,20 +114,11 @@ impl TrajectoryParentalResolver {
         }
 
         // 4. Eligible contemporary landmark channels
-        // Exclude candidate itself AND any sister isolate within within-swarm drift (d < 0.010)
         let mut contemporary_channels = Vec::new();
         for p in 0..k {
             let l_global = landmarks.indices[p];
-            let d_to_cand = crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_global);
-            if l_global != candidate_idx && d_to_cand >= 0.010 {
+            if l_global != candidate_idx {
                 contemporary_channels.push(p + 1);
-            }
-        }
-        if contemporary_channels.is_empty() {
-            for p in 0..k {
-                if landmarks.indices[p] != candidate_idx {
-                    contemporary_channels.push(p + 1);
-                }
             }
         }
         if contemporary_channels.is_empty() {

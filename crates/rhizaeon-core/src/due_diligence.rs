@@ -272,8 +272,8 @@ impl SequenceDueDiligence {
         // If Home's private autapomorphy density in the tract jumps significantly above its flank
         // baseline (r_priv_tract >= r_priv_flank + 0.020 with n_priv >= 4), Home is an accelerated
         // lineage whose terminal mutations create a phantom mirror effect on innocent taxa.
-        // This check requires N >= 6 to ensure the tree has sufficient background taxa beyond the quartet.
-        if aln.num_taxa >= 6 {
+        // This check requires N >= 4.
+        if aln.num_taxa >= 4 {
             let mut n_priv_home_tract = 0usize;
             let mut valid_home_tract = 0usize;
             for u in s_idx..e_idx {
@@ -282,7 +282,7 @@ impl SequenceDueDiligence {
                     valid_home_tract += 1;
                     let mut is_priv = true;
                     for t_idx in 0..aln.num_taxa {
-                        if t_idx != home_global && aln.row(t_idx)[u] == rh {
+                        if t_idx != home_global && t_idx != cand_idx && aln.row(t_idx)[u] == rh {
                             is_priv = false;
                             break;
                         }
@@ -302,7 +302,7 @@ impl SequenceDueDiligence {
                         valid_home_flank += 1;
                         let mut is_priv = true;
                         for t_idx in 0..aln.num_taxa {
-                            if t_idx != home_global && aln.row(t_idx)[u] == rh {
+                            if t_idx != home_global && t_idx != cand_idx && aln.row(t_idx)[u] == rh {
                                 is_priv = false;
                                 break;
                             }
@@ -333,7 +333,7 @@ impl SequenceDueDiligence {
                             valid_donor_tract += 1;
                             let mut is_priv = true;
                             for t_idx in 0..aln.num_taxa {
-                                if t_idx != dg && aln.row(t_idx)[u] == rd {
+                                if t_idx != dg && t_idx != cand_idx && aln.row(t_idx)[u] == rd {
                                     is_priv = false;
                                     break;
                                 }
@@ -353,7 +353,7 @@ impl SequenceDueDiligence {
                                 valid_donor_flank += 1;
                                 let mut is_priv = true;
                                 for t_idx in 0..aln.num_taxa {
-                                    if t_idx != dg && aln.row(t_idx)[u] == rd {
+                                    if t_idx != dg && t_idx != cand_idx && aln.row(t_idx)[u] == rd {
                                         is_priv = false;
                                         break;
                                     }
@@ -445,6 +445,7 @@ impl SequenceDueDiligence {
                 let mut best_outgroup = None;
                 let mut max_out_div = -1.0;
 
+                let d_hd = crate::landmarks::compute_pairwise_distance(aln, home_global, donor_global);
                 for o_idx in 0..aln.num_taxa {
                     if o_idx != cand_idx
                         && o_idx != home_global
@@ -454,27 +455,11 @@ impl SequenceDueDiligence {
                     {
                         let d_oh = crate::landmarks::compute_pairwise_distance(aln, o_idx, home_global);
                         let d_od = crate::landmarks::compute_pairwise_distance(aln, o_idx, donor_global);
-                        let sum_d = d_oh + d_od;
-                        if sum_d > max_out_div {
-                            max_out_div = sum_d;
-                            best_outgroup = Some(o_idx);
-                        }
-                    }
-                }
-
-                if best_outgroup.is_none() {
-                    let mut max_out_div_fallback = -1.0;
-                    for o_idx in 0..aln.num_taxa {
-                        if o_idx != cand_idx
-                            && o_idx != home_global
-                            && o_idx != donor_global
-                            && !rate_burst_indices.contains(&o_idx)
-                        {
-                            let d_oh = crate::landmarks::compute_pairwise_distance(aln, o_idx, home_global);
-                            let d_od = crate::landmarks::compute_pairwise_distance(aln, o_idx, donor_global);
+                        // An authentic phylogenetic outgroup must be external to the {H, D} split:
+                        if d_oh >= 0.40 * d_hd && d_od >= 0.40 * d_hd {
                             let sum_d = d_oh + d_od;
-                            if sum_d > max_out_div_fallback {
-                                max_out_div_fallback = sum_d;
+                            if sum_d > max_out_div {
+                                max_out_div = sum_d;
                                 best_outgroup = Some(o_idx);
                             }
                         }
@@ -689,21 +674,29 @@ impl SequenceDueDiligence {
                 }
 
                 // Co-recombinant sisters share the same Home parent and Donor parent.
-                // They descend from the same ancestral event and NEVER form a mutual 2-cycle reflection!
-                let d_inter = match (e1.home_idx, e1.donor_idx) {
-                    (Some(h), Some(d)) => crate::landmarks::compute_pairwise_distance(_aln, h, d),
-                    _ => 0.05,
-                };
-                let same_home = e1.home_name == e2.home_name || match (e1.home_idx, e2.home_idx) {
-                    (Some(h1), Some(h2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, h1, h2) < 0.5 * d_inter,
-                    _ => false,
-                };
-                let same_donor = e1.donor_name == e2.donor_name || match (e1.donor_idx, e2.donor_idx) {
-                    (Some(d1), Some(d2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, d1, d2) < 0.5 * d_inter,
-                    _ => false,
-                };
-                if same_home && same_donor {
-                    continue; // Co-recombinant sisters; preserve for group_ancestral_events
+                // They descend from the same ancestral event and NEVER form a mutual 2-cycle reflection.
+                // However, if one candidate cites the other as Home or Donor, they are in a mutual cycle relationship!
+                let c1_is_h2 = (e2.home_name == *c1_name) || (e2.home_idx.map_or(false, |h| crate::landmarks::compute_pairwise_distance(_aln, h, e1.candidate_idx) < 0.015));
+                let c2_is_h1 = (e1.home_name == *c2_name) || (e1.home_idx.map_or(false, |h| crate::landmarks::compute_pairwise_distance(_aln, h, e2.candidate_idx) < 0.015));
+                let c1_is_d2 = (e2.donor_name == *c1_name) || (e2.donor_idx.map_or(false, |d| crate::landmarks::compute_pairwise_distance(_aln, d, e1.candidate_idx) < 0.015));
+                let c2_is_d1 = (e1.donor_name == *c2_name) || (e1.donor_idx.map_or(false, |d| crate::landmarks::compute_pairwise_distance(_aln, d, e2.candidate_idx) < 0.015));
+
+                if !c1_is_h2 && !c2_is_h1 && !c1_is_d2 && !c2_is_d1 {
+                    let d_inter = match (e1.home_idx, e1.donor_idx) {
+                        (Some(h), Some(d)) => crate::landmarks::compute_pairwise_distance(_aln, h, d),
+                        _ => 0.05,
+                    };
+                    let same_home = e1.home_name == e2.home_name || match (e1.home_idx, e2.home_idx) {
+                        (Some(h1), Some(h2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, h1, h2) < 0.5 * d_inter,
+                        _ => false,
+                    };
+                    let same_donor = e1.donor_name == e2.donor_name || match (e1.donor_idx, e2.donor_idx) {
+                        (Some(d1), Some(d2)) => d_inter > 0.005 && crate::landmarks::compute_pairwise_distance(_aln, d1, d2) < 0.5 * d_inter,
+                        _ => false,
+                    };
+                    if same_home && same_donor {
+                        continue; // Co-recombinant sisters; preserve for group_ancestral_events
+                    }
                 }
 
                 // Mutual cycle adjudication requires the two events to be homologous in genomic space:

@@ -576,6 +576,105 @@ fn group_ancestral_events(
         }
     }
 
+    // Cohort Roster Recruitment (DIR-RHIZ-PAFF-013.9)
+    // Once an ancestral event is verified between Home and Donor over [u1, u2],
+    // enroll all cohort isolates that carry this verified mosaic haplotype into the event roster.
+    // Governed strictly by the 4 canonical physical polarity invariants (Zero Magic Numbers):
+    //   1. d_flank(S, H) < d_flank(S, D)
+    //   2. d_tract(S, D) < d_tract(S, H)
+    //   3. d_flank(S, D) - d_tract(S, D) > 0 (positive recoil towards Donor)
+    //   4. d_tract(S, H) - d_flank(S, H) > 0 (positive departure from Home)
+    for g in &mut grouped {
+        if let Some(hg) = g.home_idx {
+            let s_idx = g.u1.saturating_sub(1);
+            let e_idx = g.u2.min(aln.length);
+            if e_idx <= s_idx {
+                continue;
+            }
+            let home_row = aln.row(hg);
+            let donor_row_opt = g.donor_idx.map(|dg| aln.row(dg));
+
+            for t_idx in 0..aln.num_taxa {
+                let t_name = &aln.taxa[t_idx];
+                if g.isolates.contains(t_name) {
+                    continue;
+                }
+                let t_row = aln.row(t_idx);
+
+                let mut d_tr_h = 0usize; let mut v_tr_h = 0usize;
+                let mut d_fl_h = 0usize; let mut v_fl_h = 0usize;
+                for u in 0..aln.length {
+                    let rt = t_row[u];
+                    let rh = home_row[u];
+                    if rt > 0 && rh > 0 {
+                        if u >= s_idx && u < e_idx {
+                            v_tr_h += 1;
+                            if rt != rh { d_tr_h += 1; }
+                        } else {
+                            v_fl_h += 1;
+                            if rt != rh { d_fl_h += 1; }
+                        }
+                    }
+                }
+                let dist_tr_h = if v_tr_h > 0 { (d_tr_h as f64) / (v_tr_h as f64) } else { 1.0 };
+                let dist_fl_h = if v_fl_h > 0 { (d_fl_h as f64) / (v_fl_h as f64) } else { 1.0 };
+
+                if let Some(donor_row) = donor_row_opt {
+                    let mut d_tr_d = 0usize; let mut v_tr_d = 0usize;
+                    let mut d_fl_d = 0usize; let mut v_fl_d = 0usize;
+                    for u in 0..aln.length {
+                        let rt = t_row[u];
+                        let rd = donor_row[u];
+                        if rt > 0 && rd > 0 {
+                            if u >= s_idx && u < e_idx {
+                                v_tr_d += 1;
+                                if rt != rd { d_tr_d += 1; }
+                            } else {
+                                v_fl_d += 1;
+                                if rt != rd { d_fl_d += 1; }
+                            }
+                        }
+                    }
+                    let dist_tr_d = if v_tr_d > 0 { (d_tr_d as f64) / (v_tr_d as f64) } else { 1.0 };
+                    let dist_fl_d = if v_fl_d > 0 { (d_fl_d as f64) / (v_fl_d as f64) } else { 1.0 };
+
+                    let matches_mosaic = dist_fl_h < dist_fl_d
+                        && dist_tr_d < dist_tr_h
+                        && dist_fl_d > dist_tr_d
+                        && dist_tr_h > dist_fl_h;
+
+                    if matches_mosaic {
+                        g.isolates.push(t_name.clone());
+                    }
+                } else if g.is_ghost_donor {
+                    let cand_row = aln.row(g.candidate_idx);
+                    let mut d_tot_c = 0usize; let mut v_tot_c = 0usize;
+                    let mut d_tot_h = 0usize; let mut v_tot_h = 0usize;
+                    for u in 0..aln.length {
+                        let rt = t_row[u];
+                        let rc = cand_row[u];
+                        let rh = home_row[u];
+                        if rt > 0 && rc > 0 {
+                            v_tot_c += 1;
+                            if rt != rc { d_tot_c += 1; }
+                        }
+                        if rt > 0 && rh > 0 {
+                            v_tot_h += 1;
+                            if rt != rh { d_tot_h += 1; }
+                        }
+                    }
+                    let dist_tot_c = if v_tot_c > 0 { (d_tot_c as f64) / (v_tot_c as f64) } else { 1.0 };
+                    let dist_tot_h = if v_tot_h > 0 { (d_tot_h as f64) / (v_tot_h as f64) } else { 1.0 };
+                    if dist_fl_h < dist_tr_h && dist_tot_c < dist_tot_h {
+                        g.isolates.push(t_name.clone());
+                    }
+                }
+            }
+            g.isolates.sort();
+            g.isolates.dedup();
+        }
+    }
+
     // Assign 1-based sequential event ID and sort by it
     for (i, g) in grouped.iter_mut().enumerate() {
         g.event_id = i + 1;
