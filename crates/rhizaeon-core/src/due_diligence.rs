@@ -331,7 +331,7 @@ impl SequenceDueDiligence {
                 let x2 = n_priv_home_flank as f64;
                 let p1 = x1 / n1;
                 let p2 = x2 / n2;
-                if p1 > p2 && n_priv_home_tract >= 4 {
+                if p1 >= p2 + 0.020 && n_priv_home_tract >= 4 {
                     let p_pool = (x1 + x2) / (n1 + n2);
                     if p_pool > 0.0 && p_pool < 1.0 {
                         let se_pool = (p_pool * (1.0 - p_pool) * (1.0 / n1 + 1.0 / n2)).sqrt();
@@ -394,7 +394,7 @@ impl SequenceDueDiligence {
                         let x2 = n_priv_donor_flank as f64;
                         let p1 = x1 / n1;
                         let p2 = x2 / n2;
-                        if p1 > p2 && n_priv_donor_tract >= 4 {
+                        if p1 >= p2 + 0.020 && n_priv_donor_tract >= 4 {
                             let p_pool = (x1 + x2) / (n1 + n2);
                             if p_pool > 0.0 && p_pool < 1.0 {
                                 let se_pool = (p_pool * (1.0 - p_pool) * (1.0 / n1 + 1.0 / n2)).sqrt();

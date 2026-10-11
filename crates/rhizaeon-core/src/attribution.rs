@@ -66,7 +66,7 @@ impl TrajectoryParentalResolver {
         n: usize,
         landmarks: &LandmarkSet,
         aln: &crate::types::Alignment,
-        candidate_indices: &[usize],
+        _candidate_indices: &[usize],
     ) -> Vec<TrajectoryParentalPair> {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -147,38 +147,40 @@ impl TrajectoryParentalResolver {
         }
 
         // 4. Eligible contemporary landmark channels
+        // 4. Eligible contemporary landmark channels
         let mut contemporary_channels = Vec::new();
         for p in 0..k {
             let l_global = landmarks.indices[p];
             if l_global != candidate_idx {
-                let is_sister = candidate_indices.contains(&l_global)
-                    && crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_global) < d_sister;
-                if !is_sister {
-                    contemporary_channels.push(p + 1);
-                }
+                contemporary_channels.push(p + 1);
             }
         }
         if contemporary_channels.is_empty() {
-            for p in 0..k {
-                if landmarks.indices[p] != candidate_idx {
-                    contemporary_channels.push(p + 1);
-                }
-            }
-            if contemporary_channels.is_empty() {
-                contemporary_channels.push(1);
-            }
+            contemporary_channels.push(1);
         }
 
         // 5. Find optimal primary pair across all contemporary pairs
         let mut best_score = -1.0;
         let mut best_pair = (contemporary_channels[0], contemporary_channels[0]);
+        let mut best_is_sister_a = false;
+        let mut best_is_sister_b = false;
 
         for i in 0..contemporary_channels.len() {
             let ch_a = contemporary_channels[i];
+            let l_a = landmarks.indices[ch_a - 1];
+            let is_sister_a = crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_a) < d_sister;
             let var_a = cov_c[ch_a * num_channels + ch_a].max(1e-12);
 
             for j in (i + 1)..contemporary_channels.len() {
                 let ch_b = contemporary_channels[j];
+                let l_b = landmarks.indices[ch_b - 1];
+                let is_sister_b = crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_b) < d_sister;
+
+                // Both channels cannot be sisters of candidate (must be different clades)
+                if is_sister_a && is_sister_b {
+                    continue;
+                }
+
                 let var_b = cov_c[ch_b * num_channels + ch_b].max(1e-12);
                 let cov_ab = cov_c[ch_a * num_channels + ch_b];
 
@@ -193,11 +195,17 @@ impl TrajectoryParentalResolver {
                 if score > best_score {
                     best_score = score;
                     best_pair = (ch_a, ch_b);
+                    best_is_sister_a = is_sister_a;
+                    best_is_sister_b = is_sister_b;
                 }
             }
         }
 
-        let (mut home_ch, primary_donor_ch) = if mean_a[best_pair.0] >= mean_a[best_pair.1] {
+        let (mut home_ch, primary_donor_ch) = if best_is_sister_a {
+            (best_pair.0, best_pair.1)
+        } else if best_is_sister_b {
+            (best_pair.1, best_pair.0)
+        } else if mean_a[best_pair.0] >= mean_a[best_pair.1] {
             (best_pair.0, best_pair.1)
         } else {
             (best_pair.1, best_pair.0)
@@ -229,6 +237,10 @@ impl TrajectoryParentalResolver {
         // Test other contemporary channels against home_ch
         for &d in &contemporary_channels {
             if d == home_ch || d == primary_donor_ch {
+                continue;
+            }
+            let l_d = landmarks.indices[d - 1];
+            if crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_d) < d_sister {
                 continue;
             }
 

@@ -46,10 +46,21 @@ Gilles Deleuze and F{\'e}lix Guattari.
 \newblock {\em A Thousand Plateaus: Capitalism and Schizophrenia}.
 \newblock University of Minnesota Press, 1987.
 
+\bibitem{didelot2007inference}
+Xavier Didelot and Daniel Falush.
+\newblock Inference of bacterial microevolution using multilocus sequence data.
+\newblock {\em Genetics}, 175(3):1251--1266, 2007.
+
 \bibitem{didelot2010impact}
 Xavier Didelot and Martin C~J Maiden.
 \newblock Impact of recombination on bacterial evolution.
 \newblock {\em Trends in Microbiology}, 18(7):315--322, 2010.
+
+\bibitem{didelot2015clonalframeml}
+Xavier Didelot and Daniel~J Wilson.
+\newblock {ClonalFrameML}: Efficient inference of recombination in whole
+  bacterial genomes.
+\newblock {\em PLoS Computational Biology}, 11(2):e1004041, 2015.
 
 \bibitem{donsker1951invariance}
 Monroe~D. Donsker.

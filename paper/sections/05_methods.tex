@@ -523,7 +523,7 @@ To summarize performance across all four biological axes, benchmarks report the 
 \label{eq:methods_score_profile}
 \end{equation}
 
-\subsection{Synthetic Benchmark Protocols: Epidemic Clonal Expansions and Multi-Way Mosaics}
+\subsection{Synthetic Benchmark Protocols: Epidemic Expansions, Multi-Way Mosaics, Ghost Donors, and Micro-Conversions}
 \label{subsec:methods_benchmark_protocols}
 
 To rigorously assess algorithmic fidelity under authentic evolutionary challenges without synthetic placeholders or parametric shortcuts, we implemented automated benchmark generators operating on raw sequence alignments under continuous-time Markov substitution dynamics.
@@ -545,3 +545,19 @@ To evaluate algorithmic limits when the two-parent assumption is violated, we si
 \end{enumerate}
 Each topology was evaluated across divergence levels $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and descendant swarm sizes $K \in \{1, 5, 10\}$ with 45 non-recombinant background taxa (15 per parental clade; $N = 46\text{--}55$ taxa).
 Performance was evaluated against 3SEQ using identical alignments, measuring background false positive rate ($\text{FPR}_{\text{parent}}$), precision, event cardinality ($\hat{K}_{\text{unique}}$), spatial Jaccard similarity, and execution runtime.
+
+\paragraph{Scenario 1.3: Unsampled Ghost Lineage Introgression Suite.}
+To evaluate algorithmic behavior when introgressions originate from unsampled or extinct taxa, we simulated 540 alignments ($L = 5,000$ nt; 20 replicates across 27 parameter regimes) under three distinct donor availability regimes:
+\begin{enumerate}
+\item \textbf{Pure Ghost Donor}: The donor lineage $P_2$ is completely omitted from the alignment sample, leaving only $P_1$ background isolates and the recombinant progeny.
+\item \textbf{Surrogate Sister Clade}: An unsampled donor lineage introgresses into $P_1$, while a related surrogate sister clade residing at an incremental divergence of $\Delta d_{\text{surr}} = 0.03$ is sampled in the alignment.
+\item \textbf{Deep Reservoir Spillover}: The donor originates from a deeply divergent reservoir lineage separated by patristic divergence $d_{\text{res}} = 0.15$ from the recipient clade.
+\end{enumerate}
+Each regime was crossed with parental divergences $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and recombinant swarm sizes $K \in \{2, 5, 10\}$ isolates with 30 non-recombinant background parental taxa (15 per clade; $N \in \{32, 35, 40\}$ taxa). Evaluated metrics scored ghost recall, parental attribution accuracy, background false positive rate, and spatial Jaccard similarity.
+
+\paragraph{Scenario 1.4: Bacterial Micro-Conversion and Scale-Space Resolution Suite.}
+To systematically benchmark the resolution limits of continuous multiscale matched filtering against discrete triplet scanning on short non-reciprocal gene conversions, we simulated 900 alignments ($L = 5,000$ nt; 20 replicates across 45 parameter regimes) spanning five micro-conversion tract lengths: $L_{\text{tract}} \in \{50, 100, 200, 400, 800\}$ nucleotides ($1.0\%$, $2.0\%$, $4.0\%$, $8.0\%$, and $16.0\%$ of chromosome length).
+The micro-conversion tract was centered at nucleotide 2,500 ($[2,500 - L_{\text{tract}}/2, \, 2,500 + L_{\text{tract}}/2 - 1]$), replacing recipient $P_1$ sequence with homologous donor $P_2$ sequence.
+The ancestral recombinant sprouted $K \in \{2, 5, 10\}$ contemporary descendant isolates accumulating independent transmission drift ($\delta = 0.002$), alongside 30 non-recombinant background parental taxa (15 in $P_1$, 15 in $P_2$; total $N \in \{32, 35, 40\}$).
+Each tract length was evaluated across three parental divergence tiers: $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$.
+Performance was evaluated under exact, un-faked scoring metrics: inferred event cardinality ($\hat{K}$), recombinant isolate recall and precision, background parental false positive rate ($\text{FPR}_{\text{parent}}$), spatial Jaccard overlap ($J$), and execution runtime in milliseconds.

@@ -312,8 +312,8 @@ impl LocalFluxScreener {
         let scale_v = (1.4826 * mad_v).max(floor_v);
         let scale_pulse = (1.4826 * mad_pulse).max(floor_pulse);
 
-        let thresh_v = med_low_v + z_crit_cand * scale_v;
-        let thresh_pulse = med_low_pulse + z_crit_cand * scale_pulse;
+        let thresh_v = (med_low_v + z_crit_cand * scale_v).max(med_v + 1.5 * scale_v);
+        let thresh_pulse = (med_low_pulse + z_crit_cand * scale_pulse).max(med_pulse + 1.5 * scale_pulse);
 
         let mut candidate_mask = vec![false; n];
         for &i in &pool_indices {

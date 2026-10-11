@@ -215,6 +215,7 @@ impl RhizAeonEngine {
                     Some(tract.donor_channel),
                     &screening.candidate_recombinant_indices,
                 );
+
                 let tract_opt = due_diligence.verify_tract(
                     &tract,
                     &local_parental,
@@ -638,24 +639,18 @@ fn group_ancestral_events(
                     }
                 } else if g.is_ghost_donor {
                     let cand_row = aln.row(g.candidate_idx);
-                    let mut d_tot_c = 0usize; let mut v_tot_c = 0usize;
-                    let mut d_tot_h = 0usize; let mut v_tot_h = 0usize;
-                    for u in 0..aln.length {
+                    let mut d_tr_c = 0usize; let mut v_tr_c = 0usize;
+                    for u in s_idx..e_idx {
                         let rt = t_row[u];
                         let rc = cand_row[u];
-                        let rh = home_row[u];
                         if rt > 0 && rc > 0 {
-                            v_tot_c += 1;
-                            if rt != rc { d_tot_c += 1; }
-                        }
-                        if rt > 0 && rh > 0 {
-                            v_tot_h += 1;
-                            if rt != rh { d_tot_h += 1; }
+                            v_tr_c += 1;
+                            if rt != rc { d_tr_c += 1; }
                         }
                     }
-                    let dist_tot_c = if v_tot_c > 0 { (d_tot_c as f64) / (v_tot_c as f64) } else { 1.0 };
-                    let dist_tot_h = if v_tot_h > 0 { (d_tot_h as f64) / (v_tot_h as f64) } else { 1.0 };
-                    if dist_fl_h < dist_tr_h && dist_tot_c < dist_tot_h {
+                    let dist_tr_c = if v_tr_c > 0 { (d_tr_c as f64) / (v_tr_c as f64) } else { 1.0 };
+                    let (_d_sister, d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
+                    if dist_tr_c < dist_tr_h && dist_tr_h > dist_fl_h && dist_fl_h < d_clade {
                         g.isolates.push(t_name.clone());
                     }
                 }
