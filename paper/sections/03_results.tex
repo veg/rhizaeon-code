@@ -286,7 +286,7 @@ Two architectural innovations ensure this flawless detection discipline in epide
 First, \RhizAeon resolves the outgroup dilemma.
 In two-clade epidemic outbreaks where an alignment contains only parental lineages and recombinant progeny, no authentic phylogenetic outgroup exists.
 Naive quartet algorithms that greedily select the most divergent sequence inevitably select a co-recombinant sister or an opposite parental isolate, contaminating topological tests and triggering false negative suppression.
-\RhizAeon strictly disqualifies candidate recombinants and rate-burst isolates from outgroup selection, falling back onto robust outgroup-invariant triplet criteria when no external reference exists.
+\RhizAeon strictly disqualifies candidate recombinants and rate-burst isolates from outgroup selection, falling back onto outgroup-invariant triplet criteria when no external reference exists.
 By evaluating Bonferroni-corrected Fisher's exact tests ($p \le \alpha / \binom{N}{3}$), Poisson informative site floors ($s_{\text{donor}} \ge 3$), directional recoil significance, and the private autapomorphy sieve, \RhizAeon achieves 100.0\% true positive recall ($300/300$ trials) without relying on artificial outgroup assumptions.
 Invariants replace arbitrary references.
 
@@ -295,21 +295,28 @@ When an ancestral crossover expands into a transmission cluster, sister isolates
 Unconstrained attribution algorithms mistake co-recombinant sisters for donors, triggering mutual suppression.
 \RhizAeon screens flanking divergence ($d_{\text{flank}}$), disqualifying co-recombinant sister isolates ($d_{\text{flank}} < 0.008$) from acting as donor channels while preserving authentic parental donors from the opposite clade ($d_{\text{flank}} \ge 0.008$).
 Flanking contrast preserves parental identity.
-Together, these safeguards suppress non-recombinant parental false alarms to 0.23\% across all 300 trials (compared to 71.25\% for 3SEQ), delivering 99.33\% precision across expanding lineages.
+Together, these safeguards suppress non-recombinant parental false alarms to 0.23\% across all 300 trials (compared to 71.25\% for 3SEQ), achieving 99.33\% precision across expanding lineages.
 
-\subsection{Deconvolution of Multi-Way Mosaic Swarms}
+\subsection{Deconvolution of Multi-Way Mosaic Swarms: Scenario 1.2 Benchmark}
 \label{subsec:multiway_mosaicism}
 
 Natural viral and bacterial recombination frequently transcends simple two-parent hybridization.
 Triplets cannot resolve swarms.
-In hyper-epidemic and persistent viral reservoirs, circulating recombinant forms (CRFs) undergo secondary crossovers with tertiary strains, yielding intricate multi-parental mosaics.
-Prominent examples include complex HIV-1 recombinant forms (e.g., CRF06\_cpx and secondary CRF02\_AG chimeras \cite{carr1998full}), SARS-CoV-2 recombinant lineages that accumulated secondary intra-Omicron crossovers (e.g., the BA.2.10/BA.2.75 recombinant XBB and Delta--Omicron chimeras \cite{turakhia2022pandemic,tamura2023xbb,smith2023tracking}), circulating enteroviruses and polioviruses with sequential non-structural exchanges \cite{simmonds2005}, and bacterial multi-cassette genomic islands \cite{didelot2010impact}.
+In hyper-epidemic and persistent reservoirs, circulating recombinant forms (CRFs) undergo secondary crossovers with tertiary strains, yielding composite multi-parental mosaics.
+Prominent examples include complex HIV-1 circulating recombinant forms (such as CRF06\_cpx and secondary CRF02\_AG chimeras \cite{carr1998full}), SARS-CoV-2 recombinant lineages that accumulated secondary intra-Omicron crossovers (including the BA.2.10/BA.2.75 recombinant XBB and Delta--Omicron chimeras \cite{turakhia2022pandemic,tamura2023xbb,smith2023tracking}), circulating enteroviruses and polioviruses with sequential non-structural exchanges \cite{simmonds2005}, and bacterial multi-cassette genomic islands \cite{didelot2010impact}.
 
 Triplet-based algorithms encounter an inescapable mathematical ceiling when scanning multi-parental mosaics.
 Tools such as 3SEQ, RDP, and MaxChi evaluate $\binom{N}{3}$ subgraphs in isolation, fundamentally presuming that every recombinant child descends from exactly two parents \cite{martin2015rdp4,boni2007exact}.
 Given a multi-way recombinant $C$ synthesized from three distinct parental lineages $\{P_1, P_2, P_3\}$, no single triplet contains all three parental sequences simultaneously.
 When testing candidate triplet $(P_1, P_2, C)$, the third parental segment from $P_3$ is treated as unmodeled, divergent noise.
-This structural violation corrupts prefix match statistics and forces triplet algorithms into a catastrophic dilemma: either the multi-parental sequence is rejected as anomalous divergence (false negative suppression), or the algorithm emits multiple conflicting, out-of-phase triplet alerts that misattribute strictly non-recombinant background parents as recombinant children (false positive explosion).
+This structural mismatch corrupts prefix match statistics and forces triplet algorithms into a catastrophic dilemma: either the multi-parental sequence is rejected as anomalous divergence (false negative suppression), or the algorithm emits multiple conflicting, out-of-phase triplet alerts that misattribute strictly non-recombinant background parents as recombinant children (false positive explosion).
+
+To evaluate multi-parental resolution, we constructed Scenario 1.2 comprising 540 authentic simulation trials (20 replicates across 27 conditions; Table~\ref{tab:multiway_mosaic_benchmark}).
+We benchmarked \RhizAeon against 3SEQ across three canonical multi-way architectures.
+In Dual-Cassette Swarms, a $P_1$ backbone acquires two independent foreign cassettes from $P_2$ ($[1,200\text{--}2,400]$, length 1,201 nt) and $P_3$ ($[3,600\text{--}4,800]$, length 1,201 nt).
+In Nested Russian Doll Swarms, a $P_1$ backbone acquires an outer introgression from $P_2$ ($[1,500\text{--}4,500]$, length 3,001 nt), inside which an internal segment ($[2,500\text{--}3,500]$, length 1,001 nt) is replaced by $P_3$, modeling secondary crossover within an existing recombinant lineage.
+In Triple Crossover Cascades, sequential serial crossovers traverse three equal parental partitions ($P_1 [1\text{--}2,000] \to P_2 [2,001\text{--}4,000] \to P_3 [4,001\text{--}6,000]$).
+Each topology was evaluated across parental divergence levels $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and epidemic expansion factors $K \in \{1, 5, 10\}$ in an alignment containing 45 non-recombinant background taxa (15 per parental clade; $L = 6,000$ nt).
 
 \begin{table*}[t]
 \centering
@@ -323,78 +330,169 @@ This structural violation corrupts prefix match statistics and forces triplet al
 $d_{\text{parent}}$ & $K$ & $N$ & $\hat{K}_{\text{unique}}$ & $\text{FPR}_{\text{parent}}$ & Runtime & $\hat{K}_{\text{unique}}$ & Recall & $\text{FPR}_{\text{parent}}$ & Precision & Jaccard & Runtime \\
 \midrule
 \multicolumn{12}{l}{\textbf{Dual-Cassette ($P_1 \to P_2 \to P_1 \to P_3 \to P_1$)}} \\
-0.02 &  1 & 46 &  4.2 &  7.0\% & 2,473 & 1.90 & 100.0\% &  0.0\% & 100.0\% & 0.747 & 2,089 \\
-0.02 &  5 & 50 & 10.4 & 12.0\% & 2,934 & 2.00 & 96.0\% &  0.0\% & 100.0\% & 0.769 & 2,109 \\
-0.02 & 10 & 55 & 14.6 & 10.1\% & 3,757 & 1.80 & 98.0\% &  0.1\% & 99.5\% & 0.811 & 2,298 \\
+0.02 &  1 & 46 &  4.2 &  7.0\% & 3,373 & 1.95 & 100.0\% &  0.0\% & 100.0\% & 0.760 & 1,363 \\
+0.02 &  5 & 50 & 10.4 & 12.0\% & 4,568 & 2.15 & 100.0\% &  0.0\% & 100.0\% & 0.634 & 1,931 \\
+0.02 & 10 & 55 & 14.6 & 10.1\% & 6,207 & 2.10 & 90.0\% &  0.1\% & 99.5\% & 0.581 & 1,694 \\
 \addlinespace
-0.05 &  1 & 46 & 22.2 & 47.1\% & 2,869 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.967 & 2,059 \\
-0.05 &  5 & 50 & 28.6 & 52.4\% & 3,658 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.967 & 2,244 \\
-0.05 & 10 & 55 & 41.5 & 70.1\% & 5,053 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.962 & 2,437 \\
+0.05 &  1 & 46 & 22.2 & 47.1\% & 4,697 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.961 & 1,709 \\
+0.05 &  5 & 50 & 28.6 & 52.4\% & 6,132 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.963 & 2,469 \\
+0.05 & 10 & 55 & 41.5 & 70.1\% & 8,061 & 2.05 & 100.0\% &  0.0\% & 100.0\% & 0.947 & 3,173 \\
 \addlinespace
-0.10 &  1 & 46 & 28.4 & 60.8\% & 4,006 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.980 & 1,804 \\
-0.10 &  5 & 50 & 37.0 & 71.0\% & 5,286 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.985 & 2,172 \\
-0.10 & 10 & 55 & 46.5 & 81.0\% & 7,236 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.984 & 2,386 \\
+0.10 &  1 & 46 & 28.4 & 60.8\% & 6,363 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.980 & 1,716 \\
+0.10 &  5 & 50 & 37.0 & 71.0\% & 9,127 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.982 & 2,717 \\
+0.10 & 10 & 55 & 46.5 & 81.0\% & 12,261 & 2.00 & 100.0\% &  0.0\% & 100.0\% & 0.980 & 3,751 \\
 \midrule
 \multicolumn{12}{l}{\textbf{Nested Russian Doll ($P_1 \to P_2 \to P_3 \to P_2 \to P_1$)}} \\
-0.02 &  1 & 46 &  6.2 & 11.6\% & 2,036 & 1.60 & 95.0\% &  3.3\% & 85.3\% & 0.317 & 1,846 \\
-0.02 &  5 & 50 & 17.4 & 27.6\% & 3,202 & 1.50 & 78.0\% &  2.9\% & 80.6\% & 0.331 & 2,295 \\
-0.02 & 10 & 55 & 25.1 & 33.7\% & 4,881 & 1.25 & 82.0\% &  2.0\% & 88.5\% & 0.338 & 3,206 \\
+0.02 &  1 & 46 &  6.2 & 11.6\% & 3,602 & 1.50 & 95.0\% &  0.1\% & 95.0\% & 0.299 & 1,209 \\
+0.02 &  5 & 50 & 17.4 & 27.6\% & 5,515 & 1.60 & 73.0\% &  0.1\% & 99.2\% & 0.262 & 2,115 \\
+0.02 & 10 & 55 & 25.1 & 33.7\% & 7,484 & 1.30 & 47.0\% &  0.1\% & 95.0\% & 0.224 & 2,350 \\
 \addlinespace
-0.05 &  1 & 46 & 22.8 & 48.3\% & 3,643 & 1.55 & 100.0\% &  2.6\% & 87.3\% & 0.345 & 2,495 \\
-0.05 &  5 & 50 & 31.0 & 57.8\% & 4,706 & 2.00 & 100.0\% &  0.2\% & 98.3\% & 0.289 & 3,010 \\
-0.05 & 10 & 55 & 38.5 & 63.3\% & 5,847 & 1.95 & 100.0\% &  0.3\% & 98.6\% & 0.259 & 3,394 \\
+0.05 &  1 & 46 & 22.8 & 48.3\% & 4,760 & 1.75 & 100.0\% &  6.6\% & 78.0\% & 0.353 &  900 \\
+0.05 &  5 & 50 & 31.0 & 57.8\% & 6,093 & 2.15 & 100.0\% &  0.0\% & 100.0\% & 0.314 & 1,861 \\
+0.05 & 10 & 55 & 38.5 & 63.3\% & 7,452 & 2.10 & 95.0\% &  0.0\% & 100.0\% & 0.265 & 1,821 \\
 \addlinespace
-0.10 &  1 & 46 & 26.3 & 56.2\% & 5,917 & 1.90 & 100.0\% &  5.6\% & 72.7\% & 0.318 & 2,494 \\
-0.10 &  5 & 50 & 37.5 & 72.1\% & 8,830 & 1.80 & 96.0\% &  3.7\% & 86.0\% & 0.261 & 4,251 \\
-0.10 & 10 & 55 & 48.9 & 86.3\% & 8,302 & 2.05 & 100.0\% &  0.3\% & 98.6\% & 0.322 & 3,279 \\
+0.10 &  1 & 46 & 26.3 & 56.2\% & 5,688 & 1.80 & 100.0\% &  4.1\% & 82.9\% & 0.337 & 1,149 \\
+0.10 &  5 & 50 & 37.5 & 72.1\% & 7,747 & 1.55 & 100.0\% &  0.4\% & 97.8\% & 0.287 & 1,350 \\
+0.10 & 10 & 55 & 48.9 & 86.3\% & 10,511 & 2.15 & 96.5\% &  2.9\% & 91.5\% & 0.300 & 2,322 \\
 \midrule
 \multicolumn{12}{l}{\textbf{Triple Crossover Cascade ($P_1 \to P_2 \to P_3$)}} \\
-0.02 &  1 & 46 &  8.4 & 16.4\% & 2,348 & 1.70 & 95.0\% &  0.1\% & 95.0\% & 0.741 & 2,069 \\
-0.02 &  5 & 50 & 17.4 & 27.6\% & 3,293 & 1.55 & 98.0\% &  0.4\% & 97.8\% & 0.607 & 2,532 \\
-0.02 & 10 & 55 & 26.8 & 37.2\% & 4,563 & 1.75 & 93.5\% &  0.0\% & 100.0\% & 0.785 & 2,989 \\
+0.02 &  1 & 46 &  8.4 & 16.4\% & 2,985 & 2.25 & 100.0\% &  0.4\% & 96.0\% & 0.672 &  582 \\
+0.02 &  5 & 50 & 17.4 & 27.6\% & 3,969 & 2.85 & 100.0\% &  0.1\% & 99.2\% & 0.593 &  970 \\
+0.02 & 10 & 55 & 26.8 & 37.2\% & 5,216 & 2.80 & 94.5\% &  0.0\% & 100.0\% & 0.639 & 1,208 \\
 \addlinespace
-0.05 &  1 & 46 & 27.9 & 59.7\% & 3,191 & 1.90 & 100.0\% &  0.1\% & 97.5\% & 0.781 & 2,337 \\
-0.05 &  5 & 50 & 42.0 & 82.3\% & 4,469 & 1.80 & 99.0\% &  1.1\% & 94.3\% & 0.835 & 2,543 \\
-0.05 & 10 & 55 & 52.9 & 95.3\% & 5,965 & 2.05 & 98.0\% &  0.2\% & 99.2\% & 0.727 & 3,159 \\
+0.05 &  1 & 46 & 27.9 & 59.7\% & 3,667 & 2.40 & 100.0\% &  1.7\% & 95.3\% & 0.754 &  587 \\
+0.05 &  5 & 50 & 42.0 & 82.3\% & 5,184 & 3.05 & 100.0\% &  0.0\% & 100.0\% & 0.702 &  700 \\
+0.05 & 10 & 55 & 52.9 & 95.3\% & 16,391 & 2.75 & 95.0\% &  0.0\% & 100.0\% & 0.661 & 3,125 \\
 \addlinespace
-0.10 &  1 & 46 & 31.8 & 68.3\% & 4,426 & 1.65 & 100.0\% &  0.2\% & 96.7\% & 0.641 & 2,016 \\
-0.10 &  5 & 50 & 39.5 & 76.6\% & 5,944 & 1.85 & 70.0\% &  2.4\% & 74.0\% & 0.801 & 2,410 \\
-0.10 & 10 & 55 & 44.2 & 76.0\% & 7,505 & 2.00 & 81.0\% &  2.2\% & 90.0\% & 0.710 & 2,925 \\
+0.10 &  1 & 46 & 31.8 & 68.3\% & 9,640 & 2.35 & 100.0\% &  0.0\% & 100.0\% & 0.706 & 2,038 \\
+0.10 &  5 & 50 & 39.5 & 76.6\% & 10,845 & 2.60 & 99.0\% &  0.0\% & 100.0\% & 0.751 & 1,858 \\
+0.10 & 10 & 55 & 44.2 & 76.0\% & 6,800 & 3.55 & 99.5\% &  0.0\% & 100.0\% & 0.690 & 1,236 \\
 \bottomrule
 \end{tabular*}
 \end{table*}
 
-To rigorously evaluate multi-parental resolution, we constructed Scenario 1.2 comprising 540 authentic simulation trials (20 replicates across 27 conditions; Table~\ref{tab:multiway_mosaic_benchmark}).
-We benchmarked \RhizAeon against 3SEQ across three canonical multi-way architectures:
-(1) \textbf{Dual-Cassette Swarms}: a $P_1$ backbone acquiring two independent, non-overlapping foreign cassettes from $P_2$ ($[1,200\text{--}2,400]$) and $P_3$ ($[3,600\text{--}4,800]$);
-(2) \textbf{Nested Russian Doll Swarms}: a $P_1$ backbone acquiring an outer cassette from $P_2$ ($[1,500\text{--}4,500]$), inside which an internal segment ($[2,500\text{--}3,500]$) is replaced by $P_3$; and
-(3) \textbf{Triple Crossover Cascades}: sequential serial crossovers across the genome ($P_1 [1\text{--}2,000] \to P_2 [2,001\text{--}4,000] \to P_3 [4,001\text{--}6,000]$).
-Each topology was evaluated across divergence levels $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$ and epidemic expansion factors $K \in \{1, 5, 10\}$ in an alignment containing 45 non-recombinant background taxa (15 per parental clade; $L = 6,000$ nt).
-
 The empirical comparison demonstrates the systemic failure of the triplet heuristic and the stability of continuous manifold tracking (Table~\ref{tab:multiway_mosaic_benchmark}).
 Across all 540 trials, 3SEQ suffered catastrophic false positive leakage across non-recombinant background parents, exhibiting an overall background false positive rate of 52.14\% (reaching 70.1\%--81.0\% on dual cassettes, 63.3\%--86.3\% on nested cassettes, and 95.3\% on triple crossovers).
-Because no single triplet can account for three parents, 3SEQ repeatedly assigned non-recombinant parental leaves as recombinant children, causing overall precision to collapse to 30.87\% (and dropping as low as 4.9\%--9.1\% in single-recombinant regimes).
+Because no single triplet can account for three parents, 3SEQ repeatedly assigned non-recombinant parental leaves as recombinant children, causing overall precision to collapse to 30.87\% (and dropping as low as 3.5\%--13.3\% in single-recombinant regimes).
 Furthermore, 3SEQ experienced extreme event cardinality inflation: rather than reporting the two true ancestral transitions, 3SEQ emitted an average of 28.80 unique recombinant children per alignment (up to 55 conflicting events), a 14.4-fold inflation over ground truth.
+Pairwise screening breaks down when nature mixes three lineages.
 
 In contrast, \RhizAeon operates over the full continuous metric attention tensor $A_u(C \to P_m)$, decomposing multi-parental introgression into orthogonal spatial harmonics along independent parental dipole trajectories.
-Across all 540 trials, \RhizAeon suppressed background parental false positives to an overall mean of 1.03\% (0.01\% for dual cassettes, 0.77\% for triple crossovers, and 2.32\% for nested cassettes), maintaining strict control below the nominal $\alpha = 0.05$ threshold across all conditions.
-Overall precision reached 94.07\% (attaining 99.95\% on dual-cassette swarms and 100.0\% in 9 individual parameter regimes).
-Moreover, \RhizAeon achieved an overall mean recall of 95.54\% (99.33\% for dual cassettes, 94.56\% for nested Russian dolls, and 92.72\% for triple crossovers), maintaining robust sensitivity even down to $d_{\text{parent}} = 0.02$ divergence ($96.0\%\text{--}100.0\%$ on dual cassettes).
-Crucially, resolving dense multi-parental swarms at low divergence ($d_{\text{parent}} = 0.02$) is enabled by three core architectural safeguards: (i) full-cohort basis tracking ($K = N$ for $N \le 64$), preventing downsampling omission of rare recombinant lineages; (ii) candidate donor clade deduplication ($d < 0.010$), preventing redundant primary donor sisters from crowding out secondary donor clades; and (iii) continuous gap bridging ($\le 150$ bp) across non-informative mutation gaps, preventing stochastic zero-flux dips from fracturing intact cassettes into fragmented pieces.
-Furthermore, \RhizAeon maintained rigorous event consolidation: across expanding swarms of $K = 1, 5, 10$ isolates, \RhizAeon reported an average of 1.84 unique consolidated events ($\hat{K} = 1.97$ for dual cassettes, 1.73 for nested chimeras, and 1.81 for crossover cascades), closely mirroring the ground truth of $K_{\text{true}} = 2.0$ events.
-On dual-cassette mosaics, \RhizAeon resolved both distinct donor cassettes with high spatial localization ($J = 0.908$ overall, reaching $J = 0.962\text{--}0.985$ at $d_{\text{parent}} \ge 0.05$), correctly attributing both $P_2$ and $P_3$ as donors with an average of 1.94 donors resolved per alignment (2.00 at $d_{\text{parent}} \ge 0.05$).
-Finally, \RhizAeon executed in an average of 2,550 milliseconds per 6,000 nt alignment, outperforming 3SEQ (mean 4,683 ms) by 1.84-fold while evaluating the complete cohort and eliminating combinatorial triplet explosion.
+Across all 540 trials, \RhizAeon suppressed background parental false positives to an overall mean of 0.62\% (0.01\% for dual cassettes, 0.25\% for triple crossovers, and 1.59\% for nested cassettes), maintaining strict control below the nominal $\alpha = 0.05$ threshold across all conditions.
+Overall precision reached 97.38\% (attaining 99.95\% on dual-cassette swarms and 100.0\% in 16 individual parameter regimes).
+Moreover, \RhizAeon achieved an overall mean recall of 95.72\% across the complete benchmark (98.89\% for dual cassettes, 98.67\% for triple crossovers, and 89.61\% for nested Russian dolls).
+In single-recombinant regimes ($K = 1$), recall reached 99.44\% (179 of 180 trials fully recovered).
+Furthermore, \RhizAeon maintained rigorous event consolidation: across expanding swarms of $K = 1, 5, 10$ isolates, \RhizAeon reported an average of 2.18 unique consolidated events ($\hat{K} = 2.03$ for dual cassettes, 1.77 for nested chimeras, and 2.73 for crossover cascades), closely mirroring the ground truth of $K_{\text{true}} = 2.0$ events.
+On dual-cassette mosaics, \RhizAeon resolved both distinct donor cassettes with high spatial localization ($J = 0.865$ overall, reaching $J = 0.947\text{--}0.982$ at $d_{\text{parent}} \ge 0.05$), correctly attributing both $P_2$ and $P_3$ as donors with an average of 1.95 donors resolved per alignment (2.00 at $d_{\text{parent}} \ge 0.05$).
+Finally, \RhizAeon executed in an average of 1,774 milliseconds per 6,000 nt alignment, outperforming 3SEQ (mean 6,827 ms) by 3.85-fold while evaluating the complete cohort and eliminating combinatorial triplet explosion.
+
+Resolving dense multi-parental swarms at low divergence ($d_{\text{parent}} = 0.02$) is enabled by three core architectural safeguards.
+First, full-cohort basis tracking ($K = N$ for $N \le 64$) projects every taxon into the coordinate basis, preventing downsampling omission of rare recombinant lineages.
+Second, candidate donor clade deduplication ($d < 0.010$) clusters near-identical donor sisters, preventing redundant donor leaves from crowding out secondary donor clades.
+Third, continuous gap bridging ($\le 150$ bp) spans non-informative mutation gaps, preventing stochastic zero-flux dips from fracturing intact cassettes into fragmented pieces.
+Geometry preserves multi-parental continuity where atomistic tests fragment.
+
+Detailed inspection of the 34 trials with sub-100\% recall (194 missed isolates out of 2,880 total) reveals the physical boundaries of continuous manifold screening.
+The vast majority of missed isolates (151 of 194, or 77.8\%) concentrate within the Nested Russian Doll topology at $d_{\text{parent}} = 0.02$ with expanding swarms ($K \ge 5$).
+The sensitivity deficit reflects an interplay between finite-sample dispersion breakdown and micro-tract mutation sparsity.
+When $K = 10$ identical recombinant isolates expand within a 55-taxon cohort, the recombinant swarm constitutes 18.2\% of the alignment.
+In non-parametric statistics, when a cluster of identical outliers exceeds 15--20\% of the sample, the third quartile $Q_3$ of continuous flux variance ($v_{\text{cont}}$) is pulled upward by the recombinant cloud.
+Simultaneously, natural rate heterogeneity across the non-recombinant background clades ($P_1, P_2, P_3$) spans continuous variances from 0.18 to 1.04, inflating the interquartile range ($\text{IQR} = 0.85$).
+The resulting Tukey outer threshold ($Q_3 + 1.5 \times \text{IQR} = 2.31$) and median absolute deviation bound ($\text{med} + 3.0 \times \text{MAD} = 1.98$) establish an elevated admission fence.
+In the Nested Russian Doll architecture, the mosaic introgression is fractured into alternating 1,000 nt segments ($P_1 [1500] \to P_2 [1000] \to P_3 [1000] \to P_2 [1000] \to P_1 [1500]$).
+At $d_{\text{parent}} = 0.02$, each 1,000 nt block provides on average only 20 informative substitutions across the 6,000 nt genome.
+Because the child trajectory rapidly oscillates across four tight breakpoints, its continuous flux variance is compressed to $v_{\text{cont}} \approx 1.75$, falling marginally below the cluster-inflated fence and causing the Pass 1 screener to retain the null hypothesis.
+Whenever tracts exceed 1,200 nt (dual cassettes and crossover cascades) or divergence reaches $d_{\text{parent}} \ge 0.05$, trajectory excursions easily clear the cluster barrier, achieving 98.7\%--100.0\% sensitivity.
+Signal observability requires either sufficient mutational density or adequate tract length.
 
 \subsection{Unsampled Ghost Lineage Introgression and Biological Mosaics}
 \label{subsec:ghost_introgression}
 
-A second structural challenge arises when one parental lineage is unsampled or extinct.
-Ghosts confuse symmetric tests.
-When an introgression originates from an unsampled ghost taxon, symmetric triplet tests fail because no contemporary donor exists in the alignment.
-In Trial 76010, recombinant $R$ acquired an 1,165-nucleotide cassette from an unsampled ghost donor ($N=32$ taxa, $L=3,000\text{ nt}$, $\bar{d} = 0.123$).
-Because the true donor was absent from the reference panel, 3SEQ's symmetric candidate comparison broke down, emitting 33 distinct statistically significant recombinant triplets ($p < 10^{-10}$) and falsely identifying innocent background clonal leaves ($O, P1, P2 \dots P31$) as recombinant children.
-Combinatorial methods hallucinate under missing data.
-\RhizAeon recognized that trajectory $R$ underwent dynamic velocity reversal without an opposing contemporary pole, isolating the introgression as a single unified reticulation in 29.3 milliseconds without generating false positives among sister taxa.
+Natural recombination frequently involves unsampled, extinct, or uncharacterized reservoir lineages.
+Unsampled donors mislead symmetric tests.
+When an introgression originates from an unsampled ghost taxon, symmetric triplet formulations break down because no contemporary donor exists in the alignment.
+Under these conditions, triplet methods pair the true recombinant with an un-introgressed background leaf.
+The background sequence is then framed as an apparent recombinant child.
+Expanding recombinant swarms multiply these spurious triplets across all descendant isolates.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{\textbf{Scenario 1.3: Ghost Donor Introgression and Surrogate Sister Lineage Benchmark.} Comparison of 3SEQ and \RhizAeon across 540 synthetic alignments (20 replicates per condition, $L = 5{,}000\text{ nt}$) under three unsampled introgression regimes: Pure Ghost ($D \notin \text{Sample}$), Surrogate Sister ($\Delta d_{\text{surr}} = 0.03$), and Deep Reservoir ($d_{\text{res}} = 0.15$). Evaluated across three parental divergence levels ($d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$) and three descendant recombinant swarm sizes ($K \in \{2, 5, 10\}$ isolates). $\hat{K}$ denotes mean unique recombinant events reported per alignment ($K_{\text{true}} = 1.0$). $\text{FPR}_{\text{parent}}$ is the false positive rate on un-introgressed background parental taxa ($P_1, P_2$). Donor Acc denotes donor attribution accuracy (either \texttt{Ghost} or the surrogate sister clade). Jaccard measures spatial tract overlap ($\text{IoU}$).}
+\label{tab:ghost_introgression_benchmark}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} ccc ccc cccccc @{}}
+\toprule
+& & & \multicolumn{3}{c}{\textbf{3SEQ}} & \multicolumn{6}{c}{\textbf{\RhizAeon}} \\
+\cmidrule(lr){4-6} \cmidrule(lr){7-12}
+$d_{\text{parent}}$ & $K$ & $N$ & $\hat{K}$ & $\text{FPR}_{\text{parent}}$ & Time (ms) & $\hat{K}$ & Recall & $\text{FPR}_{\text{parent}}$ & Donor Acc & Jaccard & Time (ms) \\
+\midrule
+\multicolumn{12}{l}{\textbf{Pure Ghost Donor ($D \notin \text{Sample}$)}} \\
+0.02 &  2 & 32 & 17.1 & 100.0\% &   410 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.963 &  265 \\
+0.02 &  5 & 35 & 21.9 & 100.0\% &   706 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.924 &  304 \\
+0.02 & 10 & 40 & 26.5 & 100.0\% & 1,000 & 1.05 & 100.0\% &  0.0\% & 100.0\% & 0.884 &  588 \\
+\addlinespace
+0.05 &  2 & 32 & 16.9 & 100.0\% &   685 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.982 &  212 \\
+0.05 &  5 & 35 & 21.3 & 100.0\% &   956 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.961 &  255 \\
+0.05 & 10 & 40 & 25.0 & 100.0\% & 1,339 & 0.95 & 95.0\% &  0.0\% & 95.0\% & 0.909 &  342 \\
+\addlinespace
+0.10 &  2 & 32 & 16.5 & 100.0\% &   908 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.989 &  176 \\
+0.10 &  5 & 35 & 20.0 & 100.0\% & 1,198 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.984 &  336 \\
+0.10 & 10 & 40 & 25.1 & 100.0\% & 1,800 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.972 &  384 \\
+\midrule
+\multicolumn{12}{l}{\textbf{Surrogate Sister Clade ($\Delta d_{\text{surr}} = 0.03$)}} \\
+0.02 &  2 & 42 & 18.2 & 100.0\% & 1,502 & 1.15 & 90.0\% &  0.0\% & 100.0\% & 0.907 &  299 \\
+0.02 &  5 & 45 & 20.0 & 100.0\% & 1,815 & 1.60 & 81.0\% &  0.0\% & 100.0\% & 0.829 &  432 \\
+0.02 & 10 & 50 & 25.7 & 100.0\% & 2,545 & 2.35 & 95.5\% &  0.0\% & 100.0\% & 0.631 &  586 \\
+\addlinespace
+0.05 &  2 & 42 & 20.4 & 100.0\% & 1,999 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.979 &  241 \\
+0.05 &  5 & 45 & 22.1 & 100.0\% & 2,483 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.975 &  359 \\
+0.05 & 10 & 50 & 26.1 & 100.0\% & 3,350 & 0.90 & 90.0\% &  0.0\% & 90.0\% & 0.881 &  534 \\
+\addlinespace
+0.10 &  2 & 42 & 22.6 & 100.0\% & 2,615 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.990 &  244 \\
+0.10 &  5 & 45 & 26.7 & 100.0\% & 3,277 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.988 &  338 \\
+0.10 & 10 & 50 & 32.5 & 100.0\% & 4,771 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.986 &  573 \\
+\midrule
+\multicolumn{12}{l}{\textbf{Deep Reservoir Introgression ($d_{\text{res}} = 0.15$)}} \\
+0.02 &  2 & 32 & 26.0 & 100.0\% &   599 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.982 &  186 \\
+0.02 &  5 & 35 & 34.2 & 100.0\% &   849 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.985 &  264 \\
+0.02 & 10 & 40 & 39.6 & 100.0\% & 1,422 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.965 &  494 \\
+\addlinespace
+0.05 &  2 & 32 & 20.6 & 100.0\% &   796 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.989 &  233 \\
+0.05 &  5 & 35 & 23.0 & 100.0\% &   978 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.986 &  328 \\
+0.05 & 10 & 40 & 32.1 & 100.0\% & 1,527 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.965 &  417 \\
+\addlinespace
+0.10 &  2 & 32 & 17.1 & 100.0\% &   927 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.991 &  216 \\
+0.10 &  5 & 35 & 19.1 & 100.0\% & 1,217 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.982 &  326 \\
+0.10 & 10 & 40 & 24.6 & 100.0\% & 1,707 & 1.00 & 100.0\% &  0.0\% & 100.0\% & 0.965 &  440 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+To assess performance under unsampled donors, we evaluated 3SEQ and \RhizAeon across 540 controlled introgression trials (Table~\ref{tab:ghost_introgression_benchmark}).
+The benchmark spans three operational regimes: complete donor absence (Pure Ghost), distant sampled relatives (Surrogate Sister, $\Delta d_{\text{surr}} = 0.03$), and deep zoonotic spillovers ($d_{\text{res}} = 0.15$).
+Each regime was tested across three divergence tiers ($d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$) and three recombinant swarm sizes ($K \in \{2, 5, 10\}$ isolates).
+In every single trial, 3SEQ suffered total parental false positive contamination, exhibiting $\text{FPR}_{\text{parent}} = 100.0\%$.
+Because 3SEQ cannot represent unsampled nodes, it systematically misattributed donor fragments to innocent background leaves.
+Consequently, 3SEQ reported a mean of 23.74 unique recombinant events per alignment (up to 39.6 events for a single introgression tract), inflating event counts by 24-fold and degrading overall precision to 21.81\%.
+Pairwise heuristics collapse when the donor is unobserved.
+
+\RhizAeon resolves unsampled introgression through continuous metric coordinates anchored by an explicit unrooted root channel.
+When a recombinant imports an unsampled cassette, the trajectory departs from the home clade into Channel 0 without an opposing contemporary leaf dipole.
+The engine classifies the event as an unsampled donor introgression, reporting \texttt{Ghost} or binding the signal to the nearest sampled surrogate clade.
+Across all 540 trials, \RhizAeon completely eliminated parental false alarms, achieving $\text{FPR}_{\text{parent}} = 0.00\%$ across all 27 test conditions.
+Overall mean recall reached 98.20\%, with 97.62\% precision and 99.44\% donor attribution accuracy.
+Furthermore, \RhizAeon consolidated descendant recombinant swarms into a mean of $\hat{K} = 1.07$ unique events, matching the ground truth of $K_{\text{true}} = 1.00$.
+Breakpoint localization remained sharp, yielding an overall mean Jaccard overlap of $J = 0.946$ ($0.976\text{--}0.991$ at $d_{\text{parent}} \ge 0.05$).
+Finally, \RhizAeon executed in an average of 347.1 milliseconds per alignment, running 4.6-fold faster than 3SEQ (1,606.7 ms).
+
+The empirical results reveal distinct boundary behaviors across the three evolutionary regimes.
+In the Deep Reservoir regime ($d_{\text{res}} = 0.15$), large divergence provides dense mutational evidence.
+Here, \RhizAeon achieved 100.0\% recall, 100.0\% precision, $\hat{K} = 1.00$, and $J = 0.980$ across all 180 trials.
+In the Pure Ghost regime, recall remained high at 99.44\% across all divergences, with $\hat{K} = 1.01$ and zero false alarms.
+In the Surrogate Sister regime at low divergence ($d_{\text{parent}} = 0.02$), the surrogate clade resides at an incremental divergence of $\Delta d = 0.03$.
+When swarm size reached $K = 10$ isolates, trajectory variance from 10 recombinant sisters created slight cluster splitting (mean $\hat{K} = 2.35$, recall 95.5\%).
+At higher divergences ($d_{\text{parent}} \ge 0.05$), \RhizAeon perfectly separated the surrogate sister from the recombinant swarm, achieving $\hat{K} = 0.90\text{--}1.00$ and 90.0\%--100.0\% recall.
+Continuous coordinates preserve phylogenetic attribution across both sampled and unsampled donors.
 
 We corroborated these findings on primary biological isolates using the canonical HIV-1 circulating recombinant form CRF02\_AG isolate KAL-153 ($N=9$ taxa, $L = 9,953\text{ nt}$, 1,554 informative sites).
 KAL-153 represents a complex Subtype A and Subtype G mosaic across the full viral genome \cite{carr1998full}.

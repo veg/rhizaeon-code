@@ -5,6 +5,7 @@ pub struct LocalFluxScreener {
     pub spatial_coherence_threshold: f64,
     pub coherence_window: usize,
     pub variance_multiplier: f64,
+    pub alpha: f64,
     pub epsilon: f64,
 }
 
@@ -15,6 +16,7 @@ impl Default for LocalFluxScreener {
             spatial_coherence_threshold: 0.30,
             coherence_window: 50,
             variance_multiplier: 1.80,
+            alpha: 0.05,
             epsilon: 1e-12,
         }
     }
@@ -164,6 +166,8 @@ impl LocalFluxScreener {
         let num_channels = k + 1;
 
         let mut v_root = vec![0.0f64; n];
+        let mut root_pulse = vec![0.0f64; n];
+        let mut root_pulse_stat = vec![0.0f64; n];
         let mut v_cont = vec![0.0f64; n];
         let mut cont_pulse = vec![0.0f64; n];
         let mut r_root = vec![0.0f64; n];
@@ -190,10 +194,20 @@ impl LocalFluxScreener {
                 }
             }
 
-            // Root channel 0
+            // Root channel 0: step variance and standardized Brownian bridge excursion
             let mean_c0 = sum_c[0] * inv_l;
             let var_c0 = (sum_sq_c[0] * inv_l - mean_c0 * mean_c0).max(0.0);
             v_root[i] = var_c0;
+            let raw_pulse = (max_c[0] - min_c[0]).max(0.0);
+            root_pulse[i] = raw_pulse;
+
+            let mut sum_sq_f0 = 0.0;
+            for u in 0..l {
+                let f0 = f_tensor[u * n * num_channels + i * num_channels + 0];
+                sum_sq_f0 += f0 * f0;
+            }
+            let sigma_f0 = (sum_sq_f0 * inv_l).sqrt().max(1e-6);
+            root_pulse_stat[i] = raw_pulse / ((l as f64).sqrt() * sigma_f0);
 
             // Contemporary channels 1..=K
             let mut sum_var_cont = 0.0;
@@ -240,15 +254,19 @@ impl LocalFluxScreener {
         let mut is_rate_burst = vec![false; n];
         let mut is_ghost_candidate = vec![false; n];
 
+        let (d_sister, d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
+        let k_crit_root = (-0.5f64 * (self.alpha / (2.0f64 * (n as f64).max(1.0f64))).ln()).sqrt().max(1.645f64);
+
         for i in 0..n {
             let z_r = (logit_r[i] - med_logit) / scale_logit;
 
-            let is_isolated_leaf = !(0..n).any(|j| j != i && crate::landmarks::compute_pairwise_distance(aln, i, j) < 0.008);
+            let is_isolated_leaf = !(0..n).any(|j| j != i && crate::landmarks::compute_pairwise_distance(aln, i, j) < d_sister);
             if z_r > z_alpha_r && r_root[i] >= 0.05 && gamma_root[i] <= self.spatial_coherence_threshold && is_isolated_leaf {
                 is_rate_burst[i] = true;
                 rate_burst_indices.push(i);
             } else if (z_r > z_alpha_r || r_dim[i] > self.root_ratio_threshold)
-                && gamma_root[i] > self.spatial_coherence_threshold
+                && (root_pulse_stat[i] >= k_crit_root || root_pulse[i] >= 3.0)
+                && (!is_isolated_leaf || gamma_root[i] > self.spatial_coherence_threshold)
             {
                 is_ghost_candidate[i] = true;
                 ghost_candidate_indices.push(i);
@@ -264,38 +282,29 @@ impl LocalFluxScreener {
         let pool_v: Vec<f64> = pool_indices.iter().map(|&i| v_cont[i]).collect();
         let pool_pulse: Vec<f64> = pool_indices.iter().map(|&i| cont_pulse[i]).collect();
 
-        let med_v = median(&pool_v);
-        let med_pulse = median(&pool_pulse);
+        let (_q1_v, med_v, q3_v, iqr_v) = quartiles(&pool_v);
+        let (_q1_pulse, med_pulse, q3_pulse, iqr_pulse) = quartiles(&pool_pulse);
 
-        let lower_v: Vec<f64> = pool_v.iter().cloned().filter(|&x| x <= med_v).collect();
-        let lower_pulse: Vec<f64> = pool_pulse.iter().cloned().filter(|&x| x <= med_pulse).collect();
+        let mad_v = median(&pool_v.iter().map(|&x| (x - med_v).abs()).collect::<Vec<_>>());
+        let mad_pulse = median(&pool_pulse.iter().map(|&x| (x - med_pulse).abs()).collect::<Vec<_>>());
 
-        let (med_low_v, mad_v) = if !lower_v.is_empty() {
-            let med_low = median(&lower_v);
-            let mad = median(&lower_v.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
-            (med_low, mad)
-        } else {
-            (med_v, 0.0)
-        };
-        let (med_low_pulse, mad_pulse) = if !lower_pulse.is_empty() {
-            let med_low = median(&lower_pulse);
-            let mad = median(&lower_pulse.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
-            (med_low, mad)
-        } else {
-            (med_pulse, 0.0)
-        };
+        let floor_v = (q3_v / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
+        let floor_pulse = (q3_pulse / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
 
-        // Robust baseline scaling from uncontaminated lower quartile:
-        let z_crit_cand = 2.0f64;
+        let scale_iqr_v = iqr_v.max(floor_v);
+        let scale_iqr_pulse = iqr_pulse.max(floor_pulse);
 
-        let floor_v = med_low_v / (l as f64).sqrt();
-        let floor_pulse = med_low_pulse / (l as f64).sqrt();
+        let scale_mad_v = (1.4826 * mad_v).max(floor_v);
+        let scale_mad_pulse = (1.4826 * mad_pulse).max(floor_pulse);
 
-        let scale_v = (1.4826 * mad_v).max(floor_v);
-        let scale_pulse = (1.4826 * mad_pulse).max(floor_pulse);
+        let thresh_tukey_v = q3_v + 1.5 * scale_iqr_v;
+        let thresh_tukey_pulse = q3_pulse + 1.5 * scale_iqr_pulse;
 
-        let thresh_v = med_low_v + z_crit_cand * scale_v;
-        let thresh_pulse = med_low_pulse + z_crit_cand * scale_pulse;
+        let thresh_mad_v = med_v + 1.25 * scale_mad_v;
+        let thresh_mad_pulse = med_pulse + 1.25 * scale_mad_pulse;
+
+        let thresh_v = thresh_tukey_v.min(thresh_mad_v);
+        let thresh_pulse = thresh_tukey_pulse.min(thresh_mad_pulse);
 
         let mut candidate_mask = vec![false; n];
         for &i in &pool_indices {
@@ -306,29 +315,15 @@ impl LocalFluxScreener {
 
         // Requirement 1 (DIR-RHIZ-PAFF-012.7): Patristic-Distance Gated Screener Admission
         // Small-cohort high-sensitivity admission in Pass 1 must ONLY activate
-        // when the alignment is genuinely in a low-divergence regime (d <= 0.035).
-        let mut is_low_div = false;
-        if k >= 2 {
-            let mut l_dists = Vec::new();
-            for p in 0..k {
-                for q in (p + 1)..k {
-                    l_dists.push(crate::landmarks::compute_pairwise_distance(
-                        aln,
-                        landmarks.indices[p],
-                        landmarks.indices[q],
-                    ));
-                }
-            }
-            if !l_dists.is_empty() {
-                is_low_div = median(&l_dists) <= 0.035;
-            }
-        }
+        // when the alignment is genuinely in a low-divergence regime (d_clade <= 3/sqrt(L)).
+        let is_low_div = d_clade <= (3.0 / (l as f64).sqrt()).max(2.0 * d_sister);
 
         // Small-cohort dispersion admission (N <= 8, DIR-RHIZ-PAFF-012.6 / DIR-RHIZ-PAFF-012.7)
         if n <= 8 && is_low_div && !pool_indices.is_empty() {
             let max_v = pool_v.iter().cloned().fold(0.0f64, f64::max);
             let disp_ratio = max_v / med_v.max(1e-6);
-            if disp_ratio <= 4.0 || pool_v.iter().all(|&x| x < 3.0) {
+            let r_crit_disp = ((n as f64).max(2.0) / self.alpha).ln().max(3.0);
+            if disp_ratio <= r_crit_disp || pool_v.iter().all(|&x| x < 3.0) {
                 for &i in &pool_indices {
                     if !is_rate_burst[i] {
                         candidate_mask[i] = true;
@@ -339,14 +334,15 @@ impl LocalFluxScreener {
 
         // Pervasive Recombination Admission Sieve (DIR-RHIZ-PAFF-013.3 Requirement 2)
         // In cohorts with pervasive recombination (e.g. viral swarms, potyviruses, CRFs),
-        // the cohort-wide variance is orders of magnitude above the clonal floor (mean_v >= 50.0).
+        // the cohort-wide variance is orders of magnitude above the clonal floor.
         // In this regime, median-based outlier thresholds suffer from breakdown point masking.
-        // We admit all non-burst taxa whose local variance or pulse exceeds the clonal floor.
         if !pool_indices.is_empty() {
             let mean_v_cohort: f64 = pool_v.iter().sum::<f64>() / (pool_v.len().max(1) as f64);
-            if mean_v_cohort >= 50.0 || med_v >= 50.0 {
+            let v_clonal_floor = 10.0 * ((l as f64) / 1000.0).sqrt().max(1.0);
+            let v_pervasive_ceiling = 3.0 * v_clonal_floor;
+            if mean_v_cohort >= v_pervasive_ceiling || med_v >= v_pervasive_ceiling {
                 for &i in &pool_indices {
-                    if !is_rate_burst[i] && (v_cont[i] >= 10.0 || cont_pulse[i] >= 15.0) {
+                    if !is_rate_burst[i] && (v_cont[i] >= v_clonal_floor || cont_pulse[i] >= 1.5 * v_clonal_floor) {
                         candidate_mask[i] = true;
                     }
                 }
@@ -379,6 +375,31 @@ impl LocalFluxScreener {
             is_non_recombinant_h0,
         }
     }
+}
+
+fn quartiles(vals: &[f64]) -> (f64, f64, f64, f64) {
+    if vals.is_empty() {
+        return (0.0, 0.0, 0.0, 0.0);
+    }
+    let mut sorted = vals.to_vec();
+    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    let n = sorted.len();
+    let q2 = if n % 2 == 1 {
+        sorted[n / 2]
+    } else {
+        0.5 * (sorted[n / 2 - 1] + sorted[n / 2])
+    };
+
+    let (lower, upper) = if n % 2 == 1 {
+        (&sorted[0..(n / 2)], &sorted[(n / 2 + 1)..n])
+    } else {
+        (&sorted[0..(n / 2)], &sorted[(n / 2)..n])
+    };
+
+    let q1 = median(lower);
+    let q3 = median(upper);
+    let iqr = (q3 - q1).max(0.0);
+    (q1, q2, q3, iqr)
 }
 
 fn median(vals: &[f64]) -> f64 {

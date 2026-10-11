@@ -5,7 +5,7 @@ use crate::fasta::{
     compute_min_informative_sites, count_parsimony_informative_sites,
     extract_informative_snp_alignment, trim_coverage_envelope,
 };
-use crate::landmarks::{select_landmarks, select_landmarks_from_pool};
+use crate::landmarks::select_landmarks;
 use crate::polishing::CumulativeTrajectoryPolisher;
 use crate::prior::PhyloBias;
 use crate::screener::LocalFluxScreener;
@@ -162,42 +162,11 @@ impl RhizAeonEngine {
             };
         }
 
-        // Pass 2: Clonal Backbone Re-Anchoring for large cohorts (N > 64)
-        // If initial landmarks contain candidate recombinants, re-anchor landmarks strictly
-        // onto verified non-recombinant clonal backbone lineages to prevent self-masking.
-        let (landmarks, a_tensor, c_tensor, num_channels) = if n > 64
-            && !screening.candidate_recombinant_indices.is_empty()
-            && screening.clonal_backbone_indices.len() >= 4
-        {
-            let contaminated = landmarks
-                .indices
-                .iter()
-                .any(|idx| screening.candidate_recombinant_indices.contains(idx));
-            if contaminated {
-                let purified_landmarks = select_landmarks_from_pool(
-                    &aln,
-                    effective_k,
-                    Some(&screening.clonal_backbone_indices),
-                );
-                let m_matrix_p = rope.compute_query_landmark_rotary_factors(&aln, &purified_landmarks);
-                let b_prior_p = prior.compute_prior_matrix(&aln, &purified_landmarks);
-                let (a_p, _f_p, c_p) = attention.compute_attention_and_force_tensors(
-                    &aln,
-                    &purified_landmarks,
-                    &m_matrix_p,
-                    &b_prior_p,
-                    &root_seq,
-                );
-                let k_p = purified_landmarks.num_landmarks + 1;
-                (purified_landmarks, a_p, c_p, k_p)
-            } else {
-                let k_init = landmarks.num_landmarks + 1;
-                (landmarks, a_tensor, c_tensor, k_init)
-            }
-        } else {
-            let k_init = landmarks.num_landmarks + 1;
-            (landmarks, a_tensor, c_tensor, k_init)
-        };
+        // Pass 2: Retain full canonical landmark basis (DIR-RHIZ-PAFF-012)
+        // Discarding candidate taxa from the landmark basis corrupts authentic parental lineages
+        // (e.g. Subtype B in HIV-1) that exhibit legitimate contrast with recombinant children.
+        let k_init = landmarks.num_landmarks + 1;
+        let (landmarks, a_tensor, c_tensor, num_channels) = (landmarks, a_tensor, c_tensor, k_init);
 
         // 6. Pass 2 Polishing & Pass 3 Due Diligence on candidates
         let resolver = TrajectoryParentalResolver::new();
@@ -215,6 +184,7 @@ impl RhizAeonEngine {
                 n,
                 &landmarks,
                 &aln,
+                &screening.candidate_recombinant_indices,
             );
 
             let mut candidate_tracts = Vec::new();
@@ -230,8 +200,8 @@ impl RhizAeonEngine {
                 candidate_tracts.extend(tracts);
             }
 
-            let deduplicated_tracts = deduplicate_candidate_tracts(candidate_tracts);
-            for tract in deduplicated_tracts {
+            let mut candidate_verified = Vec::new();
+            for tract in candidate_tracts {
                 let local_parental = resolver.resolve_reticulation_channels_localized(
                     cand_idx,
                     tract.u1_discrete,
@@ -274,16 +244,19 @@ impl RhizAeonEngine {
                             event.u1_continuous += u_offset as f64;
                             event.u2_continuous += u_offset as f64;
                         }
-                        verified_events.push(event);
+                        candidate_verified.push(event);
                     }
                 }
             }
+
+            let deduplicated_events = deduplicate_candidate_events(candidate_verified, &aln);
+            verified_events.extend(deduplicated_events);
         }
 
-        // Sort events by candidate name and u1
+        // Sort events by candidate_idx and u1
         verified_events.sort_by(|a, b| {
-            a.isolates[0]
-                .cmp(&b.isolates[0])
+            a.candidate_idx
+                .cmp(&b.candidate_idx)
                 .then(a.u1.cmp(&b.u1))
         });
 
@@ -520,6 +493,7 @@ fn group_ancestral_events(
     mut events: Vec<crate::types::RecombinationEvent>,
     aln: &crate::types::Alignment,
 ) -> Vec<crate::types::RecombinationEvent> {
+    let (_d_sister, d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
     let mut grouped: Vec<crate::types::RecombinationEvent> = Vec::new();
     events.sort_by_key(|e| (e.home_idx, e.donor_idx, e.u1));
     for e in events {
@@ -528,7 +502,7 @@ fn group_ancestral_events(
             // Parental compatibility via midpoint bisection against inter-parental divergence:
             let d_inter = match (g.home_idx, g.donor_idx) {
                 (Some(gh), Some(gd)) => crate::landmarks::compute_pairwise_distance(aln, gh, gd),
-                _ => 0.05,
+                _ => d_clade,
             };
 
             // 1. Home compatibility: exact name match OR home leaves cluster together within midpoint radius
@@ -622,9 +596,12 @@ fn group_ancestral_events(
                 if let Some(donor_row) = donor_row_opt {
                     let mut d_tr_d = 0usize; let mut v_tr_d = 0usize;
                     let mut d_fl_d = 0usize; let mut v_fl_d = 0usize;
+                    let mut d_tr_hd = 0usize; let mut v_tr_hd = 0usize;
+                    let mut d_fl_hd = 0usize; let mut v_fl_hd = 0usize;
                     for u in 0..aln.length {
                         let rt = t_row[u];
                         let rd = donor_row[u];
+                        let rh = home_row[u];
                         if rt > 0 && rd > 0 {
                             if u >= s_idx && u < e_idx {
                                 v_tr_d += 1;
@@ -634,14 +611,27 @@ fn group_ancestral_events(
                                 if rt != rd { d_fl_d += 1; }
                             }
                         }
+                        if rh > 0 && rd > 0 {
+                            if u >= s_idx && u < e_idx {
+                                v_tr_hd += 1;
+                                if rh != rd { d_tr_hd += 1; }
+                            } else {
+                                v_fl_hd += 1;
+                                if rh != rd { d_fl_hd += 1; }
+                            }
+                        }
                     }
                     let dist_tr_d = if v_tr_d > 0 { (d_tr_d as f64) / (v_tr_d as f64) } else { 1.0 };
                     let dist_fl_d = if v_fl_d > 0 { (d_fl_d as f64) / (v_fl_d as f64) } else { 1.0 };
+                    let dist_tr_hd = if v_tr_hd > 0 { (d_tr_hd as f64) / (v_tr_hd as f64) } else { 1.0 };
+                    let dist_fl_hd = if v_fl_hd > 0 { (d_fl_hd as f64) / (v_fl_hd as f64) } else { 1.0 };
 
                     let matches_mosaic = dist_fl_h < dist_fl_d
                         && dist_tr_d < dist_tr_h
                         && dist_fl_d > dist_tr_d
-                        && dist_tr_h > dist_fl_h;
+                        && dist_tr_h > dist_fl_h
+                        && dist_fl_h < 0.5 * dist_fl_hd
+                        && dist_tr_d < 0.5 * dist_tr_hd;
 
                     if matches_mosaic {
                         g.isolates.push(t_name.clone());
@@ -675,6 +665,18 @@ fn group_ancestral_events(
         }
     }
 
+    // Sort grouped events by statistical significance (lowest p-value first, highest z-phys tiebreaker)
+    grouped.sort_by(|a, b| {
+        a.p_fisher
+            .partial_cmp(&b.p_fisher)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                b.z_phys
+                    .partial_cmp(&a.z_phys)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+    });
+
     // Assign 1-based sequential event ID and sort by it
     for (i, g) in grouped.iter_mut().enumerate() {
         g.event_id = i + 1;
@@ -682,53 +684,76 @@ fn group_ancestral_events(
     grouped
 }
 
-/// Deduplicates overlapping tracts across different parental channels for a single candidate taxon.
-/// Preserves distinct non-overlapping tracts (Multi-Way Mosaicism) while suppressing redundant
-/// sister-channel duplicates (IoU >= 0.50 or overlap >= 70% of either tract).
-fn deduplicate_candidate_tracts(mut tracts: Vec<crate::types::PhysicalTract>) -> Vec<crate::types::PhysicalTract> {
-    if tracts.len() <= 1 {
-        return tracts;
+/// Deduplicates overlapping verified events across different parental channels for a single candidate taxon.
+/// Preserves distinct non-overlapping tracts and nested multi-way mosaics (e.g. Russian dolls from distinct donors)
+/// while suppressing redundant sister-channel duplicates (IoU >= 0.50 or overlap >= 70% for same-donor clade).
+fn deduplicate_candidate_events(
+    mut events: Vec<crate::types::RecombinationEvent>,
+    aln: &crate::types::Alignment,
+) -> Vec<crate::types::RecombinationEvent> {
+    if events.len() <= 1 {
+        return events;
     }
 
-    // Sort by physical significance score descending so strongest tracts have priority
-    tracts.sort_by(|a, b| {
+    let (_d_sister, d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
+
+    // Sort by physical significance score descending so strongest events have priority
+    events.sort_by(|a, b| {
         b.z_phys
             .partial_cmp(&a.z_phys)
             .unwrap_or(std::cmp::Ordering::Equal)
     });
 
-    let mut kept: Vec<crate::types::PhysicalTract> = Vec::new();
+    let mut kept: Vec<crate::types::RecombinationEvent> = Vec::new();
 
-    for tract in tracts {
+    for ev in events {
         let mut is_redundant = false;
-        let l_tract = (tract.u2_discrete.saturating_sub(tract.u1_discrete) + 1) as f64;
+        let l_ev = (ev.u2.saturating_sub(ev.u1) + 1) as f64;
 
         for existing in &kept {
-            let s_ov = tract.u1_discrete.max(existing.u1_discrete);
-            let e_ov = tract.u2_discrete.min(existing.u2_discrete);
+            let s_ov = ev.u1.max(existing.u1);
+            let e_ov = ev.u2.min(existing.u2);
 
             if e_ov >= s_ov {
                 let inter = (e_ov - s_ov + 1) as f64;
-                let l_exist = (existing.u2_discrete.saturating_sub(existing.u1_discrete) + 1) as f64;
-                let union_span = (tract.u2_discrete.max(existing.u2_discrete) - tract.u1_discrete.min(existing.u1_discrete) + 1) as f64;
+                let l_exist = (existing.u2.saturating_sub(existing.u1) + 1) as f64;
+                let union_span = (ev.u2.max(existing.u2) - ev.u1.min(existing.u1) + 1) as f64;
                 let iou = inter / union_span.max(1.0);
-                let frac_tract = inter / l_tract.max(1.0);
+                let frac_ev = inter / l_ev.max(1.0);
                 let frac_exist = inter / l_exist.max(1.0);
 
-                if iou >= 0.50 || frac_tract >= 0.70 || frac_exist >= 0.70 {
-                    is_redundant = true;
-                    break;
+                let is_same_donor = match (ev.donor_idx, existing.donor_idx) {
+                    (Some(d1), Some(d2)) => {
+                        d1 == d2 || crate::landmarks::compute_pairwise_distance(aln, d1, d2) < d_clade
+                    }
+                    (None, None) => true,
+                    _ => false,
+                };
+
+                if is_same_donor {
+                    // For the same donor clade, any substantial overlap is redundant
+                    if iou >= 0.50 || frac_ev >= 0.70 || frac_exist >= 0.70 {
+                        is_redundant = true;
+                        break;
+                    }
+                } else {
+                    // For distinct donor clades, only compete if they claim the exact same span (IoU >= 0.50)
+                    // Nested Russian dolls (IoU < 0.50) from distinct donors are preserved.
+                    if iou >= 0.50 {
+                        is_redundant = true;
+                        break;
+                    }
                 }
             }
         }
 
         if !is_redundant {
-            kept.push(tract);
+            kept.push(ev);
         }
     }
 
     // Restore coordinate order
-    kept.sort_by_key(|t| t.u1_discrete);
+    kept.sort_by_key(|e| e.u1);
     kept
 }
 
@@ -738,62 +763,51 @@ mod tests {
     use crate::types::Alignment;
 
     #[test]
-    fn test_deduplicate_candidate_tracts() {
-        let t1 = crate::types::PhysicalTract {
+    fn test_deduplicate_candidate_events() {
+        let make_event = |u1: usize, u2: usize, donor: &str, z: f64| crate::types::RecombinationEvent {
+            event_id: 1,
+            isolates: vec!["R".to_string()],
             candidate_idx: 0,
-            home_channel: 1,
-            donor_channel: 2,
+            candidate_name: "R".to_string(),
+            home_idx: Some(1),
+            home_name: "P1".to_string(),
+            donor_idx: Some(2),
+            donor_name: donor.to_string(),
+            is_ghost_donor: false,
             is_crossover: false,
-            u1_discrete: 100,
-            u2_discrete: 500,
-            u1_continuous: 100.0,
-            u2_continuous: 500.0,
-            delta_c_max: 20.0,
-            z_phys: 12.0,
-            z_crit: 3.0,
-            is_physically_significant: true,
+            u1,
+            u2,
+            u1_continuous: u1 as f64,
+            u2_continuous: u2 as f64,
+            tract_length: u2 - u1 + 1,
+            s_informative: 20,
+            p_fisher: 1e-10,
+            z_phys: z,
+            d_flank_home: 0.005,
+            d_flank_donor: 0.05,
+            d_tract_home: 0.05,
+            d_tract_donor: 0.005,
+            is_verified: true,
         };
 
-        // Redundant with t1 (nearly identical span)
-        let t2 = crate::types::PhysicalTract {
-            candidate_idx: 0,
-            home_channel: 1,
-            donor_channel: 3,
-            is_crossover: false,
-            u1_discrete: 110,
-            u2_discrete: 490,
-            u1_continuous: 110.0,
-            u2_continuous: 490.0,
-            delta_c_max: 18.0,
-            z_phys: 9.0,
-            z_crit: 3.0,
-            is_physically_significant: true,
-        };
+        let t1 = make_event(100, 500, "P2", 12.0);
+        let t2 = make_event(110, 490, "P3", 9.0);
+        let t3 = make_event(800, 1200, "P4", 11.0);
 
-        // Distinct non-overlapping tract (Multi-Way mosaic second tract)
-        let t3 = crate::types::PhysicalTract {
-            candidate_idx: 0,
-            home_channel: 1,
-            donor_channel: 4,
-            is_crossover: false,
-            u1_discrete: 800,
-            u2_discrete: 1200,
-            u1_continuous: 800.0,
-            u2_continuous: 1200.0,
-            delta_c_max: 22.0,
-            z_phys: 11.0,
-            z_crit: 3.0,
-            is_physically_significant: true,
+        let dummy_aln = Alignment {
+            taxa: vec!["R".into(), "P1".into(), "P2".into(), "P3".into(), "P4".into()],
+            num_taxa: 5,
+            length: 1500,
+            matrix: vec![1u8; 5 * 1500],
         };
-
-        let dedup = deduplicate_candidate_tracts(vec![t1, t2, t3]);
-        assert_eq!(dedup.len(), 2, "Expected 2 tracts after deduplicating redundant overlap");
-        assert_eq!(dedup[0].u1_discrete, 100);
-        assert_eq!(dedup[0].u2_discrete, 500);
-        assert_eq!(dedup[0].donor_channel, 2, "Stronger tract should survive");
-        assert_eq!(dedup[1].u1_discrete, 800);
-        assert_eq!(dedup[1].u2_discrete, 1200);
-        assert_eq!(dedup[1].donor_channel, 4);
+        let dedup = deduplicate_candidate_events(vec![t1, t2, t3], &dummy_aln);
+        assert_eq!(dedup.len(), 2, "Expected 2 events after deduplicating redundant overlap");
+        assert_eq!(dedup[0].u1, 100);
+        assert_eq!(dedup[0].u2, 500);
+        assert_eq!(dedup[0].donor_name, "P2", "Stronger event should survive");
+        assert_eq!(dedup[1].u1, 800);
+        assert_eq!(dedup[1].u2, 1200);
+        assert_eq!(dedup[1].donor_name, "P4");
     }
 
     #[test]

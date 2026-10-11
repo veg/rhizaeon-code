@@ -33,6 +33,44 @@ pub fn jukes_cantor_distance(p: f64) -> f64 {
     -0.75 * (1.0 - (4.0 / 3.0) * clamped_p).ln()
 }
 
+/// Computes empirical scale-invariant sister and clade distance thresholds from the alignment.
+/// - d_sister: Poisson transmission drift floor, bounded below by 3 / L
+/// - d_clade: 10th percentile of positive pairwise distances, bounded below by 5 / L
+pub fn compute_scale_invariant_distance_thresholds(aln: &Alignment) -> (f64, f64) {
+    let l_f64 = aln.length.max(1) as f64;
+    let sister_floor = 3.0 / l_f64;
+    let clade_floor = 5.0 / l_f64;
+
+    let n = aln.num_taxa;
+    if n <= 1 {
+        return (sister_floor, clade_floor);
+    }
+
+    let mut dists = Vec::with_capacity((n * (n - 1)) / 2);
+    for i in 0..n {
+        for j in (i + 1)..n {
+            let d = compute_pairwise_distance(aln, i, j);
+            if d > 0.0 {
+                dists.push(d);
+            }
+        }
+    }
+
+    if dists.is_empty() {
+        return (sister_floor, clade_floor);
+    }
+
+    dists.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let idx_01 = (0.01 * (dists.len() as f64)).floor() as usize;
+    let d_sister = dists[idx_01.min(dists.len() - 1)].max(sister_floor);
+
+    let idx_10 = (0.10 * (dists.len() as f64)).floor() as usize;
+    let d_clade = dists[idx_10.min(dists.len() - 1)].max(clade_floor).max(1.5 * d_sister);
+
+    (d_sister, d_clade)
+}
+
 /// Builds Full-Cohort LandmarkSet when N <= 64 (zero-subsampling manifold tracking)
 pub fn build_full_cohort_landmarks(alignment: &Alignment) -> LandmarkSet {
     let n = alignment.num_taxa;

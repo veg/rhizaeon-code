@@ -50,6 +50,7 @@ impl TrajectoryParentalResolver {
             n,
             landmarks,
             aln,
+            &[],
         );
         all_pairs.into_iter().next().unwrap()
     }
@@ -65,6 +66,7 @@ impl TrajectoryParentalResolver {
         n: usize,
         landmarks: &LandmarkSet,
         aln: &crate::types::Alignment,
+        candidate_indices: &[usize],
     ) -> Vec<TrajectoryParentalPair> {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -95,6 +97,23 @@ impl TrajectoryParentalResolver {
             swings[ch] = (max_c - min_c).max(0.0);
         }
 
+        // 2b. Standardized Brownian bridge excursions and scale-invariant parameters
+        let mut z_swings = vec![0.0f64; num_channels];
+        for ch in 0..num_channels {
+            let mut sum_sq_a = 0.0;
+            for u in 0..l {
+                let a_val = a_tensor[u * n * num_channels + candidate_idx * num_channels + ch];
+                let diff = a_val - mean_a[ch];
+                sum_sq_a += diff * diff;
+            }
+            let sigma_a = (sum_sq_a * inv_l).sqrt().max(1e-6);
+            z_swings[ch] = swings[ch] / ((l as f64).sqrt() * sigma_a);
+        }
+        let uniform_share = 1.0 / (num_channels as f64);
+        let km_channel = uniform_share;
+        let k_crit_att = (-0.5 * (0.05 / (2.0 * (num_channels as f64))).ln()).sqrt().max(1.645);
+        let (d_sister, _d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
+
         // 3. Covariance matrix of C_R in shape (num_channels, num_channels)
         let mut cov_c = vec![0.0f64; num_channels * num_channels];
         for a in 0..num_channels {
@@ -118,11 +137,22 @@ impl TrajectoryParentalResolver {
         for p in 0..k {
             let l_global = landmarks.indices[p];
             if l_global != candidate_idx {
-                contemporary_channels.push(p + 1);
+                let is_sister = candidate_indices.contains(&l_global)
+                    && crate::landmarks::compute_pairwise_distance(aln, candidate_idx, l_global) < d_sister;
+                if !is_sister {
+                    contemporary_channels.push(p + 1);
+                }
             }
         }
         if contemporary_channels.is_empty() {
-            contemporary_channels.push(1);
+            for p in 0..k {
+                if landmarks.indices[p] != candidate_idx {
+                    contemporary_channels.push(p + 1);
+                }
+            }
+            if contemporary_channels.is_empty() {
+                contemporary_channels.push(1);
+            }
         }
 
         // 5. Find optimal primary pair across all contemporary pairs
@@ -143,7 +173,7 @@ impl TrajectoryParentalResolver {
                 let opposition = 1.0 - rho_ab;
 
                 let max_mean_a = mean_a[ch_a].max(mean_a[ch_b]);
-                let attention_support = max_mean_a / (max_mean_a + 0.1);
+                let attention_support = max_mean_a / (max_mean_a + km_channel);
 
                 let score = diff_var * opposition * attention_support;
                 if score > best_score {
@@ -197,15 +227,15 @@ impl TrajectoryParentalResolver {
             let opposition = 1.0 - rho_hd;
 
             let max_mean = mean_a[home_ch].max(mean_a[d]);
-            let attention_support = max_mean / (max_mean + 0.1);
+            let attention_support = max_mean / (max_mean + km_channel);
 
             let score_d = diff_var * opposition * attention_support;
 
             // Donor selection criterion:
             // Needs meaningful contrast with Home and non-trivial attention/swing
             if score_d >= 0.05 * best_score.max(1e-6)
-                && (mean_a[d] >= 0.010 || swings[d] >= 1.0)
-                && swings[d] >= 0.35
+                && (mean_a[d] >= 0.5 * uniform_share || z_swings[d] >= 1.0)
+                && (z_swings[d] >= k_crit_att || swings[d] >= 0.25)
             {
                 candidate_donors.push(CandidateDonor {
                     channel: d,
@@ -215,22 +245,52 @@ impl TrajectoryParentalResolver {
             }
         }
 
-        // Channel 0 is reserved as the continuous autapomorphy sink (DIR-RHIZ-PAFF-012.3)
+        // Channel 0: Ghost / Unsampled Donor evaluation (DIR-RHIZ-PAFF-012.3)
         // Autapomorphic rate bursts naturally pool into [ROOT], preventing false donor attribution.
+        let var_h = cov_c[home_ch * num_channels + home_ch].max(1e-12);
+        let var_0 = cov_c[0].max(1e-12);
+        let cov_h0 = cov_c[home_ch * num_channels + 0];
+
+        let diff_var_0 = (var_h + var_0 - 2.0 * cov_h0).max(0.0);
+        let rho_h0 = (cov_h0 / (var_h * var_0).sqrt()).clamp(-1.0, 1.0);
+        let opposition_0 = 1.0 - rho_h0;
+
+        let max_mean_0 = mean_a[home_ch].max(mean_a[0]);
+        let attention_support_0 = max_mean_0 / (max_mean_0 + km_channel);
+
+        let score_0 = diff_var_0 * opposition_0 * attention_support_0;
+
+        if score_0 >= 0.05 * best_score.max(1e-6)
+            && (mean_a[0] >= 0.5 * uniform_share || z_swings[0] >= 1.0)
+            && (z_swings[0] >= k_crit_att || swings[0] >= 0.25)
+        {
+            candidate_donors.push(CandidateDonor {
+                channel: 0,
+                is_ghost: true,
+                score: score_0,
+            });
+        }
 
         // Sort candidate donors by score descending
         candidate_donors.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
 
-        // Deduplicate candidate donors across sister lineages (d < 0.010)
+        // Deduplicate candidate donors across sister lineages (d < d_sister)
         // so multiple sisters from the primary donor clade don't crowd out secondary donor clades in multi-way mosaicism.
         let mut distinct_donors: Vec<CandidateDonor> = Vec::new();
         for cd in candidate_donors {
+            if cd.is_ghost {
+                distinct_donors.push(cd);
+                continue;
+            }
             let dk = cd.channel.saturating_sub(1);
             if let Some(dg) = landmarks.indices.get(dk).copied() {
                 let is_sister = distinct_donors.iter().any(|existing| {
+                    if existing.is_ghost {
+                        return false;
+                    }
                     let ex_k = existing.channel.saturating_sub(1);
                     if let Some(ex_g) = landmarks.indices.get(ex_k).copied() {
-                        crate::landmarks::compute_pairwise_distance(aln, dg, ex_g) < 0.010
+                        crate::landmarks::compute_pairwise_distance(aln, dg, ex_g) < d_sister
                     } else {
                         false
                     }
@@ -253,7 +313,7 @@ impl TrajectoryParentalResolver {
         let home_global = landmarks.indices.get(home_k).copied();
 
         let mut pairs = Vec::with_capacity(candidate_donors.len());
-        for cd in candidate_donors {
+        for cd in &candidate_donors {
             let (donor_k, donor_name, donor_global) = if cd.is_ghost {
                 (None, "Ghost".to_string(), None)
             } else {
@@ -279,6 +339,61 @@ impl TrajectoryParentalResolver {
                 swing_home: swings[home_ch],
                 swing_donor: swings[cd.channel],
             });
+        }
+
+        // Multi-Way Mosaicism: Also evaluate secondary reticulation dipoles between distinct donor clades
+        // (e.g. nested Russian dolls P2 -> P3, or sequential cascade transitions)
+        if candidate_donors.len() >= 2 {
+            for i in 0..candidate_donors.len() {
+                let d1 = candidate_donors[i].channel;
+                if d1 == 0 { continue; } // Ghost handled separately
+
+                for j in (i + 1)..candidate_donors.len() {
+                    let d2 = candidate_donors[j].channel;
+                    if d2 == 0 { continue; }
+
+                    let var_1 = cov_c[d1 * num_channels + d1].max(1e-12);
+                    let var_2 = cov_c[d2 * num_channels + d2].max(1e-12);
+                    let cov_12 = cov_c[d1 * num_channels + d2];
+
+                    let diff_var = (var_1 + var_2 - 2.0 * cov_12).max(0.0);
+                    let rho_12 = (cov_12 / (var_1 * var_2).sqrt()).clamp(-1.0, 1.0);
+                    let opposition = 1.0 - rho_12;
+
+                    let max_m = mean_a[d1].max(mean_a[d2]);
+                    let att_sup = max_m / (max_m + km_channel);
+                    let score_12 = diff_var * opposition * att_sup;
+
+                    if score_12 >= 0.05 * best_score.max(1e-6)
+                        && (z_swings[d1] >= k_crit_att || swings[d1] >= 0.25)
+                        && (z_swings[d2] >= k_crit_att || swings[d2] >= 0.25)
+                    {
+                        let (h_sec, d_sec) = if mean_a[d1] >= mean_a[d2] {
+                            (d1, d2)
+                        } else {
+                            (d2, d1)
+                        };
+
+                        let h_sec_k = h_sec.saturating_sub(1);
+                        let d_sec_k = d_sec.saturating_sub(1);
+
+                        pairs.push(TrajectoryParentalPair {
+                            candidate_idx,
+                            home_channel: h_sec,
+                            donor_channel: d_sec,
+                            home_landmark_idx: Some(h_sec_k),
+                            donor_landmark_idx: Some(d_sec_k),
+                            is_ghost_donor: false,
+                            home_name: landmarks.taxa.get(h_sec_k).cloned().unwrap_or_else(|| "Home".to_string()),
+                            donor_name: landmarks.taxa.get(d_sec_k).cloned().unwrap_or_else(|| "Donor".to_string()),
+                            home_global_idx: landmarks.indices.get(h_sec_k).copied(),
+                            donor_global_idx: landmarks.indices.get(d_sec_k).copied(),
+                            swing_home: swings[h_sec],
+                            swing_donor: swings[d_sec],
+                        });
+                    }
+                }
+            }
         }
 
         if pairs.is_empty() {
@@ -318,6 +433,7 @@ impl TrajectoryParentalResolver {
     ) -> TrajectoryParentalPair {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
+        let (d_sister, d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
 
         let u1_idx = (u1.saturating_sub(1)).min(l - 1);
         let u2_idx = (u2.saturating_sub(1)).min(l - 1);
@@ -478,9 +594,9 @@ impl TrajectoryParentalResolver {
         for &(ch, d_fl) in &recoil_channels {
             let k_idx = ch - 1;
             let t_idx = landmarks.indices[k_idx];
-            // Disqualify co-recombinant sisters sharing the candidate's home flank (d_fl < 0.008),
+            // Disqualify co-recombinant sisters sharing the candidate's home flank (d_fl < d_sister),
             // while allowing authentic donor parents from the opposite clade:
-            let is_corecombinant_sister = candidate_indices.contains(&t_idx) && d_fl < 0.008;
+            let is_corecombinant_sister = candidate_indices.contains(&t_idx) && d_fl < d_sister;
             if !is_corecombinant_sister {
                 non_candidate_recoil.push(ch);
             }
@@ -519,7 +635,19 @@ impl TrajectoryParentalResolver {
             let best_w = w_tract[best_donor_ch];
             let mut runner_ups = Vec::new();
             for &ch in &eligible_donor_channels {
-                if (best_w - w_tract[ch]) < 0.25 * best_w.abs().max(1.0) {
+                let is_sister = if let Some(pref_d) = preferred_donor_ch {
+                    let k_pref = pref_d.saturating_sub(1);
+                    let k_ch = ch.saturating_sub(1);
+                    if let (Some(&t_pref), Some(&t_ch)) = (landmarks.indices.get(k_pref), landmarks.indices.get(k_ch)) {
+                        crate::landmarks::compute_pairwise_distance(aln, t_pref, t_ch) < d_clade
+                    } else {
+                        ch == pref_d
+                    }
+                } else {
+                    true
+                };
+
+                if is_sister && (best_w - w_tract[ch]) < 0.25 * best_w.abs().max(1.0) {
                     runner_ups.push(ch);
                 }
             }
@@ -579,7 +707,19 @@ impl TrajectoryParentalResolver {
             let best_w = w_flank[best_home_ch];
             let mut runner_ups = Vec::new();
             for &ch in &home_candidates {
-                if (best_w - w_flank[ch]) < 0.25 * best_w.abs().max(1.0) {
+                let is_sister = if let Some(pref_h) = preferred_home_ch {
+                    let k_pref = pref_h.saturating_sub(1);
+                    let k_ch = ch.saturating_sub(1);
+                    if let (Some(&t_pref), Some(&t_ch)) = (landmarks.indices.get(k_pref), landmarks.indices.get(k_ch)) {
+                        crate::landmarks::compute_pairwise_distance(aln, t_pref, t_ch) < d_clade
+                    } else {
+                        ch == pref_h
+                    }
+                } else {
+                    true
+                };
+
+                if is_sister && (best_w - w_flank[ch]) < 0.25 * best_w.abs().max(1.0) {
                     runner_ups.push(ch);
                 }
             }
