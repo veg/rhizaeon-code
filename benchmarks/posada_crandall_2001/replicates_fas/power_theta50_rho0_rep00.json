@@ -1,0 +1,14 @@
+{
+  "scenario_id": "power_theta50_rho0",
+  "category": "power",
+  "theta": 50.0,
+  "rho": 0.0,
+  "alpha": null,
+  "n_taxa": 10,
+  "length_nt": 1000,
+  "rep_idx": 0,
+  "seed": 20061120,
+  "num_partitions": 1,
+  "true_breakpoints": [],
+  "true_events": []
+}

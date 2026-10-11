@@ -877,11 +877,44 @@ impl SequenceDueDiligence {
 
                 if e2_cites_e1 {
                     // e2 is citing an active recombinant candidate as parent.
-                    if e1.p_fisher <= e2.p_fisher {
+                    let e1_donor_internal = e1.donor_idx.map_or(false, |d| {
+                        crate::landmarks::compute_pairwise_distance(_aln, d, e1.candidate_idx) < d_clade
+                            || e1.home_idx.map_or(false, |h| crate::landmarks::compute_pairwise_distance(_aln, d, h) < d_clade)
+                    });
+                    let e2_donor_internal = e2.donor_idx.map_or(false, |d| {
+                        crate::landmarks::compute_pairwise_distance(_aln, d, e2.candidate_idx) < d_clade
+                            || e2.home_idx.map_or(false, |h| crate::landmarks::compute_pairwise_distance(_aln, d, h) < d_clade)
+                    });
+
+                    let e1_has_ext_donor = e1.donor_idx.is_some() && !e1_donor_internal;
+                    let e2_has_ext_donor = e2.donor_idx.is_some() && !e2_donor_internal;
+
+                    if e1_has_ext_donor && !e2_has_ext_donor {
                         pruned[j] = true;
-                    } else {
+                    } else if e2_has_ext_donor && !e1_has_ext_donor {
                         pruned[i] = true;
                         break;
+                    } else {
+                        let delta_h1 = (e1.d_tract_home - e1.d_flank_home).max(0.0);
+                        let delta_h2 = (e2.d_tract_home - e2.d_flank_home).max(0.0);
+                        let delta_d1 = (e1.d_flank_donor - e1.d_tract_donor).max(0.0);
+                        let delta_d2 = (e2.d_flank_donor - e2.d_tract_donor).max(0.0);
+                        let trans1 = delta_h1 + delta_d1;
+                        let trans2 = delta_h2 + delta_d2;
+
+                        if (trans1 - trans2).abs() > 1e-4 {
+                            if trans1 > trans2 {
+                                pruned[j] = true;
+                            } else {
+                                pruned[i] = true;
+                                break;
+                            }
+                        } else if e1.p_fisher <= e2.p_fisher {
+                            pruned[j] = true;
+                        } else {
+                            pruned[i] = true;
+                            break;
+                        }
                     }
                 }
             }

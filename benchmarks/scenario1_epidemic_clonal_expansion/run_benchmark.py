@@ -294,10 +294,13 @@ def main():
     parser = argparse.ArgumentParser(description="Run Scenario 1.1 Epidemic Clonal Expansion Benchmark")
     parser.add_argument("--replicates", type=int, default=20, help="Replicates per condition (default 20)")
     parser.add_argument("--threads", type=int, default=min(8, cpu_count()), help="Multiprocessing workers")
+    parser.add_argument("--rhiz-bin", type=str, default="/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon", help="Path to rhizaeon binary")
+    parser.add_argument("--three-bin", type=str, default="/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq", help="Path to 3seq binary")
+    parser.add_argument("--out-dir", type=str, default="/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario1_epidemic_clonal_expansion", help="Directory for output CSVs")
     args = parser.parse_args()
     
-    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
-    three_bin = "/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq"
+    rhiz_bin = args.rhiz_bin
+    three_bin = args.three_bin
     
     assert os.path.exists(rhiz_bin), f"RhizAeon binary not found at {rhiz_bin}"
     assert os.path.exists(three_bin), f"3SEQ binary not found at {three_bin}"
@@ -324,7 +327,7 @@ def main():
                 print(f"  Processed {idx}/{total_jobs} alignments ({idx/total_jobs*100:.1f}%) in {elapsed:.1f}s")
                 
     # Save raw results
-    out_dir = Path("/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario1_epidemic_clonal_expansion")
+    out_dir = Path(args.out_dir)
     raw_csv = out_dir / "epidemic_raw_results.csv"
     
     import csv

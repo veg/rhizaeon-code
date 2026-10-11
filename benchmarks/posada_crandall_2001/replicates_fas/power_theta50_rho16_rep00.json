@@ -1,0 +1,123 @@
+{
+  "scenario_id": "power_theta50_rho16",
+  "category": "power",
+  "theta": 50.0,
+  "rho": 16.0,
+  "alpha": null,
+  "n_taxa": 10,
+  "length_nt": 1000,
+  "rep_idx": 0,
+  "seed": 20091120,
+  "num_partitions": 36,
+  "true_breakpoints": [
+    2,
+    92,
+    113,
+    127,
+    130,
+    152,
+    167,
+    195,
+    196,
+    244,
+    251,
+    256,
+    260,
+    264,
+    277,
+    283,
+    336,
+    371,
+    448,
+    513,
+    619,
+    644,
+    657,
+    704,
+    713,
+    717,
+    719,
+    784,
+    785,
+    847,
+    895,
+    929,
+    953,
+    982,
+    998
+  ],
+  "true_events": [
+    {
+      "child": "Taxon_0",
+      "home": "Taxon_1",
+      "donor": "Taxon_5",
+      "u1": 283,
+      "u2": 371,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_0",
+      "home": "Taxon_1",
+      "donor": "Taxon_7",
+      "u1": 371,
+      "u2": 644,
+      "snps_in_tract": 3
+    },
+    {
+      "child": "Taxon_0",
+      "home": "Taxon_1",
+      "donor": "Taxon_3",
+      "u1": 717,
+      "u2": 784,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_0",
+      "home": "Taxon_1",
+      "donor": "Taxon_6",
+      "u1": 784,
+      "u2": 1000,
+      "snps_in_tract": 12
+    },
+    {
+      "child": "Taxon_2",
+      "home": "Taxon_1",
+      "donor": "Taxon_7",
+      "u1": 0,
+      "u2": 371,
+      "snps_in_tract": 2
+    },
+    {
+      "child": "Taxon_5",
+      "home": "Taxon_0",
+      "donor": "Taxon_7",
+      "u1": 644,
+      "u2": 998,
+      "snps_in_tract": 14
+    },
+    {
+      "child": "Taxon_6",
+      "home": "Taxon_3",
+      "donor": "Taxon_0",
+      "u1": 784,
+      "u2": 1000,
+      "snps_in_tract": 11
+    },
+    {
+      "child": "Taxon_7",
+      "home": "Taxon_2",
+      "donor": "Taxon_0",
+      "u1": 371,
+      "u2": 644,
+      "snps_in_tract": 3
+    },
+    {
+      "child": "Taxon_7",
+      "home": "Taxon_2",
+      "donor": "Taxon_5",
+      "u1": 644,
+      "u2": 998,
+      "snps_in_tract": 7
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "scenario_id": "fp_theta50_alpha0p05",
+  "category": "false_positive",
+  "theta": 50.0,
+  "rho": 0.0,
+  "alpha": 0.05,
+  "n_taxa": 10,
+  "length_nt": 1000,
+  "rep_idx": 0,
+  "seed": 20261120,
+  "num_partitions": 1,
+  "true_breakpoints": [],
+  "true_events": []
+}

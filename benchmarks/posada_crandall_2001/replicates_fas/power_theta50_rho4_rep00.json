@@ -1,0 +1,61 @@
+{
+  "scenario_id": "power_theta50_rho4",
+  "category": "power",
+  "theta": 50.0,
+  "rho": 4.0,
+  "alpha": null,
+  "n_taxa": 10,
+  "length_nt": 1000,
+  "rep_idx": 0,
+  "seed": 20081120,
+  "num_partitions": 14,
+  "true_breakpoints": [
+    10,
+    151,
+    179,
+    213,
+    422,
+    465,
+    477,
+    650,
+    687,
+    793,
+    893,
+    923,
+    928
+  ],
+  "true_events": [
+    {
+      "child": "Taxon_3",
+      "home": "Taxon_4",
+      "donor": "Taxon_6",
+      "u1": 893,
+      "u2": 1000,
+      "snps_in_tract": 7
+    },
+    {
+      "child": "Taxon_4",
+      "home": "Taxon_3",
+      "donor": "Taxon_1",
+      "u1": 893,
+      "u2": 1000,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_6",
+      "home": "Taxon_2",
+      "donor": "Taxon_3",
+      "u1": 893,
+      "u2": 1000,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_7",
+      "home": "Taxon_1",
+      "donor": "Taxon_0",
+      "u1": 650,
+      "u2": 1000,
+      "snps_in_tract": 19
+    }
+  ]
+}

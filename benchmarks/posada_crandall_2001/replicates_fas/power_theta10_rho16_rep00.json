@@ -1,0 +1,162 @@
+{
+  "scenario_id": "power_theta10_rho16",
+  "category": "power",
+  "theta": 10.0,
+  "rho": 16.0,
+  "alpha": null,
+  "n_taxa": 10,
+  "length_nt": 1000,
+  "rep_idx": 0,
+  "seed": 20041120,
+  "num_partitions": 51,
+  "true_breakpoints": [
+    10,
+    12,
+    22,
+    32,
+    40,
+    67,
+    78,
+    119,
+    136,
+    168,
+    198,
+    217,
+    252,
+    255,
+    274,
+    289,
+    316,
+    320,
+    335,
+    345,
+    357,
+    358,
+    367,
+    371,
+    373,
+    456,
+    528,
+    549,
+    567,
+    574,
+    585,
+    623,
+    630,
+    704,
+    706,
+    748,
+    753,
+    769,
+    772,
+    774,
+    783,
+    795,
+    798,
+    800,
+    825,
+    829,
+    844,
+    859,
+    958,
+    994
+  ],
+  "true_events": [
+    {
+      "child": "Taxon_0",
+      "home": "Taxon_3",
+      "donor": "Taxon_4",
+      "u1": 78,
+      "u2": 119,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_2",
+      "home": "Taxon_0",
+      "donor": "Taxon_3",
+      "u1": 0,
+      "u2": 136,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_2",
+      "home": "Taxon_0",
+      "donor": "Taxon_9",
+      "u1": 800,
+      "u2": 1000,
+      "snps_in_tract": 4
+    },
+    {
+      "child": "Taxon_3",
+      "home": "Taxon_0",
+      "donor": "Taxon_2",
+      "u1": 0,
+      "u2": 136,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_4",
+      "home": "Taxon_5",
+      "donor": "Taxon_7",
+      "u1": 0,
+      "u2": 373,
+      "snps_in_tract": 5
+    },
+    {
+      "child": "Taxon_5",
+      "home": "Taxon_7",
+      "donor": "Taxon_1",
+      "u1": 32,
+      "u2": 67,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_5",
+      "home": "Taxon_7",
+      "donor": "Taxon_2",
+      "u1": 78,
+      "u2": 136,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_5",
+      "home": "Taxon_7",
+      "donor": "Taxon_1",
+      "u1": 255,
+      "u2": 316,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_7",
+      "home": "Taxon_5",
+      "donor": "Taxon_4",
+      "u1": 0,
+      "u2": 373,
+      "snps_in_tract": 5
+    },
+    {
+      "child": "Taxon_8",
+      "home": "Taxon_9",
+      "donor": "Taxon_1",
+      "u1": 772,
+      "u2": 994,
+      "snps_in_tract": 4
+    },
+    {
+      "child": "Taxon_9",
+      "home": "Taxon_8",
+      "donor": "Taxon_4",
+      "u1": 753,
+      "u2": 800,
+      "snps_in_tract": 1
+    },
+    {
+      "child": "Taxon_9",
+      "home": "Taxon_8",
+      "donor": "Taxon_2",
+      "u1": 800,
+      "u2": 1000,
+      "snps_in_tract": 5
+    }
+  ]
+}

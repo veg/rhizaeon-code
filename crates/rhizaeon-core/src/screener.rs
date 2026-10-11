@@ -264,9 +264,9 @@ impl LocalFluxScreener {
             if z_r > z_alpha_r && r_root[i] >= 0.05 && gamma_root[i] <= self.spatial_coherence_threshold && is_isolated_leaf {
                 is_rate_burst[i] = true;
                 rate_burst_indices.push(i);
-            } else if (z_r > z_alpha_r || r_dim[i] > self.root_ratio_threshold)
-                && (root_pulse_stat[i] >= k_crit_root || root_pulse[i] >= 3.0)
-                && (!is_isolated_leaf || gamma_root[i] > self.spatial_coherence_threshold)
+            } else if (z_r > z_alpha_r || r_root[i] > self.root_ratio_threshold)
+                && root_pulse_stat[i] >= k_crit_root
+                && gamma_root[i] > self.spatial_coherence_threshold
             {
                 is_ghost_candidate[i] = true;
                 ghost_candidate_indices.push(i);
@@ -282,29 +282,38 @@ impl LocalFluxScreener {
         let pool_v: Vec<f64> = pool_indices.iter().map(|&i| v_cont[i]).collect();
         let pool_pulse: Vec<f64> = pool_indices.iter().map(|&i| cont_pulse[i]).collect();
 
-        let (_q1_v, med_v, q3_v, iqr_v) = quartiles(&pool_v);
-        let (_q1_pulse, med_pulse, q3_pulse, iqr_pulse) = quartiles(&pool_pulse);
+        let med_v = median(&pool_v);
+        let med_pulse = median(&pool_pulse);
 
-        let mad_v = median(&pool_v.iter().map(|&x| (x - med_v).abs()).collect::<Vec<_>>());
-        let mad_pulse = median(&pool_pulse.iter().map(|&x| (x - med_pulse).abs()).collect::<Vec<_>>());
+        let lower_v: Vec<f64> = pool_v.iter().cloned().filter(|&x| x <= med_v).collect();
+        let lower_pulse: Vec<f64> = pool_pulse.iter().cloned().filter(|&x| x <= med_pulse).collect();
 
-        let floor_v = (q3_v / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
-        let floor_pulse = (q3_pulse / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
+        let (med_low_v, mad_v) = if !lower_v.is_empty() {
+            let med_low = median(&lower_v);
+            let mad = median(&lower_v.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
+            (med_low, mad)
+        } else {
+            (med_v, 0.0)
+        };
+        let (med_low_pulse, mad_pulse) = if !lower_pulse.is_empty() {
+            let med_low = median(&lower_pulse);
+            let mad = median(&lower_pulse.iter().map(|&x| (x - med_low).abs()).collect::<Vec<_>>());
+            (med_low, mad)
+        } else {
+            (med_pulse, 0.0)
+        };
 
-        let scale_iqr_v = iqr_v.max(floor_v);
-        let scale_iqr_pulse = iqr_pulse.max(floor_pulse);
+        // Robust baseline scaling from uncontaminated lower quartile (75% breakdown point against recombinant swarms):
+        let z_crit_cand = 2.0f64;
 
-        let scale_mad_v = (1.4826 * mad_v).max(floor_v);
-        let scale_mad_pulse = (1.4826 * mad_pulse).max(floor_pulse);
+        let floor_v = (med_low_v / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
+        let floor_pulse = (med_low_pulse / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
 
-        let thresh_tukey_v = q3_v + 1.5 * scale_iqr_v;
-        let thresh_tukey_pulse = q3_pulse + 1.5 * scale_iqr_pulse;
+        let scale_v = (1.4826 * mad_v).max(floor_v);
+        let scale_pulse = (1.4826 * mad_pulse).max(floor_pulse);
 
-        let thresh_mad_v = med_v + 1.25 * scale_mad_v;
-        let thresh_mad_pulse = med_pulse + 1.25 * scale_mad_pulse;
-
-        let thresh_v = thresh_tukey_v.min(thresh_mad_v);
-        let thresh_pulse = thresh_tukey_pulse.min(thresh_mad_pulse);
+        let thresh_v = med_low_v + z_crit_cand * scale_v;
+        let thresh_pulse = med_low_pulse + z_crit_cand * scale_pulse;
 
         let mut candidate_mask = vec![false; n];
         for &i in &pool_indices {
@@ -377,30 +386,6 @@ impl LocalFluxScreener {
     }
 }
 
-fn quartiles(vals: &[f64]) -> (f64, f64, f64, f64) {
-    if vals.is_empty() {
-        return (0.0, 0.0, 0.0, 0.0);
-    }
-    let mut sorted = vals.to_vec();
-    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    let n = sorted.len();
-    let q2 = if n % 2 == 1 {
-        sorted[n / 2]
-    } else {
-        0.5 * (sorted[n / 2 - 1] + sorted[n / 2])
-    };
-
-    let (lower, upper) = if n % 2 == 1 {
-        (&sorted[0..(n / 2)], &sorted[(n / 2 + 1)..n])
-    } else {
-        (&sorted[0..(n / 2)], &sorted[(n / 2)..n])
-    };
-
-    let q1 = median(lower);
-    let q3 = median(upper);
-    let iqr = (q3 - q1).max(0.0);
-    (q1, q2, q3, iqr)
-}
 
 fn median(vals: &[f64]) -> f64 {
     if vals.is_empty() {

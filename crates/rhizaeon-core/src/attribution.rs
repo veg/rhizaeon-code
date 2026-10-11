@@ -114,21 +114,35 @@ impl TrajectoryParentalResolver {
         let k_crit_att = (-0.5 * (0.05 / (2.0 * (num_channels as f64))).ln()).sqrt().max(1.645);
         let (d_sister, _d_clade) = crate::landmarks::compute_scale_invariant_distance_thresholds(aln);
 
-        // 3. Covariance matrix of C_R in shape (num_channels, num_channels)
+        // 3. Channel-contiguous trajectory buffer for SIMD cache-friendly dot products
+        let mut c_traj = vec![0.0f64; num_channels * l];
+        for u in 0..l {
+            let offset = u * n * num_channels + candidate_idx * num_channels;
+            for ch in 0..num_channels {
+                c_traj[ch * l + u] = c_tensor[offset + ch];
+            }
+        }
+
+        let mut mean_c = vec![0.0f64; num_channels];
+        for ch in 0..num_channels {
+            let slice = &c_traj[ch * l..(ch + 1) * l];
+            mean_c[ch] = slice.iter().sum::<f64>() * inv_l;
+        }
+
+        // Covariance matrix of C_R in shape (num_channels, num_channels)
         let mut cov_c = vec![0.0f64; num_channels * num_channels];
         for a in 0..num_channels {
-            for b in 0..num_channels {
-                let mut sum_ab = 0.0;
-                let mut sum_a = 0.0;
-                let mut sum_b = 0.0;
+            let slice_a = &c_traj[a * l..(a + 1) * l];
+            let mean_a = mean_c[a];
+            for b in a..num_channels {
+                let slice_b = &c_traj[b * l..(b + 1) * l];
+                let mut sum_ab = 0.0f64;
                 for u in 0..l {
-                    let ca = c_tensor[u * n * num_channels + candidate_idx * num_channels + a];
-                    let cb = c_tensor[u * n * num_channels + candidate_idx * num_channels + b];
-                    sum_a += ca;
-                    sum_b += cb;
-                    sum_ab += ca * cb;
+                    sum_ab += slice_a[u] * slice_b[u];
                 }
-                cov_c[a * num_channels + b] = sum_ab * inv_l - (sum_a * inv_l) * (sum_b * inv_l);
+                let cov = sum_ab * inv_l - mean_a * mean_c[b];
+                cov_c[a * num_channels + b] = cov;
+                cov_c[b * num_channels + a] = cov;
             }
         }
 

@@ -489,7 +489,21 @@ def compute_reticulation_metrics(true_events, pred_events, mat, taxa_to_idx, D_t
     }
 
 
-def evaluate_single_replicate(scenario: PosadaScenario, sc_idx: int, rep_idx: int) -> Dict[str, Any]:
+SAMPLE_SCENARIOS = {
+    "power_theta10_rho0",
+    "power_theta50_rho0",
+    "power_theta50_rho1",
+    "power_theta50_rho4",
+    "power_theta50_rho16",
+    "power_theta50_rho64",
+    "power_theta10_rho16",
+    "power_theta200_rho16",
+    "fp_theta50_alpha0p05",
+    "fp_theta100_alpha0p5",
+}
+
+
+def evaluate_single_replicate(scenario: PosadaScenario, sc_idx: int, rep_idx: int, save_samples_dir: Optional[str] = None) -> Dict[str, Any]:
     seed = MASTER_SEED + sc_idx * 10000 + rep_idx
     # 1. Simulate ARG & sequences
     parts = simulate_hudson_arg(n=scenario.n_taxa, L=scenario.length_nt, rho=scenario.rho, seed=seed)
@@ -510,6 +524,33 @@ def evaluate_single_replicate(scenario: PosadaScenario, sc_idx: int, rep_idx: in
 
     # Ground truth events
     true_events = extract_ground_truth_events(parts, scenario.n_taxa, scenario.length_nt, mat, taxa) if scenario.rho > 0 else []
+
+    # Optional: Save sample replicate as .fas file for review
+    if save_samples_dir is not None and scenario.scenario_id in SAMPLE_SCENARIOS and rep_idx == 0:
+        out_dir = Path(save_samples_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        sample_path = out_dir / f"{scenario.scenario_id}_rep{rep_idx:02d}.fas"
+        with open(sample_path, "w") as f_out:
+            for i, t in enumerate(taxa):
+                seq = "".join(NT_CHARS[c] for c in mat[i])
+                f_out.write(f">{t}\n{seq}\n")
+        # Save companion metadata JSON
+        meta_path = out_dir / f"{scenario.scenario_id}_rep{rep_idx:02d}.json"
+        with open(meta_path, "w") as f_meta:
+            json.dump({
+                "scenario_id": scenario.scenario_id,
+                "category": scenario.category,
+                "theta": scenario.theta,
+                "rho": scenario.rho,
+                "alpha": scenario.alpha,
+                "n_taxa": scenario.n_taxa,
+                "length_nt": scenario.length_nt,
+                "rep_idx": rep_idx,
+                "seed": seed,
+                "num_partitions": len(parts),
+                "true_breakpoints": meta["true_breakpoints"],
+                "true_events": true_events
+            }, f_meta, indent=2)
 
     # 2. Run RhizAeon
     with tempfile.NamedTemporaryFile("w", suffix=".fasta", delete=False) as f_fa:
@@ -571,6 +612,7 @@ def main():
     parser.add_argument("--reps", type=int, default=100, help="Number of replicates per scenario [default: 100]")
     parser.add_argument("--workers", type=int, default=max(1, os.cpu_count() - 1), help="Number of parallel workers")
     parser.add_argument("--scenarios", type=str, default="all", help="Subset of scenarios ('all', 'power', 'fp')")
+    parser.add_argument("--save-samples-dir", type=str, default=str(SCRIPT_DIR / "replicates_fas"), help="Directory to save representative .fas replicates")
     args = parser.parse_args()
 
     scenarios = build_scenarios(n_reps=args.reps)
@@ -583,12 +625,14 @@ def main():
     print("  POSADA & CRANDALL (2001, PNAS) REPLICATION BENCHMARK")
     print(f"  Scenarios: {len(scenarios)} conditions | Replicates: {args.reps} | Total trials: {len(scenarios) * args.reps}")
     print(f"  Workers: {args.workers} | Engine: {RHIZAEON_BIN}")
+    if args.save_samples_dir:
+        print(f"  Saving representative .fas replicates to: {args.save_samples_dir}")
     print("=" * 80)
 
     tasks = []
     for sc_idx, sc in enumerate(scenarios):
         for rep in range(args.reps):
-            tasks.append((sc, sc_idx, rep))
+            tasks.append((sc, sc_idx, rep, args.save_samples_dir))
 
     t_start = time.perf_counter()
     raw_results = []
@@ -596,7 +640,7 @@ def main():
     total = len(tasks)
 
     with ProcessPoolExecutor(max_workers=args.workers) as executor:
-        futures = {executor.submit(evaluate_single_replicate, sc, sc_idx, rep): (sc.scenario_id, rep) for sc, sc_idx, rep in tasks}
+        futures = {executor.submit(evaluate_single_replicate, sc, sc_idx, rep, sdir): (sc.scenario_id, rep) for sc, sc_idx, rep, sdir in tasks}
         for future in as_completed(futures):
             res = future.result()
             raw_results.append(res)
@@ -640,6 +684,15 @@ def main():
     summary_csv = SCRIPT_DIR / "posada_summary.csv"
     df_summary.to_csv(summary_csv, index=False)
     print(f"[DONE] Saved summary table ({len(df_summary)} scenarios) to {summary_csv}")
+
+    # Synchronize posada_comparison_rhizaeon_vs_3seq.csv if 3SEQ summary is present
+    summary_3seq_csv = SCRIPT_DIR / "posada_summary_3seq.csv"
+    if summary_3seq_csv.exists():
+        df_3seq = pd.read_csv(summary_3seq_csv)
+        df_comp = df_summary.merge(df_3seq, on="scenario_id", suffixes=("_rhiz", "_3seq"))
+        comp_csv = SCRIPT_DIR / "posada_comparison_rhizaeon_vs_3seq.csv"
+        df_comp.to_csv(comp_csv, index=False)
+        print(f"[DONE] Saved comparison table to {comp_csv}")
     print("=" * 80)
 
 

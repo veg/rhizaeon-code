@@ -38,8 +38,8 @@ pub fn jukes_cantor_distance(p: f64) -> f64 {
 /// - d_clade: 10th percentile of positive pairwise distances, bounded below by 5 / L
 pub fn compute_scale_invariant_distance_thresholds(aln: &Alignment) -> (f64, f64) {
     let l_f64 = aln.length.max(1) as f64;
-    let sister_floor = 3.0 / l_f64;
-    let clade_floor = 5.0 / l_f64;
+    let sister_floor = 0.008f64.max(3.0 / l_f64);
+    let clade_floor = 0.015f64.max(5.0 / l_f64);
 
     let n = aln.num_taxa;
     if n <= 1 {
