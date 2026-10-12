@@ -46,12 +46,20 @@ pub fn compute_scale_invariant_distance_thresholds(aln: &Alignment) -> (f64, f64
         return (sister_floor, clade_floor);
     }
 
-    let mut dists = Vec::with_capacity((n * (n - 1)) / 2);
+    let total_pairs = (n * (n - 1)) / 2;
+    let max_samples = 2048;
+    let stride = (total_pairs / max_samples).max(1);
+
+    let mut dists = Vec::with_capacity(total_pairs.min(max_samples) + 16);
+    let mut count = 0usize;
     for i in 0..n {
         for j in (i + 1)..n {
-            let d = compute_pairwise_distance(aln, i, j);
-            if d > 0.0 {
-                dists.push(d);
+            count += 1;
+            if count % stride == 0 {
+                let d = compute_pairwise_distance(aln, i, j);
+                if d > 0.0 {
+                    dists.push(d);
+                }
             }
         }
     }

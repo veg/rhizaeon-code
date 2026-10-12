@@ -1,0 +1,15 @@
+================================================================================
+               RHIZAEON GRAND-SCALE CONTINUOUS SWEEP SUMMARY                    
+================================================================================
+Total Trials:              2,000
+Null Trials:              1,000
+Null False Positive Rate: 0.1000% (1/1000)
+Taxon-level False Alarm:  0.00150%
+Recombinant Trials:       1,000
+Overall Empirical Power:  43.00%
+Mean Taxon Precision:     93.75%
+Mean Taxon Recall:        32.51%
+Median BP1 Error:         17.0 nt
+Median BP2 Error:         16.0 nt
+Median Runtime per Trial: 37.56 ms
+================================================================================

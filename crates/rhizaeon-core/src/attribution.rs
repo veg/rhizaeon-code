@@ -66,7 +66,7 @@ impl TrajectoryParentalResolver {
         n: usize,
         landmarks: &LandmarkSet,
         aln: &crate::types::Alignment,
-        _candidate_indices: &[usize],
+        ghost_candidate_indices: &[usize],
     ) -> Vec<TrajectoryParentalPair> {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -283,10 +283,11 @@ impl TrajectoryParentalResolver {
 
         let max_mean_0 = mean_a[home_ch].max(mean_a[0]);
         let attention_support_0 = max_mean_0 / (max_mean_0 + km_channel);
-
         let score_0 = diff_var_0 * opposition_0 * attention_support_0;
 
-        if score_0 >= 0.05 * best_score.max(1e-6)
+        let allow_ghost = ghost_candidate_indices.contains(&candidate_idx);
+        if allow_ghost
+            && score_0 >= 0.05 * best_score.max(1e-6)
             && (mean_a[0] >= 0.5 * uniform_share || z_swings[0] >= 1.0)
             && (z_swings[0] >= k_crit_att || swings[0] >= 0.25)
         {
@@ -456,6 +457,7 @@ impl TrajectoryParentalResolver {
         preferred_home_ch: Option<usize>,
         preferred_donor_ch: Option<usize>,
         candidate_indices: &[usize],
+        ghost_candidate_indices: &[usize],
     ) -> TrajectoryParentalPair {
         let k = landmarks.num_landmarks;
         let num_channels = k + 1;
@@ -509,7 +511,12 @@ impl TrajectoryParentalResolver {
             }
         }
 
-        if preferred_donor_ch == Some(0) || (w_tract[0] >= self.min_root_swing && w_tract[0] > max_w_tr_cont) {
+        if preferred_donor_ch == Some(0)
+            || (preferred_donor_ch.is_none()
+                && ghost_candidate_indices.contains(&candidate_idx)
+                && w_tract[0] >= self.min_root_swing
+                && w_tract[0] > max_w_tr_cont)
+        {
             is_ghost = true;
         }
 

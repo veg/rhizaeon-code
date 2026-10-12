@@ -36,7 +36,6 @@ fn test_human_mtdna_empirical_null() {
     assert!(fasta_path.exists(), "Human mtDNA alignment not found at {:?}", fasta_path);
     let fasta_content = std::fs::read_to_string(&fasta_path).expect("Failed to read mtDNA");
     let alignment = parse_fasta(&fasta_content).expect("Failed to parse mtDNA FASTA");
-
     let engine = RhizAeonEngine::new().with_landmarks(16);
     let result = engine.scan(&alignment);
 

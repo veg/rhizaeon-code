@@ -26,6 +26,21 @@ venv/
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
 
 # 3SEQ scratch files
 *.3s.*
+
+# Large simulation sweep artifacts (>1MB)
+grand_sweep_*.csv
+grand_sweep_*.png
+grand_sweep_*.txt
+test_sweep_*.png
+test_sweep_500*.csv
+test_sweep_1k.csv
+test_sweep_2k.csv
+test_sweep_5k.csv

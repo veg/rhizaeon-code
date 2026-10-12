@@ -24,3 +24,11 @@ path = "src/bin/export_figure1_data.rs"
 name = "export_figure2_data"
 path = "src/bin/export_figure2_data.rs"
 
+[[bin]]
+name = "grand_sweep"
+path = "src/bin/grand_sweep.rs"
+
+[[bin]]
+name = "debug_trial"
+path = "src/bin/debug_trial.rs"
+

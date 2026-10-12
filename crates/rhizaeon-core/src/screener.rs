@@ -261,7 +261,7 @@ impl LocalFluxScreener {
             let z_r = (logit_r[i] - med_logit) / scale_logit;
 
             let is_isolated_leaf = !(0..n).any(|j| j != i && crate::landmarks::compute_pairwise_distance(aln, i, j) < d_sister);
-            if z_r > z_alpha_r && r_root[i] >= 0.05 && gamma_root[i] <= self.spatial_coherence_threshold && is_isolated_leaf {
+            if z_r > z_alpha_r && r_root[i] >= self.root_ratio_threshold && gamma_root[i] <= self.spatial_coherence_threshold && is_isolated_leaf {
                 is_rate_burst[i] = true;
                 rate_burst_indices.push(i);
             } else if (z_r > z_alpha_r || r_root[i] > self.root_ratio_threshold)

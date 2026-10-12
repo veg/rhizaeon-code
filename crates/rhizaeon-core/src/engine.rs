@@ -107,10 +107,11 @@ impl RhizAeonEngine {
         }
 
         // Auto-Trigger Threshold Policy:
-        // Automatically compress to informative SNPs when L > 50,000 bp OR (L > 10,000 bp AND M_inf / L < 0.10)
+        // Automatically compress to informative SNPs when L > 50,000 bp (bacterial/chromosomal scale)
+        // or when L > 20,000 bp AND N >= 64
         let should_compress = self.compress_snps.unwrap_or_else(|| {
             aln_trimmed.length > 50_000
-                || (aln_trimmed.length > 10_000 && (m_inf as f64) / (aln_trimmed.length as f64) < 0.10)
+                || (aln_trimmed.length > 20_000 && n >= 64)
         });
 
         let (aln, snp_map_opt) = if should_compress && m_inf >= m_min {
@@ -184,7 +185,7 @@ impl RhizAeonEngine {
                 n,
                 &landmarks,
                 &aln,
-                &screening.candidate_recombinant_indices,
+                &screening.ghost_candidate_indices,
             );
 
             let mut candidate_tracts = Vec::new();
@@ -214,6 +215,7 @@ impl RhizAeonEngine {
                     Some(tract.home_channel),
                     Some(tract.donor_channel),
                     &screening.candidate_recombinant_indices,
+                    &screening.ghost_candidate_indices,
                 );
 
                 let tract_opt = due_diligence.verify_tract(
