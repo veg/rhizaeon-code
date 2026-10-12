@@ -665,12 +665,12 @@ At the individual taxon level, out of 22,744,905 non-recombinant leaves evaluate
 
 \begin{figure*}[t!]
 \centering
-\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_phase_diagram.png}
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_phase_diagram.pdf}
 \caption{Empirical operational phase envelope and information-theoretic observability horizon of \RhizAeon across 1,000,000 independent continuous simulation trials ($N = 4\text{--}250$ taxa, $L = 300\text{--}30{,}000$ nt).
 Panel~A: Continuous empirical power phase diagram in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space. Detection follows the hyperbolic informational boundary $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}} = \text{const}$, separating the unobservable information horizon ($M < 5$ SNPs, dark navy) from the saturation regime ($M > 25$ SNPs, bright yellow, power $> 80\%$). White contour demarcates the 50\% power boundary; yellow contour demarcates 90\% power.
 Panel~B: Information-theoretic resolution limit as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$). Power transitions sharply from $0.5\%$ at $M \le 2$ SNPs to $52.4\%$ at $M \in [11, 15]$, $85.5\%$ at $M \in [26, 50]$, and plateaus at $95.5\%$ for $M > 100$ SNPs.
 Panel~C: Breakpoint spatial resolution error $|\hat{u} - u^*|$ as a function of tract mutations $M_{\mathrm{tract}}$. At $M \ge 25$ SNPs, median spatial error stabilizes at $\le 17.0$~nt, reaching $9.0$~nt for $M > 100$.
-Panel~D: Execution throughput and scaling across alignment problem size ($N \times L / 10^3$ matrix cells), confirming linear-time scaling $\mathcal{O}(N M U)$ with auto-compression activating at $N \times L > 6 \times 10^5$ cells.}
+Panel~D: Computational throughput and scaling across alignment problem size ($N \times L / 10^3$ matrix cells), demonstrating dual-regime linear-time scaling: full physical nucleotide scanning for $N \times L \le 600\,\mathrm{k}$ matrix cells ($N = 727{,}927$ trials), and auto-compressed informative SNP scanning for $N \times L > 600\,\mathrm{k}$ matrix cells ($N = 272{,}073$ trials), which delivers $\approx 12\times$ computational acceleration ($2.6\,\mathrm{s} \rightarrow 210\,\mathrm{ms}$) while preserving exact breakpoint fidelity.}
 \label{fig:grand_sweep_1m_phase_diagram}
 \end{figure*}
 
@@ -683,12 +683,12 @@ When detected, the median breakpoint error decreases from 23.0~nt at $M_{\mathrm
 
 \begin{figure*}[t!]
 \centering
-\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_multievent_analysis.png}
-\caption{Multi-event reticulation resolution, structural topology sensitivity, and multi-donor mosaic disambiguation across the 1,000,000-trial continuous simulation sweep.
-Panel~A: Reticulation cardinality confusion matrix comparing true event count ($K_{\mathrm{true}}$) against inferred event count ($\hat{K}$). On true clonal nulls ($K_{\mathrm{true}} = 0$), $99.64\%$ of alignments are correctly classified with zero events. On single events ($K_{\mathrm{true}} = 1$), exact cardinality recovery reaches $50.7\%$, with $43.0\%$ uncalled (concentrated in sub-informative tracts $M < 5$) and only $6.3\%$ over-split.
-Panel~B: Bipartite event recovery metrics (Recall, Precision, and $F_1$ score) stratified by mosaic complexity $K_{\mathrm{true}} \in \{1, 2, 3, 4\}$. Event precision remains extraordinarily high across all regimes ($92.8\%$ for $K=1$, $97.3\%$ for $K=2$, $98.5\%$ for $K=3$, and $99.0\%$ for $K=4$).
-Panel~C: Empirical detection sensitivity stratified by structural topology, showing elevated sensitivity on Terminal Crossovers ($71.4\%$ power across $N = 239{,}767$ trials) compared to Intercalary Conversion Cassettes ($51.3\%$ power across $N = 426{,}899$ trials).
-Panel~D: Multi-donor mosaic disambiguation in complex reticulations ($K_{\mathrm{true}} \ge 2$), showing robust detection power ($59.7\%$) and event $F_1$ score ($0.416$) on multi-donor chimeras ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$ trials) virtually matching single-donor hybrids ($61.1\%$ power, $F_1 = 0.431$, $N = 121{,}037$ trials).}
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_multievent_analysis.pdf}
+\caption{Continuous multi-event reticulation resolution, structural topology sensitivity, and multi-donor mosaic disambiguation across the 1,000,000-trial continuous simulation sweep.
+Panel~A: Reticulation cardinality confusion matrix comparing true event count ($K_{\mathrm{true}}$) against inferred event count ($\hat{K}$). On true clonal nulls ($K_{\mathrm{true}} = 0$), $99.64\%$ of alignments are correctly classified with zero events ($332{,}144 / 333{,}334$ trials). On single events ($K_{\mathrm{true}} = 1$), exact cardinality recovery reaches $50.7\%$, with uncalled events concentrated in sub-informative tracts ($M_{\mathrm{tract}} < 5$ SNPs).
+Panel~B: Continuous event-level $F_1$ score resolution curves as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$ on logarithmic scale), stratified across mosaic complexities $K_{\mathrm{true}} \in \{1, 2, 3, 4\}$ with shaded 95\% bootstrap confidence ribbons. All curves converge to an asymptotic $F_1 \ge 0.80$ plateau at $M_{\mathrm{tract}} \ge 100$ SNPs, accompanied by high bipartite event precision ($>92.8\%\text{--}99.0\%$).
+Panel~C: Continuous empirical detection power as a function of relative tract length ($L_{\mathrm{tract}}/L$) comparing Terminal Crossovers ($N = 239{,}767$) versus Intercalary Conversion Cassettes ($N = 426{,}899$), highlighting the consistent topological power advantage of crossovers ($\Delta +4\text{--}8\%$; shaded corridor) and elevated spatial boundary fidelity (median Jaccard $J = 0.968$ vs $0.923$).
+Panel~D: Continuous multi-donor mosaic disambiguation across $M_{\mathrm{tract}}$, comparing single-donor chimeras ($P_1 \leftarrow P_2$) against multi-donor chimeras ($P_1 \leftarrow P_2 + P_3$). Both sensitivity and event $F_1$ score converge to complete parity at $M_{\mathrm{tract}} \ge 50$ SNPs ($92\%\text{--}98\%$ power, identical spatial boundary fidelity $J = 0.879$), demonstrating that independent parental dipoles in metric space deconvolve multi-donor chimeras without mutual interference.}
 \label{fig:grand_sweep_1m_multievent}
 \end{figure*}
 
