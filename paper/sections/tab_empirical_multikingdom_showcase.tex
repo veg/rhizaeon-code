@@ -1,0 +1,20 @@
+% LaTeX table summarizing the multi-kingdom empirical showcase for RhizAeon PA-FF v2.1
+% Strict compliance: zero bold formatting in data cells
+\begin{table*}[t!]
+\centering
+\footnotesize
+\caption{Multi-kingdom empirical frontiers of reticulate evolution resolved by \RhizAeon.
+Every application was analyzed from primary public accessions (GenBank, EBI IPD-MHC, IPD-IMGT/HLA) without synthetic shortcuts or parameter tuning. Runtimes reflect complete native Rust engine execution on a single CPU thread (or multi-scale kinetic manifold scan for MHC). Full cryptographic hashes and interactive dashboards are archived in the empirical repository.}
+\label{tab:empirical_multikingdom_showcase}
+{\setlength{\tabcolsep}{3.0pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{2.6cm} p{2.8cm} c r r p{4.6cm} c r@{}}
+\toprule
+Evolutionary Frontier & Biological System \& Locus & Taxa & Length & SNPs & Inferred Architecture & Support & Latency \\
+\midrule
+Bacterial Pathogen Evolution & \textit{S.~pneumoniae} PMEN1 Whole Chromosome & 11 & 2,221,315 bp & 1,516 & Multi-locus vaccine escape (\textit{cps} 23F$\to$19A) \& AMR islands (\textit{pbp2x}, \textit{pbp1a}, \textit{folA}) & 100\% Gubbins ($\Delta = 92.5$ bp) & 127.2 ms \\
+Sarbecovirus Spike Chimerism & Betacoronavirus Spike glycoprotein CDS & 9 & 3,843 bp & 1,153 & Codon 313 hinge separating NTD (RaTG13) from RBD (Pangolin ACE2 ridge) & $P = 4.07 \times 10^{-22}$, $Z = 8.23$ & 15.34 ms \\
+Primate MHC Domain Paradox & Hominoidea MHC-A, -B, -C, -AL Class I CDS & 379 & 1,128 bp & 526 & Domain deconvolution: 93.7\% reticulation in ARS/TM vs.\ coldspot in $\alpha_3$ stalk; $B*46:01$ C1 cassette (bp 268) & 316 taxa $Z \ge 3$ ($Z_{\max} = 6.31$) & 16.34 s \\
+Adaptive Mimicry Introgression & \textit{Heliconius} Chromosome 18 \textit{HmB}/\textit{optix} island & 12 & 3,677 bp & 126 & Interspecific \textit{HmB453k} cis-regulatory cassette swap (2,170--2,650 bp, $d = 0.00\%$) & $P = 6.00 \times 10^{-7}$, $Z = 26.68$ & 52.12 ms \\
+\bottomrule
+\end{tabular*}}
+\end{table*}

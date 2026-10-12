@@ -1,0 +1,32 @@
+\section{Simulation Protocols and Benchmark Frameworks}
+\label{sec:simulations_methods}
+
+\subsection{Continuous-Time Markov Substitution Modeling}
+\label{subsec:mbe_markov_sim}
+
+All simulated alignments evolved under continuous-time Markov substitution dynamics. Nucleotide evolution followed the HKY85 model with transition/transversion ratio $\kappa = 2.5$ and equilibrium base frequencies $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$ (or $\kappa = 2.0$, $\bm{\pi} = [0.40, 0.20, 0.30, 0.10]$ for Posada \& Crandall controls \citep{posada2001evaluation}). Finite-time transition probability matrices $\mathbf{P}(t)$ across branches of length $t$ were evaluated analytically via matrix exponentiation:
+\begin{equation}
+\mathbf{P}(t) = \exp(\mathbf{Q} \cdot t),
+\end{equation}
+where $\mathbf{Q}$ is the normalized generator rate matrix with mean rate $-\sum_i \pi_i Q_{ii} = 1.0$. Continuous site-rate heterogeneity was modeled by drawing relative site mutation rates $r_i \sim \text{Gamma}(\alpha, \alpha)$ using Marsaglia and Tsang's exact transformation rejection algorithm. For strict molecular clock controls, $\alpha$ was clamped to $100.0$; for biological heterotachy, $\alpha$ varied continuously across $[0.05, 5.0]$.
+
+\subsection{Whole-Genome Simulation Sweep Protocol}
+\label{subsec:mbe_sweep_protocol}
+
+The whole-genome simulation sweep was executed using the compiled native Rust benchmark harness (\texttt{grand\_sweep.rs}) under Rayon multi-threaded parallelism across 16 CPU cores. For each trial:
+\begin{enumerate}
+    \item \textit{Dimensional Parameter Sampling}: Genome length was drawn from $L \sim \text{Uniform}(1{,}000, 30{,}000)$~nt; cohort size from $N \sim \text{Uniform}(4, 250)$~taxa; parental sequence divergence from $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.25)$~subs/site; and Gamma shape $\alpha$ was sampled from $\text{Uniform}(0.05, 5.0)$ with probability 0.75 and set to $100.0$ (clock-like) with probability 0.25.
+    \item \textit{Topological Construction}: Clonal backbones were generated as balanced or comb star-like coalescent trees with terminal branch lengths scaled to maintain target pairwise divergence.
+    \item \textit{Recombinant Implantation}: For recombinant trials, a recipient leaf $R$ and donor leaf $D$ were selected uniformly at random. A recombinant tract of length $L_{\mathrm{tract}} \sim \text{Uniform}(0.008 \cdot L, 0.50 \cdot L)$ was implanted at start coordinate $u_1 \sim \text{Uniform}(0, L - L_{\mathrm{tract}})$. Across $[u_1, u_1 + L_{\mathrm{tract}}]$, sequence characters in $R$ were replaced by those of $D$ prior to terminal transmission drift ($\delta \sim \text{Uniform}(0.001, 0.005)$).
+    \item \textit{Automated Scanning}: Each alignment was streamed directly to a \texttt{rhizaeon\_core::Alignment} struct and evaluated using \texttt{RhizAeonEngine::scan()} with significance threshold $\alpha = 0.05$ and $K \le 32$ spectral landmarks. No trials were post-filtered or discarded.
+\end{enumerate}
+
+\subsection{Targeted Failure Mode Benchmarks and Scoring Standards}
+\label{subsec:mbe_scoring_standards}
+
+Targeted failure mode benchmarks were executed using Python harnesses incorporating \texttt{scipy.linalg.expm} and automated calls to the compiled \texttt{rhizaeon} binary and \texttt{3seq} \citep[v1.7;][]{lam20183seq}:
+\begin{itemize}
+    \item \textit{Breakpoint Spatial Accuracy}: Evaluated via Informative SNP Jaccard Index ($J_{\mathrm{SNP}}$) over the flanking informative polymorphisms $[u_{\mathrm{left}}, u_{\mathrm{right}}]$ bounding the physical exchange. Exact plateau containment ($E_{\mathrm{SNP}} = 0$) achieves $J = 1.00$.
+    \item \textit{Cardinality and Lineage Attribution}: Inferred events were paired to ground truth via 1-to-1 bijective bipartite matching using the Hungarian algorithm (\texttt{scipy.optimize.linear\_sum\_assignment}) on spatial boundary distance. Spurious extra calls were penalized as false alarms (deflating precision $\text{PPV}$); missed events deflated recall.
+    \item \textit{Parental Specificity}: The parental false positive rate ($\text{FPR}_{\mathrm{parent}}$) measured the proportion of un-introgressed background parental lineages falsely classified as recombinant children.
+\end{itemize}

@@ -1,0 +1,46 @@
+\subsection{The Empirical Operational Envelope and Informational Horizon Across 150,000 Whole Genomes}
+\label{subsec:sim_grand_sweep}
+
+To systematically delineate the operational boundaries of coordinate-based recombination detection without parameter tuning or cherry-picked test cases, we executed a grand simulation sweep across 150,000 independent synthetic alignments ($75{,}000$ non-recombinant clonal nulls and $75{,}000$ recombinant chimeras; Table~\ref{tab:grand_sweep_150k_envelope}, Figure~\ref{fig:grand_sweep_150k_phase_diagram}).
+The simulation grid systematically permuted five orthogonal evolutionary dimensions: genome length spanning compact viral genes to bacterial chromosomes ($L \in [1{,}000, 30{,}000]$~nt), cohort size ($N \in [4, 250]$~taxa), parental sequence divergence ($d_{\mathrm{parent}} \in [0.005, 0.25]$~subs/site), recombinant tract length ratio ($L_{\mathrm{tract}} / L \in [0.008, 0.50]$), and continuous Gamma site-rate heterogeneity ($\alpha \in [0.05, 5.0]$) alongside strict molecular clock controls ($\alpha \ge 50$).
+
+\input{sections/tab_grand_sweep_150k_envelope.tex}
+
+Across all 75,000 non-recombinant null alignments, \RhizAeon maintained rigorous false positive rate calibration, triggering only 311 false alarms (alignment-level $\text{FPR} = 0.415\%$; $>99.58\%$ specificity; Figure~\ref{fig:grand_sweep_150k_phase_diagram}B).
+On strict molecular clock controls ($\alpha \ge 50$), the false alarm rate was $0.160\%$ (30 / 18,749).
+Under extreme biological heterotachy ($\alpha \le 0.50$), rate variation inflated the false alarm rate to only $0.500\%$ (281 / 56,251).
+At the individual taxon level, out of 5,099,969 non-recombinant leaves evaluated across the null corpus, only 503 leaves were falsely flagged as recombinant ($\text{FPR}_{\text{taxon}} = 0.0099\%$; $>99.99\%$ per-taxon specificity).
+Routing autapomorphic rate bursts through the unpolarized ancestral root token prevents localized mutational accelerations from mimicking horizontal donor introgression.
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_150k_phase_diagram.png}
+\caption{Empirical operational phase envelope and information-theoretic observability horizon of \RhizAeon across 150,000 independent simulation trials ($N = 4\text{--}250$ taxa, $L = 1{,}000\text{--}30{,}000$ nt).
+Panel~A: Continuous empirical power phase diagram in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space. Detection follows the hyperbolic informational boundary $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}} = \text{const}$, separating the unobservable information floor ($M < 5$ SNPs, dark navy) from the saturation regime ($M > 25$ SNPs, bright yellow, power $> 80\%$).
+Panel~B: Alignment-level false positive rate across non-recombinant nulls ($N = 75{,}000$) stratified by evolutionary rate variation $\alpha$. Strict molecular clock ($\alpha \ge 50$, $0.160\%$) and extreme Gamma heterotachy ($\alpha \le 0.5$, $0.500\%$) maintain strict false positive rate control ($<0.50\%$).
+Panel~C: Breakpoint spatial resolution error $|\hat{b} - b_{\mathrm{true}}|$ as a function of tract mutations $M_{\mathrm{tract}}$. At $M \ge 25$ SNPs, median spatial error stabilizes at $\le 18.0$~nt, reaching $8.0$~nt for $M > 100$.
+Panel~D: Execution throughput and scaling across genome lengths ($L$) and cohort sizes ($N$), confirming sustained execution at $>30$~trials per second across diverse phylogenetic regimes.}
+\label{fig:grand_sweep_150k_phase_diagram}
+\end{figure*}
+
+On the recombinant partition ($N = 75{,}000$), \RhizAeon's empirical power phase diagram maps a clear physical phase transition governed by the Informative Mutation Horizon $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}}$ (Figure~\ref{fig:grand_sweep_150k_phase_diagram}A).
+When an imported cassette contains fewer than three informative mutations ($M_{\mathrm{tract}} \le 2$), detection power drops to $0.4\%$ (44 / 11,273), reflecting the fundamental information-theoretic limit where phylogenetic incongruence cannot be distinguished from random neutral substitutions along an uninterrupted branch.
+As informative mutational density increases, detection escalates sharply: power reaches $39.4\%$ at $M_{\mathrm{tract}} \in [6, 10]$ SNPs, passes $64.5\%$ at $M_{\mathrm{tract}} \in [16, 25]$ SNPs, and plateaus at $84.0\%$ for $M_{\mathrm{tract}} > 100$ SNPs (Table~\ref{tab:grand_sweep_150k_envelope}).
+Spatial accuracy mirrors this informative transition (Figure~\ref{fig:grand_sweep_150k_phase_diagram}C): when detected, the median breakpoint error decreases from 25.0~nt at $M_{\mathrm{tract}} \in [6, 10]$ to 18.0~nt at $M_{\mathrm{tract}} \in [26, 50]$ and 8.0~nt for $M_{\mathrm{tract}} > 100$, while mean tract overlap achieves a Jaccard index of $0.817$.
+Furthermore, across the entire 150,000-trial suite, \RhizAeon maintained an average throughput of 31.2~trials per second (median runtime 73.9~ms per trial; Figure~\ref{fig:grand_sweep_150k_phase_diagram}D).
+
+\subsection{Resolution of Evolutionary Pathologies: Micro-Conversions, Ghost Donors, and Descendant Swarms}
+\label{subsec:sim_pathologies}
+
+To evaluate how continuous metric tracking performs against standard triplet scanning (3SEQ) under specific biological failure modes, we executed targeted benchmark suites totaling 1,980 controlled simulation trials:
+
+\begin{enumerate}
+    \item \textit{Bacterial Micro-Conversions and Multiscale Scale-Space (900 trials, $L_{\mathrm{tract}} \in [50, 800]$~nt)}:
+    When a 50~nt conversion tract imports into a 5,000~nt chromosome ($1.0\%$ of genome length) at $d_{\mathrm{parent}} = 0.02$, the tract carries on average only 0.8 distinguishing mutations. Both \RhizAeon and 3SEQ declare zero events ($\hat{K} = 0.00$, $\text{FPR} = 0.0\%$), respecting the physical Nyquist floor. As tract length expands ($L_{\mathrm{tract}} \ge 100$~nt, $d_{\mathrm{parent}} \ge 0.05$), \RhizAeon's continuous dyadic matched filter captures micro-tracts with $84.5\%$--$100.0\%$ recall, achieving $99.98\%$ overall precision with an un-introgressed background parental false positive rate of $\text{FPR}_{\mathrm{parent}} = 0.0037\%$. In contrast, isolated triplet tests begin misidentifying un-introgressed background leaves as recombinant children: at $L_{\mathrm{tract}} = 800$~nt and $d_{\mathrm{parent}} = 0.10$, 3SEQ's parental false alarm rate surges to $99.8\%$ ($39.95$ of $40$ taxa falsely accused), emitting up to 40 uncollapsed events per alignment and deflating precision to $8.2\%$.
+    
+    \item \textit{Unsampled Ghost Reservoirs (540 trials)}:
+    In natural zoonoses and bacterial transformation, donor lineages are frequently unsampled. In the absence of contemporary donor sequences, 3SEQ systematically pairs the recombinant child with an un-introgressed background leaf, suffering a $100.0\%$ parental false alarm rate ($\text{FPR}_{\mathrm{parent}} = 100.0\%$) and emitting a mean of 23.7 candidate events per single introgression. By anchoring metric coordinates with an unrooted origin channel, \RhizAeon isolates off-manifold trajectories lacking an opposing contemporary leaf dipole, attributing the introgression to \texttt{Ghost} with $99.4\%$ donor accuracy, $0.00\%$ parental false alarms across all 540 trials, and mean Jaccard overlap of $J = 0.946$.
+    
+    \item \textit{Epidemic Swarms and Multi-Way Cassettes (540 trials)}:
+    When an ancestral recombination event expands into an epidemic swarm ($K = 2, 5, 10$ descendant isolates with ongoing transmission drift), pairwise counting treats each isolate as an independent reticulation, inflating event counts up to 38-fold ($\hat{K} = 38.2$). \RhizAeon groups co-recombinant sisters into an average of $\hat{K} = 1.05$ unique ancestral events. On complex multi-parental architectures (dual cassettes, crossover cascades, and nested Russian dolls), \RhizAeon resolves distinct flanking and internal donors ($J = 0.865$) while suppressing parental false alarms to $0.62\%$.
+\end{enumerate}

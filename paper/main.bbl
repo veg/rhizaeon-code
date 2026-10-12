@@ -1,11 +1,31 @@
 \begin{thebibliography}{10}
 
+\bibitem{adams2001species}
+Erin~J. Adams and Peter Parham.
+\newblock Species-specific evolution of {MHC} class {I} genes in the higher
+  primates.
+\newblock {\em Immunological Reviews}, 183(1):41--64, 2001.
+
 \bibitem{alfonsi2024data}
 Tommaso Alfonsi, Eleonora Cella, Giorgio Berno, Diana Fanti, Silvia Fabris,
   Marta Giovanetti, Massimo Ciccozzi, Alberto Riva, Gianguglielmo Zehender, and
   Allegra Via.
 \newblock Data-driven recombination detection in viral genomes.
 \newblock {\em Nature Communications}, 15:3110, 2024.
+
+\bibitem{barber1996inter}
+L.~D. Barber, L.~Percival, N.~M. Valiante, L.~Chen, C.~Lee, J.~E. Gumperz,
+  J.~H. Phillips, L.~L. Lanier, J.~C. Bigge, R.~B. Parekh, and P.~Parham.
+\newblock The inter-locus recombinant {HLA-B*4601} has high selectivity in
+  peptide binding and functions characteristic of {HLA-C}.
+\newblock {\em The Journal of Experimental Medicine}, 184(2):735--740, 1996.
+
+\bibitem{boni2020evolutionary}
+Maciej~F Boni, Philippe Lemey, Xiao-Wei Jiang, Tommy Tsan-Yuk Lam, Martha~B
+  Perry, Todd~A Castoe, Andrew Rambaut, and David~L Robertson.
+\newblock Evolutionary origins of the {SARS-CoV-2} sarbecovirus lineage
+  responsible for the {COVID-19} pandemic.
+\newblock {\em Nature Microbiology}, 5(11):1408--1417, 2020.
 
 \bibitem{boni2007exact}
 Maciej~F Boni, David Posada, and Marcus~W Feldman.
@@ -41,6 +61,13 @@ Nicholas~J Croucher, Simon~R Harris, Christophe Fraser, Michael~A Quail, John
 \newblock Rapid pneumococcal evolution in response to clinical interventions.
 \newblock {\em Science}, 331(6016):430--434, 2011.
 
+\bibitem{croucher2015rapid}
+Nicholas~J Croucher, Andrew~J Page, Thomas~R Connor, Aidan~J Delaney,
+  Jacqueline~A Keane, Stephen~D Bentley, Julian Parkhill, and Simon~R Harris.
+\newblock Rapid phylogenetic analysis of large samples of recombinant bacterial
+  whole genome sequences using {Gubbins}.
+\newblock {\em Nucleic Acids Research}, 43(3):e15, 2015.
+
 \bibitem{deleuze1987thousand}
 Gilles Deleuze and F{\'e}lix Guattari.
 \newblock {\em A Thousand Plateaus: Capitalism and Schizophrenia}.
@@ -66,6 +93,20 @@ Xavier Didelot and Daniel~J Wilson.
 Monroe~D. Donsker.
 \newblock An invariance principle for certain probability limit theorems.
 \newblock {\em Memoirs of the American Mathematical Society}, 6:1--12, 1951.
+
+\bibitem{fortier2025ancient}
+Alyssa~Lyn Fortier and Jonathan~K. Pritchard.
+\newblock Ancient trans-species polymorphism at the {Major Histocompatibility
+  Complex} in primates.
+\newblock {\em eLife}, 14:RP103547, 2025.
+
+\bibitem{geller2002linkage}
+Ron Geller, Erin Adams, Lisbeth Guethlein, Ann-Margaret Little, Alejandro
+  Madrigal, and Peter Parham.
+\newblock Linkage of {Patr-AL} to {Patr-A} and {-B} in the major
+  histocompatibility complex of the common chimpanzee (\textit{Pan
+  troglodytes}).
+\newblock {\em Immunogenetics}, 54(6):441--444, 2002.
 
 \bibitem{glais2002}
 I~Glais, M~Tribodet, and C~Kerlan.
@@ -100,6 +141,15 @@ Richard~R Hudson.
 \newblock Properties of a neutral allele model with intragenic recombination.
 \newblock {\em Genetical Research}, 41(3):261--269, 1983.
 
+\bibitem{jansen2024pneumococcal}
+Melissa~J Jansen~van Rensburg, Duncan~J Berger, Iman Yassine, David Shaw, Andy
+  Fohrmann, James~E Bray, Keith~A Jolley, Martin C~J Maiden, and Angela~B
+  Brueggemann.
+\newblock Development of the {Pneumococcal Genome Library}, a core genome
+  multilocus sequence typing scheme, and a taxonomic life identification number
+  barcoding system to investigate and define pneumococcal population structure.
+\newblock {\em Microbial Genomics}, 10(8):001280, 2024.
+
 \bibitem{kosakovsky2006gard}
 Sergei~L Kosakovsky~Pond, David Posada, Michael~B Gravenor, Christopher~H
   Woelk, and Simon D~W Frost.
@@ -117,6 +167,22 @@ H~M Lam, O~Ratmann, and M~F Boni.
 \newblock Improved algorithmic complexity for the {3SEQ} recombination
   detection algorithm.
 \newblock {\em Molecular Biology and Evolution}, 35(1):247--251, 2018.
+
+\bibitem{lytras2022exploring}
+Spyros Lytras, Joseph Hughes, Darren Martin, Phillip Swanepoel, Arn{\'e}
+  de~Klerk, Rentia Lourens, Sergei~L. Kosakovsky~Pond, Wei Xia, Xiaowei Jiang,
+  and David~L. Robertson.
+\newblock {Exploring the Natural Origins of SARS-CoV-2 in the Light of
+  Recombination}.
+\newblock {\em Genome Biology and Evolution}, 14(2):evac018, 2022.
+
+\bibitem{maccari2017ipd}
+Giuseppe Maccari, James Robinson, Keith Ballingall, Lisbeth~A. Guethlein, Unni
+  Grimholt, Jim Kaufman, Chak-Sum Ho, Natasja~G. de~Groot, Paul Flicek,
+  Ronald~E. Bontrop, John~A. Hammond, and Steven G.~E. Marsh.
+\newblock {IPD-MHC 2.0}: an improved inter-species database for the study of
+  the major histocompatibility complex.
+\newblock {\em Nucleic Acids Research}, 45(D1):D860--D864, 2017.
 
 \bibitem{marchenko1967distribution}
 Vladimir~A. Marchenko and Leonid~A. Pastur.
@@ -151,6 +217,11 @@ Bui~Quang Minh, Heiko~A Schmidt, Olga Chernomor, Dominik Schrempf, Michael~D
   inference in the genomic era.
 \newblock {\em Molecular Biology and Evolution}, 37(5):1530--1534, 2020.
 
+\bibitem{parham1995origins}
+Peter Parham, Erin~J. Adams, and Kelly~L. Arnett.
+\newblock The origins of {HLA-A,B,C} polymorphism.
+\newblock {\em Immunological Reviews}, 143(1):141--180, 1995.
+
 \bibitem{posada2002evaluation}
 David Posada.
 \newblock Evaluation of methods for detecting recombination from {DNA}
@@ -171,6 +242,12 @@ Loren~H Rieseberg, Olivier Raymond, David~M Rosenthal, Zhao Lai, Kevin
 \newblock Major ecological transitions in wild sunflowers facilitated by
   hybridization.
 \newblock {\em Science}, 301(5637):1211--1216, 2003.
+
+\bibitem{robinson2020ipd}
+James Robinson, Dominic~J. Barker, Xenia Georgiou, Michael~A. Cooper, Paul
+  Flicek, and Steven G.~E. Marsh.
+\newblock {IPD-IMGT/HLA} database.
+\newblock {\em Nucleic Acids Research}, 48(D1):D948--D955, 2020.
 
 \bibitem{schierup2000consequences}
 Mikkel~H Schierup and Jotun Hein.
@@ -226,6 +303,18 @@ Tomokazu Tamura, Junpei Ito, Keiya Uriu, Jiri Zahradnik, Isaac Kida, Yuki
 \newblock Virological characteristics of the {SARS-CoV-2} {XBB} variant derived
   from recombination of two {Omicron} subvariants.
 \newblock {\em The Lancet Microbe}, 4(7):e529--e539, 2023.
+
+\bibitem{temmam2022bat}
+Sarah Temmam, Khamsing Vongphayloth, Eduard Baquero, Sandie Munier,
+  Massimiliano Bonomi, B{\'e}atrice Regnault, Bounsavane Douangboubpha, Yasaman
+  Karami, Delphine Chr{\'e}tien, Daosavanh Sanamxay, Vilakhan Xayaphet,
+  Phetphoumin Paphaphanh, Vincent Lacoste, Somphavanh Somlor, Khaithong
+  Lakeomany, Nothasin Phommavanh, Philippe P{\'e}rot, Oc{\'e}ane Dehan,
+  Faustine Amara, Flora Donati, Thomas Bigot, Michael Nilges, F{\'e}lix~A. Rey,
+  Sylvie van~der Werf, Paul~T. Brey, and Marc Eloit.
+\newblock {Bat coronaviruses related to SARS-CoV-2 and infectious for human
+  cells}.
+\newblock {\em Nature}, 604(7905):330--336, 2022.
 
 \bibitem{turakhia2022pandemic}
 Yatish Turakhia, Bryan Thornlow, Angie~S Hinrichs, Nicola De~Maio, Landen
