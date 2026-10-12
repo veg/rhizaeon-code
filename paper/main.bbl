@@ -1,57 +1,81 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{51}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem{adams2001species}
+\bibitem[Adams and Parham(2001)]{adams2001species}
 Erin~J. Adams and Peter Parham.
 \newblock Species-specific evolution of {MHC} class {I} genes in the higher
   primates.
-\newblock {\em Immunological Reviews}, 183(1):41--64, 2001.
+\newblock \emph{Immunological Reviews}, 183\penalty0 (1):\penalty0 41--64,
+  2001.
+\newblock \doi{10.1034/j.1600-065x.2001.1830104.x}.
 
-\bibitem{alfonsi2024data}
+\bibitem[Alfonsi et~al.(2024)Alfonsi, Cella, Berno, Fanti, Fabris, Giovanetti,
+  Ciccozzi, Riva, Zehender, and Via]{alfonsi2024data}
 Tommaso Alfonsi, Eleonora Cella, Giorgio Berno, Diana Fanti, Silvia Fabris,
   Marta Giovanetti, Massimo Ciccozzi, Alberto Riva, Gianguglielmo Zehender, and
   Allegra Via.
 \newblock Data-driven recombination detection in viral genomes.
-\newblock {\em Nature Communications}, 15:3110, 2024.
+\newblock \emph{Nature Communications}, 15:\penalty0 3110, 2024.
+\newblock \doi{10.1038/s41467-024-47464-5}.
 
-\bibitem{barber1996inter}
+\bibitem[Barber et~al.(1996)Barber, Percival, Valiante, Chen, Lee, Gumperz,
+  Phillips, Lanier, Bigge, Parekh, and Parham]{barber1996inter}
 L.~D. Barber, L.~Percival, N.~M. Valiante, L.~Chen, C.~Lee, J.~E. Gumperz,
   J.~H. Phillips, L.~L. Lanier, J.~C. Bigge, R.~B. Parekh, and P.~Parham.
 \newblock The inter-locus recombinant {HLA-B*4601} has high selectivity in
   peptide binding and functions characteristic of {HLA-C}.
-\newblock {\em The Journal of Experimental Medicine}, 184(2):735--740, 1996.
+\newblock \emph{The Journal of Experimental Medicine}, 184\penalty0
+  (2):\penalty0 735--740, 1996.
+\newblock \doi{10.1084/jem.184.2.735}.
 
-\bibitem{boni2020evolutionary}
+\bibitem[Boni et~al.(2007)Boni, Posada, and Feldman]{boni2007exact}
+Maciej~F Boni, David Posada, and Marcus~W Feldman.
+\newblock An exact nonparametric method for inferring mosaic structure with
+  application to genetics data and simulated data.
+\newblock \emph{Genetics}, 176\penalty0 (2):\penalty0 1035--1047, 2007.
+\newblock \doi{10.1534/genetics.106.068874}.
+
+\bibitem[Boni et~al.(2020)Boni, Lemey, Jiang, Lam, Perry, Castoe, Rambaut, and
+  Robertson]{boni2020evolutionary}
 Maciej~F Boni, Philippe Lemey, Xiao-Wei Jiang, Tommy Tsan-Yuk Lam, Martha~B
   Perry, Todd~A Castoe, Andrew Rambaut, and David~L Robertson.
 \newblock Evolutionary origins of the {SARS-CoV-2} sarbecovirus lineage
   responsible for the {COVID-19} pandemic.
-\newblock {\em Nature Microbiology}, 5(11):1408--1417, 2020.
+\newblock \emph{Nature Microbiology}, 5\penalty0 (11):\penalty0 1408--1417,
+  2020.
+\newblock \doi{10.1038/s41564-020-0771-4}.
 
-\bibitem{boni2007exact}
-Maciej~F Boni, David Posada, and Marcus~W Feldman.
-\newblock An exact nonparametric method for inferring mosaic structure with
-  application to genetics data and simulated data.
-\newblock {\em Genetics}, 176(2):1035--1047, 2007.
-
-\bibitem{bruen2006simple}
+\bibitem[Bruen et~al.(2006)Bruen, Philippe, and Bryant]{bruen2006simple}
 Trevor~C Bruen, Herv{\'e} Philippe, and David Bryant.
 \newblock A simple and robust statistical test for detecting the presence of
   recombination.
-\newblock {\em Genetics}, 172(4):2665--2681, 2006.
+\newblock \emph{Genetics}, 172\penalty0 (4):\penalty0 2665--2681, 2006.
+\newblock \doi{10.1534/genetics.105.048975}.
 
-\bibitem{buneman1974note}
+\bibitem[Buneman(1974)]{buneman1974note}
 Peter Buneman.
 \newblock A note on the metric properties of trees.
-\newblock {\em Journal of Combinatorial Theory, Series B}, 17(1):48--50, 1974.
+\newblock \emph{Journal of Combinatorial Theory, Series B}, 17\penalty0
+  (1):\penalty0 48--50, 1974.
+\newblock \doi{10.1016/0095-8956(74)90047-1}.
 
-\bibitem{carr1998full}
+\bibitem[Carr et~al.(1998)Carr, Salminen, Albert, Sanders-Buell, Gotte, Birx,
+  and McCutchan]{carr1998full}
 Jean~K Carr, Mika~O Salminen, Jan Albert, Eric Sanders-Buell, Daniela Gotte,
   Deborah~L Birx, and Francine~E McCutchan.
 \newblock Full genome sequences of human immunodeficiency virus type 1 subtypes
   {G} and {A/G} intersubtype recombinants.
-\newblock {\em Virology}, 247(1):22--31, 1998.
+\newblock \emph{Virology}, 247\penalty0 (1):\penalty0 22--31, 1998.
+\newblock \doi{10.1006/viro.1998.9211}.
 
-\bibitem{croucher2011rapid}
+\bibitem[Croucher et~al.(2011)Croucher, Harris, Fraser, Quail, Burton, van~der
+  Linden, McGee, von Gottberg, Song, Ko, Pichon, Baker, Parry, Lambertsen,
+  Shahinas, Pillai, Mitchell, Dougan, Tomasz, Klugman, Parkhill, Hanage, and
+  Bentley]{croucher2011rapid}
 Nicholas~J Croucher, Simon~R Harris, Christophe Fraser, Michael~A Quail, John
   Burton, Mark van~der Linden, Lesley McGee, Anne von Gottberg, Jae~Hoon Song,
   Kwan~Soo Ko, Bruno Pichon, Stephen Baker, Christopher~M Parry, Lotte~M
@@ -59,252 +83,328 @@ Nicholas~J Croucher, Simon~R Harris, Christophe Fraser, Michael~A Quail, John
   Alexander Tomasz, Keith~P Klugman, Julian Parkhill, William~P Hanage, and
   Stephen~D Bentley.
 \newblock Rapid pneumococcal evolution in response to clinical interventions.
-\newblock {\em Science}, 331(6016):430--434, 2011.
+\newblock \emph{Science}, 331\penalty0 (6016):\penalty0 430--434, 2011.
+\newblock \doi{10.1126/science.1198545}.
 
-\bibitem{croucher2015rapid}
+\bibitem[Croucher et~al.(2015)Croucher, Page, Connor, Delaney, Keane, Bentley,
+  Parkhill, and Harris]{croucher2015rapid}
 Nicholas~J Croucher, Andrew~J Page, Thomas~R Connor, Aidan~J Delaney,
   Jacqueline~A Keane, Stephen~D Bentley, Julian Parkhill, and Simon~R Harris.
 \newblock Rapid phylogenetic analysis of large samples of recombinant bacterial
   whole genome sequences using {Gubbins}.
-\newblock {\em Nucleic Acids Research}, 43(3):e15, 2015.
+\newblock \emph{Nucleic Acids Research}, 43\penalty0 (3):\penalty0 e15, 2015.
+\newblock \doi{10.1093/nar/gku1196}.
 
-\bibitem{deleuze1987thousand}
+\bibitem[Deleuze and Guattari(1987)]{deleuze1987thousand}
 Gilles Deleuze and F{\'e}lix Guattari.
-\newblock {\em A Thousand Plateaus: Capitalism and Schizophrenia}.
+\newblock \emph{A Thousand Plateaus: Capitalism and Schizophrenia}.
 \newblock University of Minnesota Press, 1987.
 
-\bibitem{didelot2007inference}
+\bibitem[Didelot and Falush(2007)]{didelot2007inference}
 Xavier Didelot and Daniel Falush.
 \newblock Inference of bacterial microevolution using multilocus sequence data.
-\newblock {\em Genetics}, 175(3):1251--1266, 2007.
+\newblock \emph{Genetics}, 175\penalty0 (3):\penalty0 1251--1266, 2007.
+\newblock \doi{10.1534/genetics.106.063305}.
 
-\bibitem{didelot2010impact}
+\bibitem[Didelot and Maiden(2010)]{didelot2010impact}
 Xavier Didelot and Martin C~J Maiden.
 \newblock Impact of recombination on bacterial evolution.
-\newblock {\em Trends in Microbiology}, 18(7):315--322, 2010.
+\newblock \emph{Trends in Microbiology}, 18\penalty0 (7):\penalty0 315--322,
+  2010.
+\newblock \doi{10.1016/j.tim.2010.04.002}.
 
-\bibitem{didelot2015clonalframeml}
+\bibitem[Didelot and Wilson(2015)]{didelot2015clonalframeml}
 Xavier Didelot and Daniel~J Wilson.
 \newblock {ClonalFrameML}: Efficient inference of recombination in whole
   bacterial genomes.
-\newblock {\em PLoS Computational Biology}, 11(2):e1004041, 2015.
+\newblock \emph{PLoS Computational Biology}, 11\penalty0 (2):\penalty0
+  e1004041, 2015.
+\newblock \doi{10.1371/journal.pcbi.1004041}.
 
-\bibitem{donsker1951invariance}
+\bibitem[Donsker(1951)]{donsker1951invariance}
 Monroe~D. Donsker.
 \newblock An invariance principle for certain probability limit theorems.
-\newblock {\em Memoirs of the American Mathematical Society}, 6:1--12, 1951.
+\newblock \emph{Memoirs of the American Mathematical Society}, 6:\penalty0
+  1--12, 1951.
+\newblock \doi{10.1090/memo/0006}.
 
-\bibitem{fortier2025ancient}
+\bibitem[Fortier and Pritchard(2025)]{fortier2025ancient}
 Alyssa~Lyn Fortier and Jonathan~K. Pritchard.
 \newblock Ancient trans-species polymorphism at the {Major Histocompatibility
   Complex} in primates.
-\newblock {\em eLife}, 14:RP103547, 2025.
+\newblock \emph{eLife}, 14:\penalty0 RP103547, 2025.
+\newblock \doi{10.7554/elife.103547}.
 
-\bibitem{geller2002linkage}
+\bibitem[Geller et~al.(2002)Geller, Adams, Guethlein, Little, Madrigal, and
+  Parham]{geller2002linkage}
 Ron Geller, Erin Adams, Lisbeth Guethlein, Ann-Margaret Little, Alejandro
   Madrigal, and Peter Parham.
 \newblock Linkage of {Patr-AL} to {Patr-A} and {-B} in the major
   histocompatibility complex of the common chimpanzee (\textit{Pan
   troglodytes}).
-\newblock {\em Immunogenetics}, 54(6):441--444, 2002.
+\newblock \emph{Immunogenetics}, 54\penalty0 (6):\penalty0 441--444, 2002.
+\newblock \doi{10.1007/s00251-002-0452-x}.
 
-\bibitem{glais2002}
+\bibitem[Glais et~al.(2002)Glais, Tribodet, and Kerlan]{glais2002}
 I~Glais, M~Tribodet, and C~Kerlan.
 \newblock Genomic variability in {Potato} potyvirus {Y} ({PVY}): evidence that
   {PVY(N)W} and {PVY(NTN)} variants are single to multiple recombinants between
   {PVY(O)} and {PVY(N)} isolates.
-\newblock {\em Archives of Virology}, 147(2):363--378, 2002.
+\newblock \emph{Archives of Virology}, 147\penalty0 (2):\penalty0 363--378,
+  2002.
+\newblock \doi{10.1007/s705-002-8325-0}.
 
-\bibitem{gonzalez1985clustering}
+\bibitem[Gonzalez(1985)]{gonzalez1985clustering}
 Teofilo~F. Gonzalez.
 \newblock Clustering to minimize the maximum intercluster distance.
-\newblock {\em Theoretical Computer Science}, 38:293--306, 1985.
+\newblock \emph{Theoretical Computer Science}, 38:\penalty0 293--306, 1985.
+\newblock \doi{10.1016/0304-3975(85)90224-5}.
 
-\bibitem{gower1966some}
+\bibitem[Gower(1966)]{gower1966some}
 J.~C. Gower.
 \newblock Some distance properties of latent root and vector methods used in
   multivariate analysis.
-\newblock {\em Biometrika}, 53(3-4):325--338, 1966.
+\newblock \emph{Biometrika}, 53\penalty0 (3-4):\penalty0 325--338, 1966.
+\newblock \doi{10.1093/biomet/53.3-4.325}.
 
-\bibitem{gower1968adding}
+\bibitem[Gower(1968)]{gower1968adding}
 J.~C. Gower.
 \newblock Adding a point to vector diagrams in multivariate analysis.
-\newblock {\em Biometrika}, 55(3):582--585, 1968.
+\newblock \emph{Biometrika}, 55\penalty0 (3):\penalty0 582--585, 1968.
+\newblock \doi{10.1093/biomet/55.3.582}.
 
-\bibitem{griffiths1996ancestral}
+\bibitem[Griffiths and Marjoram(1996)]{griffiths1996ancestral}
 Robert~C Griffiths and Paul Marjoram.
 \newblock Ancestral inference from gene trees with recombination.
-\newblock {\em Theoretical Population Biology}, 50(3):341--377, 1996.
+\newblock \emph{Theoretical Population Biology}, 50\penalty0 (3):\penalty0
+  341--377, 1996.
+\newblock \doi{10.1006/tpbi.1996.0034}.
 
-\bibitem{hudson1983properties}
+\bibitem[Hudson(1983)]{hudson1983properties}
 Richard~R Hudson.
 \newblock Properties of a neutral allele model with intragenic recombination.
-\newblock {\em Genetical Research}, 41(3):261--269, 1983.
+\newblock \emph{Genetical Research}, 41\penalty0 (3):\penalty0 261--269, 1983.
+\newblock \doi{10.1017/s0016672300021350}.
 
-\bibitem{jansen2024pneumococcal}
+\bibitem[Jansen~van Rensburg et~al.(2024)Jansen~van Rensburg, Berger, Yassine,
+  Shaw, Fohrmann, Bray, Jolley, Maiden, and
+  Brueggemann]{jansen2024pneumococcal}
 Melissa~J Jansen~van Rensburg, Duncan~J Berger, Iman Yassine, David Shaw, Andy
   Fohrmann, James~E Bray, Keith~A Jolley, Martin C~J Maiden, and Angela~B
   Brueggemann.
 \newblock Development of the {Pneumococcal Genome Library}, a core genome
   multilocus sequence typing scheme, and a taxonomic life identification number
   barcoding system to investigate and define pneumococcal population structure.
-\newblock {\em Microbial Genomics}, 10(8):001280, 2024.
+\newblock \emph{Microbial Genomics}, 10\penalty0 (8):\penalty0 001280, 2024.
+\newblock \doi{10.1099/mgen.0.001280}.
 
-\bibitem{kosakovsky2006gard}
+\bibitem[Kosakovsky~Pond et~al.(2006)Kosakovsky~Pond, Posada, Gravenor, Woelk,
+  and Frost]{kosakovsky2006gard}
 Sergei~L Kosakovsky~Pond, David Posada, Michael~B Gravenor, Christopher~H
   Woelk, and Simon D~W Frost.
 \newblock Automated phylogenetic detection of recombination using a genetic
   algorithm.
-\newblock {\em Molecular Biology and Evolution}, 23(10):1891--1901, 2006.
+\newblock \emph{Molecular Biology and Evolution}, 23\penalty0 (10):\penalty0
+  1891--1901, 2006.
+\newblock \doi{10.1093/molbev/msl051}.
 
-\bibitem{kuhn1955hungarian}
+\bibitem[Kuhn(1955)]{kuhn1955hungarian}
 Harold~W. Kuhn.
 \newblock The hungarian method for the assignment problem.
-\newblock {\em Naval Research Logistics Quarterly}, 2(1--2):83--97, 1955.
+\newblock \emph{Naval Research Logistics Quarterly}, 2\penalty0
+  (1--2):\penalty0 83--97, 1955.
+\newblock \doi{10.1002/nav.3800020109}.
 
-\bibitem{lam20183seq}
+\bibitem[Lam et~al.(2018)Lam, Ratmann, and Boni]{lam20183seq}
 H~M Lam, O~Ratmann, and M~F Boni.
 \newblock Improved algorithmic complexity for the {3SEQ} recombination
   detection algorithm.
-\newblock {\em Molecular Biology and Evolution}, 35(1):247--251, 2018.
+\newblock \emph{Molecular Biology and Evolution}, 35\penalty0 (1):\penalty0
+  247--251, 2018.
+\newblock \doi{10.1093/molbev/msx263}.
 
-\bibitem{lytras2022exploring}
+\bibitem[Lytras et~al.(2022)Lytras, Hughes, Martin, Swanepoel, de~Klerk,
+  Lourens, Kosakovsky~Pond, Xia, Jiang, and Robertson]{lytras2022exploring}
 Spyros Lytras, Joseph Hughes, Darren Martin, Phillip Swanepoel, Arn{\'e}
   de~Klerk, Rentia Lourens, Sergei~L. Kosakovsky~Pond, Wei Xia, Xiaowei Jiang,
   and David~L. Robertson.
 \newblock {Exploring the Natural Origins of SARS-CoV-2 in the Light of
   Recombination}.
-\newblock {\em Genome Biology and Evolution}, 14(2):evac018, 2022.
+\newblock \emph{Genome Biology and Evolution}, 14\penalty0 (2):\penalty0
+  evac018, 2022.
+\newblock \doi{10.1093/gbe/evac018}.
 
-\bibitem{maccari2017ipd}
+\bibitem[Maccari et~al.(2017)Maccari, Robinson, Ballingall, Guethlein,
+  Grimholt, Kaufman, Ho, de~Groot, Flicek, Bontrop, Hammond, and
+  Marsh]{maccari2017ipd}
 Giuseppe Maccari, James Robinson, Keith Ballingall, Lisbeth~A. Guethlein, Unni
   Grimholt, Jim Kaufman, Chak-Sum Ho, Natasja~G. de~Groot, Paul Flicek,
   Ronald~E. Bontrop, John~A. Hammond, and Steven G.~E. Marsh.
 \newblock {IPD-MHC 2.0}: an improved inter-species database for the study of
   the major histocompatibility complex.
-\newblock {\em Nucleic Acids Research}, 45(D1):D860--D864, 2017.
+\newblock \emph{Nucleic Acids Research}, 45\penalty0 (D1):\penalty0 D860--D864,
+  2017.
+\newblock \doi{10.1093/nar/gkw1050}.
 
-\bibitem{marchenko1967distribution}
+\bibitem[Marchenko and Pastur(1967)]{marchenko1967distribution}
 Vladimir~A. Marchenko and Leonid~A. Pastur.
 \newblock Distribution of eigenvalues for some sets of random matrices.
-\newblock {\em Mathematics of the USSR-Sbornik}, 1(4):457--483, 1967.
+\newblock \emph{Mathematics of the USSR-Sbornik}, 1\penalty0 (4):\penalty0
+  457--483, 1967.
+\newblock \doi{10.1070/SM1967v001n04ABEH001994}.
 
-\bibitem{martin2015rdp4}
+\bibitem[Martin et~al.(2015)Martin, Murrell, Golden, Khoosal, and
+  Muhire]{martin2015rdp4}
 Darren~P Martin, Ben Murrell, Michael Golden, Arshan Khoosal, and Brejnev
   Muhire.
 \newblock {RDP4}: Detection and analysis of recombination patterns in virus
   genomes.
-\newblock {\em Virus Evolution}, 1(1):vev003, 2015.
+\newblock \emph{Virus Evolution}, 1\penalty0 (1):\penalty0 vev003, 2015.
+\newblock \doi{10.1093/ve/vev003}.
 
-\bibitem{martin2021rdp5}
+\bibitem[Martin et~al.(2021)Martin, Varsani, Roumagnac, Botha, Maslamoney,
+  Schwab, Kelz, Kumar, and Murrell]{martin2021rdp5}
 Darren~P Martin, Arvind Varsani, Philippe Roumagnac, Gonasagren Botha, Shailen
   Maslamoney, Travis Schwab, Zander Kelz, Sudhir Kumar, and Ben Murrell.
 \newblock {RDP5}: a computer program for analyzing recombination in, and
   removing signals of recombination from, nucleotide sequence datasets.
-\newblock {\em Virus Evolution}, 7(1):veaa087, 2021.
+\newblock \emph{Virus Evolution}, 7\penalty0 (1):\penalty0 veaa087, 2021.
+\newblock \doi{10.1093/ve/veaa087}.
 
-\bibitem{mcvean2004fine}
+\bibitem[McVean et~al.(2004)McVean, Myers, Hunt, Deloukas, Bentley, and
+  Donnelly]{mcvean2004fine}
 Gil A~T McVean, Simon~R Myers, Sarah Hunt, Panos Deloukas, David~R Bentley, and
   Peter Donnelly.
 \newblock The fine-scale structure of recombination rate variation in the human
   genome.
-\newblock {\em Science}, 304(5670):581--584, 2004.
+\newblock \emph{Science}, 304\penalty0 (5670):\penalty0 581--584, 2004.
+\newblock \doi{10.1126/science.1092500}.
 
-\bibitem{minh2020iqtree2}
+\bibitem[Minh et~al.(2020)Minh, Schmidt, Chernomor, Schrempf, Woodhams, von
+  Haeseler, and Lanfear]{minh2020iqtree2}
 Bui~Quang Minh, Heiko~A Schmidt, Olga Chernomor, Dominik Schrempf, Michael~D
   Woodhams, Arndt von Haeseler, and Robert Lanfear.
 \newblock {IQ-TREE} 2: New models and efficient methods for phylogenetic
   inference in the genomic era.
-\newblock {\em Molecular Biology and Evolution}, 37(5):1530--1534, 2020.
+\newblock \emph{Molecular Biology and Evolution}, 37\penalty0 (5):\penalty0
+  1530--1534, 2020.
+\newblock \doi{10.1093/molbev/msaa015}.
 
-\bibitem{parham1995origins}
+\bibitem[Parham et~al.(1995)Parham, Adams, and Arnett]{parham1995origins}
 Peter Parham, Erin~J. Adams, and Kelly~L. Arnett.
 \newblock The origins of {HLA-A,B,C} polymorphism.
-\newblock {\em Immunological Reviews}, 143(1):141--180, 1995.
+\newblock \emph{Immunological Reviews}, 143\penalty0 (1):\penalty0 141--180,
+  1995.
+\newblock \doi{10.1111/j.1600-065x.1995.tb00674.x}.
 
-\bibitem{posada2002evaluation}
+\bibitem[Posada(2002)]{posada2002evaluation}
 David Posada.
 \newblock Evaluation of methods for detecting recombination from {DNA}
   sequences: Empirical data.
-\newblock {\em Molecular Biology and Evolution}, 19(5):708--717, 2002.
+\newblock \emph{Molecular Biology and Evolution}, 19\penalty0 (5):\penalty0
+  708--717, 2002.
+\newblock \doi{10.1093/oxfordjournals.molbev.a004129}.
 
-\bibitem{posada2001evaluation}
+\bibitem[Posada and Crandall(2001)]{posada2001evaluation}
 David Posada and Keith~A Crandall.
 \newblock Evaluation of methods for detecting recombination from {DNA}
   sequences: Computer simulations.
-\newblock {\em Proceedings of the National Academy of Sciences},
-  98(24):13757--13762, 2001.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 98\penalty0
+  (24):\penalty0 13757--13762, 2001.
+\newblock \doi{10.1073/pnas.241370698}.
 
-\bibitem{rieseberg2003major}
+\bibitem[Rieseberg et~al.(2003)Rieseberg, Raymond, Rosenthal, Lai, Livingstone,
+  Nakazato, Durphy, Schwarzbach, Donovan, and Lexer]{rieseberg2003major}
 Loren~H Rieseberg, Olivier Raymond, David~M Rosenthal, Zhao Lai, Kevin
   Livingstone, Takuya Nakazato, Jennifer~L Durphy, Andrea~E Schwarzbach, Lisa~A
   Donovan, and Christian Lexer.
 \newblock Major ecological transitions in wild sunflowers facilitated by
   hybridization.
-\newblock {\em Science}, 301(5637):1211--1216, 2003.
+\newblock \emph{Science}, 301\penalty0 (5637):\penalty0 1211--1216, 2003.
+\newblock \doi{10.1126/science.1086949}.
 
-\bibitem{robinson2020ipd}
+\bibitem[Robinson et~al.(2020)Robinson, Barker, Georgiou, Cooper, Flicek, and
+  Marsh]{robinson2020ipd}
 James Robinson, Dominic~J. Barker, Xenia Georgiou, Michael~A. Cooper, Paul
   Flicek, and Steven G.~E. Marsh.
 \newblock {IPD-IMGT/HLA} database.
-\newblock {\em Nucleic Acids Research}, 48(D1):D948--D955, 2020.
+\newblock \emph{Nucleic Acids Research}, 48\penalty0 (D1):\penalty0 D948--D955,
+  2020.
+\newblock \doi{10.1093/nar/gkz950}.
 
-\bibitem{schierup2000consequences}
+\bibitem[Schierup and Hein(2000)]{schierup2000consequences}
 Mikkel~H Schierup and Jotun Hein.
 \newblock Consequences of recombination on traditional phylogenetic analysis.
-\newblock {\em Genetics}, 156(2):879--891, 2000.
+\newblock \emph{Genetics}, 156\penalty0 (2):\penalty0 879--891, 2000.
+\newblock \doi{10.1093/genetics/156.2.879}.
 
-\bibitem{sidak1967rectangular}
+\bibitem[{\v{S}}id{\'a}k(1967)]{sidak1967rectangular}
 Zbyn{\v{e}}k {\v{S}}id{\'a}k.
 \newblock Rectangular confidence regions for the means of multivariate normal
   distributions.
-\newblock {\em Journal of the American Statistical Association},
-  62(318):626--633, 1967.
+\newblock \emph{Journal of the American Statistical Association}, 62\penalty0
+  (318):\penalty0 626--633, 1967.
+\newblock \doi{10.1080/01621459.1967.10482935}.
 
-\bibitem{simmonds2005}
+\bibitem[Simmonds and Welch(2006)]{simmonds2005}
 Peter Simmonds and Jenny Welch.
 \newblock Frequency and dynamics of recombination within different species of
   human enteroviruses.
-\newblock {\em Journal of Virology}, 80(1):483--493, 2006.
+\newblock \emph{Journal of Virology}, 80\penalty0 (1):\penalty0 483--493, 2006.
+\newblock \doi{10.1128/jvi.80.1.483-493.2006}.
 
-\bibitem{simonloriere2011recombination}
+\bibitem[Simon-Loriere and Holmes(2011)]{simonloriere2011recombination}
 Etienne Simon-Loriere and Edward~C Holmes.
 \newblock Why do {RNA} viruses recombine?
-\newblock {\em Nature Reviews Microbiology}, 9(8):617--626, 2011.
+\newblock \emph{Nature Reviews Microbiology}, 9\penalty0 (8):\penalty0
+  617--626, 2011.
+\newblock \doi{10.1038/nrmicro2614}.
 
-\bibitem{smith2023tracking}
+\bibitem[Smith et~al.(2023)Smith, Ye, and Turakhia]{smith2023tracking}
 Kyle Smith, Cheng Ye, and Yatish Turakhia.
 \newblock Tracking and curating putative {SARS-CoV-2} recombinants with
   {RIVET}.
-\newblock {\em Bioinformatics}, 39(9):btad538, 2023.
+\newblock \emph{Bioinformatics}, 39\penalty0 (9):\penalty0 btad538, 2023.
+\newblock \doi{10.1093/bioinformatics/btad538}.
 
-\bibitem{su2024roformer}
+\bibitem[Su et~al.(2024)Su, Ahmed, Lu, Pan, Bo, and Liu]{su2024roformer}
 Jianlin Su, Murtadha Ahmed, Yu~Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu.
 \newblock {RoFormer}: Enhanced transformer with {Rotary Position Embedding}.
-\newblock {\em Neurocomputing}, 568:127063, 2024.
+\newblock \emph{Neurocomputing}, 568:\penalty0 127063, 2024.
+\newblock \doi{10.1016/j.neucom.2023.127063}.
 
-\bibitem{su2000characterization}
+\bibitem[Su et~al.(2000)Su, Graf, Zhang, von Briesen, Xing, K{\"o}stler, Melzl,
+  Wolf, Shao, and Wagner]{su2000characterization}
 Ling Su, Marcus Graf, Ying Zhang, Hagen von Briesen, Hui Xing, Josef
   K{\"o}stler, H~Melzl, Hans Wolf, Yiming Shao, and Ralf Wagner.
 \newblock Characterization of a virtually full-length human immunodeficiency
   virus type 1 genome of a prevalent intersubtype ({C/B}$'$) recombinant strain
   in {China}.
-\newblock {\em Journal of Virology}, 74(23):11367--11376, 2000.
+\newblock \emph{Journal of Virology}, 74\penalty0 (23):\penalty0 11367--11376,
+  2000.
+\newblock \doi{10.1128/jvi.74.23.11367-11376.2000}.
 
-\bibitem{tamura1993estimation}
+\bibitem[Tamura and Nei(1993)]{tamura1993estimation}
 Koichiro Tamura and Masatoshi Nei.
 \newblock Estimation of the number of nucleotide substitutions in the control
   region of mitochondrial {DNA} in humans and chimpanzees.
-\newblock {\em Molecular Biology and Evolution}, 10(3):512--526, 1993.
+\newblock \emph{Molecular Biology and Evolution}, 10\penalty0 (3):\penalty0
+  512--526, 1993.
+\newblock \doi{10.1093/oxfordjournals.molbev.a040023}.
 
-\bibitem{tamura2023xbb}
+\bibitem[Tamura et~al.(2023)Tamura, Ito, Uriu, Zahradnik, Kida, Anraku, Nasser,
+  Toyoda, Mizuma, Shimizu, et~al.]{tamura2023xbb}
 Tomokazu Tamura, Junpei Ito, Keiya Uriu, Jiri Zahradnik, Isaac Kida, Yuki
   Anraku, Hesham Nasser, Mai Toyoda, Keita Mizuma, Ryo Shimizu, et~al.
 \newblock Virological characteristics of the {SARS-CoV-2} {XBB} variant derived
   from recombination of two {Omicron} subvariants.
-\newblock {\em The Lancet Microbe}, 4(7):e529--e539, 2023.
+\newblock \emph{The Lancet Microbe}, 4\penalty0 (7):\penalty0 e529--e539, 2023.
+\newblock \doi{10.1016/S2666-5247(22)00384-4}.
 
-\bibitem{temmam2022bat}
+\bibitem[Temmam et~al.(2022)Temmam, Vongphayloth, Baquero, Munier, Bonomi,
+  Regnault, Douangboubpha, Karami, Chr{\'e}tien, Sanamxay, Xayaphet,
+  Paphaphanh, Lacoste, Somlor, Lakeomany, Phommavanh, P{\'e}rot, Dehan, Amara,
+  Donati, Bigot, Nilges, Rey, van~der Werf, Brey, and Eloit]{temmam2022bat}
 Sarah Temmam, Khamsing Vongphayloth, Eduard Baquero, Sandie Munier,
   Massimiliano Bonomi, B{\'e}atrice Regnault, Bounsavane Douangboubpha, Yasaman
   Karami, Delphine Chr{\'e}tien, Daosavanh Sanamxay, Vilakhan Xayaphet,
@@ -314,19 +414,24 @@ Sarah Temmam, Khamsing Vongphayloth, Eduard Baquero, Sandie Munier,
   Sylvie van~der Werf, Paul~T. Brey, and Marc Eloit.
 \newblock {Bat coronaviruses related to SARS-CoV-2 and infectious for human
   cells}.
-\newblock {\em Nature}, 604(7905):330--336, 2022.
+\newblock \emph{Nature}, 604\penalty0 (7905):\penalty0 330--336, 2022.
+\newblock \doi{10.1038/s41586-022-04532-4}.
 
-\bibitem{turakhia2022pandemic}
+\bibitem[Turakhia et~al.(2022)Turakhia, Thornlow, Hinrichs, De~Maio, Gozashti,
+  Lanfear, Haussler, and Corbett-Detig]{turakhia2022pandemic}
 Yatish Turakhia, Bryan Thornlow, Angie~S Hinrichs, Nicola De~Maio, Landen
   Gozashti, Robert Lanfear, David Haussler, and Russell Corbett-Detig.
 \newblock Pandemic-scale phylogenomics reveals the {SARS-CoV-2} recombination
   landscape.
-\newblock {\em Nature}, 609(7929):994--997, 2022.
+\newblock \emph{Nature}, 609\penalty0 (7929):\penalty0 994--997, 2022.
+\newblock \doi{10.1038/s41586-022-05189-9}.
 
-\bibitem{worobey2002questioning}
+\bibitem[Worobey et~al.(2002)Worobey, Rambaut, Pybus, and
+  Robertson]{worobey2002questioning}
 Michael Worobey, Andrew Rambaut, Oliver~G. Pybus, and David~L. Robertson.
 \newblock Questioning the evidence for genetic recombination in the 1918
   "spanish flu" virus.
-\newblock {\em Science}, 296(5566):211, 2002.
+\newblock \emph{Science}, 296\penalty0 (5566):\penalty0 211, 2002.
+\newblock \doi{10.1126/science.296.5566.211a}.
 
 \end{thebibliography}

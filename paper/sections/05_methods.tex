@@ -7,15 +7,14 @@
 Let $\mathcal{S} = \{s_1, s_2, \dots, s_M\}$ denote a multiple sequence alignment of $M$ contemporary nucleotide sequences of length $L$ over the alphabet $\Sigma = \{\text{A}, \text{C}, \text{G}, \text{T}\} \cup \{-\}$.
 When $M \gg 1,000$, computing an all-to-all pairwise distance matrix requires $\binom{M}{2} \approx \frac{1}{2} M^2$ pairwise comparisons, scaling as $O(M^2 L)$ and creating a computational bottleneck for large-scale genomic surveillance.
 Diversity anchors coordinates.
-\RhizAeon eliminates this quadratic barrier through sequential Farthest-Point Sampling (FPS) \cite{gonzalez1985clustering}, selecting a sparse subset of $N \ll M$ reference landmark genomes in strictly $O(N M L)$ operations.
-
+\\RhizAeon eliminates this quadratic barrier through sequential Farthest-Point Sampling (FPS) \citep{gonzalez1985clustering}, selecting a sparse subset of $N \ll M$ reference landmark genomes in strictly $O(N M L)$ operations.
 The selection algorithm begins by designating the initial reference landmark $s_{(1)}$ as the sequence exhibiting the highest non-gap coverage across the alignment:
 \begin{equation}
 s_{(1)} = \arg\max_{s_i \in \mathcal{S}} \sum_{u=1}^L \mathbb{I}(s_i(u) \neq \text{'-'}).
 \label{eq:methods_fps_seed}
 \end{equation}
 The algorithm then computes the pairwise evolutionary distance from $s_{(1)}$ to all $M$ sequences in the cohort, initializing a running minimum distance vector $\mathbf{r} = (r_1, \dots, r_M)^T \in \mathbb{R}^M$, where $r_i = d(s_i, s_{(1)})$.
-Pairwise evolutionary distances $d(s_i, s_j)$ are computed under the Tamura-Nei (TN93) continuous-time Markov substitution model with pairwise deletion of gap positions \cite{tamura1993estimation}:
+Pairwise evolutionary distances $d(s_i, s_j)$ are computed under the Tamura-Nei (TN93) continuous-time Markov substitution model with pairwise deletion of gap positions \citep{tamura1993estimation}:
 \begin{equation}
 d_{\text{TN93}} = -2 a_1 \ln\left(1 - \frac{P_1}{2 a_1} - \frac{Q}{2 a_3}\right) - 2 a_2 \ln\left(1 - \frac{P_2}{2 a_2} - \frac{Q}{2 a_3}\right) - 2 (a_3 - a_1 - a_2) \ln\left(1 - \frac{Q}{2 a_3}\right),
 \label{eq:methods_tn93}
@@ -54,7 +53,7 @@ This guarantees that only stable, unadmixed parental lineages serve as coordinat
 From the selected reference genomes $\{s_{(1)}, \dots, s_{(N)}\}$, we construct the symmetric reference distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$, with elements $D_{i,j} = d(s_{(i)}, s_{(j)})$ and diagonal entries $D_{i,i} = 0$.
 We define the element-wise squared distance matrix $\mathbf{D}^{(2)} \in \mathbb{R}^{N \times N}$ such that $[\mathbf{D}^{(2)}]_{i,j} = D_{i,j}^2$.
 To map these distances into an inner-product space, we apply the geometric centering projection operator $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$, where $\mathbf{I}_N$ is the $N \times N$ identity matrix and $\mathbf{1}_N = (1, \dots, 1)^T \in \mathbb{R}^N$ is the all-ones vector.
-The doubly centered inner-product Gram matrix $\mathbf{B} \in \mathbb{R}^{N \times N}$ is formulated via classical multidimensional scaling (MDS) \cite{gower1966some}:
+The doubly centered inner-product Gram matrix $\mathbf{B} \in \mathbb{R}^{N \times N}$ is formulated via classical multidimensional scaling (MDS) \citep{gower1966some}:
 \begin{equation}
 \mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}.
 \label{eq:methods_gram_matrix}
@@ -78,14 +77,14 @@ The static $d$-dimensional metric coordinates $\mathbf{x}_i \in \mathbb{R}^d$ fo
 \label{eq:methods_static_coords}
 \end{equation}
 By construction, these coordinates satisfy $\langle \mathbf{x}_i, \mathbf{x}_j \rangle = [\mathbf{B}]_{i,j}$ within the subspace $\mathbb{R}^d$.
-By Buneman's metric tree theorem \cite{buneman1974note}, tree metrics satisfy four-point additivity conditions $d(a, b) + d(c, d) \le \max(d(a, c) + d(b, d), \, d(a, d) + d(b, c))$, ensuring that tree-like evolutionary divergences embed into Euclidean spaces where macroscopic clade splits project onto the dominant eigenvectors.
+By Buneman's metric tree theorem \citep{buneman1974note}, tree metrics satisfy four-point additivity conditions $d(a, b) + d(c, d) \le \max(d(a, c) + d(b, d), \, d(a, d) + d(b, c))$, ensuring that tree-like evolutionary divergences embed into Euclidean spaces where macroscopic clade splits project onto the dominant eigenvectors.
 
 \subsection{Analytical Gower Out-of-Sample Trajectory Projection}
 \label{subsec:methods_gower_projection}
 
 Tracking sequence affinities along the chromosome requires establishing an instantaneous coordinate $\mathbf{z}_i(u) \in \mathbb{R}^d$ for each query sequence $i \in \{1, \dots, M\}$ at every genomic site $u \in [1, L]$.
 Recomputing multidimensional scaling independently within sliding windows would produce arbitrary orthogonal rotations and reflections, distorting geometric distances and necessitating expensive Procrustes alignments.
-Instead, \RhizAeon projects local distance vectors into the fixed canonical coordinate basis $(\mathbf{V}_d, \mathbf{\Lambda}_d)$ using Gower's analytical out-of-sample interpolation theorem \cite{gower1968adding}.
+Instead, \RhizAeon projects local distance vectors into the fixed canonical coordinate basis $(\mathbf{V}_d, \mathbf{\Lambda}_d)$ using Gower's analytical out-of-sample interpolation theorem \citep{gower1968adding}.
 
 At coordinate $u$, we evaluate local evolutionary distances across an aligned window $[u - W/2, u + W/2]$ of width $W$ (default $W = 300\text{ nt}$) sampled at stride $S$ (default $S = 10\text{ nt}$).
 For query sequence $i$, this yields an instantaneous local distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to the $N$ reference landmarks:
@@ -125,7 +124,7 @@ proving algebraic self-consistency and zero metric distortion on reference taxa.
 \subsection{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}
 \label{subsec:methods_treerope_prior}
 
-Standard transformer neural networks incorporate sequential position along one-dimensional text using Rotary Position Embeddings (RoPE) \cite{su2024roformer}.
+Standard transformer neural networks incorporate sequential position along one-dimensional text using Rotary Position Embeddings (RoPE) \citep{su2024roformer}.
 However, biological sequences diverge across multidimensional phylogenetic trees rather than linear strings.
 To integrate evolutionary distance directly into cross-sequence attention, \RhizAeon generalizes rotary embeddings from one-dimensional sequence indices to continuous metric coordinates.
 
@@ -246,7 +245,7 @@ Let $\Delta Y(u) = Y(u) - Y(u-1)$ denote the local trajectory increments, with s
 \end{equation}
 
 Under the clonal null hypothesis $H_0$, the increments are stationary and unreticulated.
-By Donsker's functional central limit theorem \cite{donsker1951invariance}, the standardized process:
+By Donsker's functional central limit theorem \citep{donsker1951invariance}, the standardized process:
 \begin{equation}
 W_L^0(t) = \frac{B_{i, m}(\lfloor t L \rfloor)}{\sigma \sqrt{L}}, \quad t \in [0, 1],
 \label{eq:methods_donsker_bridge}
@@ -258,7 +257,7 @@ P\left( \sup_{t \in [0, 1]} |W^0(t)| \le z \right) = 1 - 2 \sum_{k=1}^\infty (-1
 \label{eq:methods_kolmogorov_cdf}
 \end{equation}
 
-To control the family-wise error rate (FWER) across all $M_{\text{topo}} = \binom{N}{2} \max(1, N - 2)$ testable donor-recipient reticulation topologies at nominal significance $\alpha = 0.05$, we apply the Dunn-\v{S}id\'{a}k extreme-value correction \cite{sidak1967rectangular}:
+To control the family-wise error rate (FWER) across all $M_{\text{topo}} = \binom{N}{2} \max(1, N - 2)$ testable donor-recipient reticulation topologies at nominal significance $\alpha = 0.05$, we apply the Dunn-\v{S}id\'{a}k extreme-value correction \citep{sidak1967rectangular}:
 \begin{equation}
 K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( 1 - (1 - \alpha)^{1 / M_{\text{topo}}} \right)} \approx \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2 M_{\text{topo}}} \right)}.
 \label{eq:methods_sidak_bound}
@@ -334,7 +333,7 @@ For alignments exhibiting multiple recombinant tracts, we stack force vectors in
 where $s_1 \ge s_2 \ge \dots \ge s_r$ denote singular values.
 Each detected reticulation mode $m$ is deconvolved via iterative mode peeling, subtracting $s_m \mathbf{u}_m \mathbf{v}_m^T$ from $\mathbf{F}$.
 To prevent over-segmentation and halt peeling when residual variation reflects neutral coalescent drift, we apply random matrix theory.
-Under the unreticulated null hypothesis, the singular values of an $N \times L$ random noise matrix follow the Marchenko-Pastur distribution \cite{marchenko1967distribution}.
+Under the unreticulated null hypothesis, the singular values of an $N \times L$ random noise matrix follow the Marchenko-Pastur distribution \citep{marchenko1967distribution}.
 The theoretical upper boundary of the bulk spectral noise edge is:
 \begin{equation}
 s_{\text{bulk}} = \frac{L}{\pi} \sigma_{\text{noise}} \left( 1 + \sqrt{\frac{P}{L}} \right),
@@ -503,7 +502,7 @@ s(E_i, \hat{E}_j) = S_{\text{triad}}(E_i, \hat{E}_j) \times J_{\text{SNP}}(E_i, 
 \label{eq:methods_event_affinity}
 \end{equation}
 To evaluate reticulations under strict cardinality discipline, we construct the pairwise cost matrix $C_{ij} = 1 - s(E_i, \hat{E}_j)$ for all $i \in \{1, \dots, K\}$ and $j \in \{1, \dots, \hat{K}\}$.
-We compute the optimal bijective bipartite matching $\mathcal{M}$ using the Hungarian algorithm \cite{kuhn1955hungarian}.
+We compute the optimal bijective bipartite matching $\mathcal{M}$ using the Hungarian algorithm \citep{kuhn1955hungarian}.
 Every unmatched true event counts as a false negative, while every unmatched predicted event counts as an ungrounded false alarm.
 
 Across the optimal matching $\mathcal{M}$, reticulation precision and recall are defined as:

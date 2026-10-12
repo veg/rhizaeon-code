@@ -75,7 +75,7 @@ In naturally competent pathogens such as \textit{Streptococcus pneumoniae}, hori
 Resolving these events across bacterial cohorts has historically required heavy computation: ancestral inference tools like ClonalFrame \citep{didelot2007inference} and Gubbins \citep{croucher2015rapid} rely on iterative phylogenetic reconstruction and tree peeling via maximum likelihood, demanding hours to weeks of compute.
 
 \RhizAeon bypasses iterative tree reconstruction by tracking whole-chromosome sequence trajectories in continuous metric space, quantifying spatial turbulence as breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
-We evaluated \RhizAeon on the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 lineage of \textit{S.~pneumoniae} (PMEN1, ATCC 700669; 11 representative global isolates spanning 1984--2008; \citet{croucher2011rapid}).
+We evaluated \RhizAeon on the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 lineage of \textit{S.~pneumoniae} (PMEN1, ATCC 700669; 11 representative global isolates spanning 1984--2008; \citealt{croucher2011rapid}).
 Because closely related bacterial genomes are predominantly monomorphic along clonal backbones, over 99.9\% of alignment columns carry zero phylogenetic information.
 \RhizAeon exploits this sparsity through lossless SNP compression.
 Indexing out invariant positions reduces the 2.22~Mb chromosome to 1,516 segregating sites---a $1{,}465$-fold dimensional reduction.
@@ -127,7 +127,7 @@ In contrast, the adjacent $\alpha_3$ structural stalk (Exon 4) remains conserved
 Phylogenetic methods struggle with this modular architecture: full-length alignments generate topological conflicts that collapse locus monophyly, whereas sliding windows require arbitrary boundaries and risk missing short micro-conversions.
 
 \RhizAeon resolves this structural compartmentalization by tracking continuous trajectories across the full coding sequence without window slicing (Figure~\ref{fig:hominoidea_mhc_landscape}A).
-We evaluated \RhizAeon on an exhaustive cohort of $N = 379$ Hominoidea classical MHC Class~I alleles ($L = 1{,}128$~bp, 526 segregating polymorphic sites across human, chimpanzee, gorilla, and orangutan; \citet{maccari2017ipd}).
+We evaluated \RhizAeon on an exhaustive cohort of $N = 379$ Hominoidea classical MHC Class~I alleles ($L = 1{,}128$~bp, 526 segregating polymorphic sites across human, chimpanzee, gorilla, and orangutan; \citealt{maccari2017ipd}).
 In 16.34~seconds across all 379 alleles (and 3.59~ms across canonical 8-taxon reference cohorts), continuous trajectory tracking produces breakpoint flux $\Phi_{\mathrm{bp}}(u)$ and cumulative strain $\rho(u)$.
 Without structural annotations, the breakpoint flux pinpoints the physical boundary between the $\alpha_2$ ARS groove and the $\alpha_3$ structural stalk at nt 608--615 (canonical exon junction 618~bp; Figure~\ref{fig:hominoidea_mhc_landscape}A).
 Quantitative profiling confirms marked domain segregation: $93.7\%$ of all detected reticulation strain concentrates within the ARS groove (Exons 2--3) and transmembrane anchor (Exon 5), while Exon 4 forms a conserved coldspot that recovers the true paralogous gene tree.

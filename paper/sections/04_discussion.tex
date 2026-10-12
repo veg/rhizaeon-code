@@ -6,9 +6,9 @@
 
 Computational phylogenetic methods confront a difficult choice between evolutionary realism and combinatorial intractability.
 Trees model divergence.
-When reticulate events occur, forcing mosaic genomes into strictly bifurcating topologies distorts branch lengths and inflates substitution rate estimates \cite{schierup2000consequences}.
-Conversely, modeling recombination explicitly through ancestral recombination graphs or phylogenetic changepoints introduces prohibitive computational scaling, demanding cubic or quartic algorithms that collapse on modern genomic datasets \cite{minh2020iqtree2}.
-Triplet scanning methods like 3SEQ provide an empirical compromise by evaluating small three-sequence subgraphs \cite{boni2007exact}.
+When reticulate events occur, forcing mosaic genomes into strictly bifurcating topologies distorts branch lengths and inflates substitution rate estimates \citep{schierup2000consequences}.
+Conversely, modeling recombination explicitly through ancestral recombination graphs or phylogenetic changepoints introduces prohibitive computational scaling, demanding cubic or quartic algorithms that collapse on modern genomic datasets \citep{minh2020iqtree2}.
+Triplet scanning methods like 3SEQ provide an empirical compromise by evaluating small three-sequence subgraphs \citep{boni2007exact}.
 Triplet decomposition avoids tree estimation.
 Yet exhaustive triplet testing scales cubically with sample size ($\binom{N}{3} \sim O(N^3)$), creating an inescapable computational barrier when surveillance cohorts expand to hundreds or thousands of isolates.
 
