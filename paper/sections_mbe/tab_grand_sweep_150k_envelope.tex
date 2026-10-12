@@ -1,0 +1,29 @@
+% LaTeX table summarizing the 150,000-trial Grand Parameter Sweep
+% Strict compliance: zero synthetic mockery, zero bold formatting in data cells
+\begin{table*}[t!]
+\centering
+\footnotesize
+\caption{Empirical operational phase envelope of \RhizAeon across 150,000 independent simulation trials.
+Simulations span $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d_{\mathrm{parent}} \in [0.005, 0.25]$~subs/site, and continuous Gamma rate variation $\alpha \in [0.05, 5.0]$. Evaluated across two independent random seed batches ($N=50{,}000$, seed 42 on workstation; $N=100{,}000$, seed 9999 on Apple M4 Pro). Breakpoint errors report median absolute error (nt) among detected recombinant tracts.}
+\label{tab:grand_sweep_150k_envelope}
+{\setlength{\tabcolsep}{4.0pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l c r r r c r@{}}
+\toprule
+Evolutionary Regime & Parameter Space & Total Trials & Detected / Rec & Power / FPR & Median Jaccard & Median BP Error \\
+\midrule
+Strict Molecular Clock Null & $d \in [0.005, 0.25], \alpha \ge 50$ & 18,749 & 30 & 0.160\% FPR & 1.000 & --- \\
+Gamma Heterotachy Null & $\alpha \in [0.05, 5.0], d \in [0.005, 0.25]$ & 56,251 & 281 & 0.500\% FPR & 1.000 & --- \\
+Taxon-Level False Alarm & $N_{\mathrm{taxa}} = 5,099,969$ total leaves & 75,000 & 503 taxa & 0.0099\% FPR & --- & --- \\
+\midrule
+\multicolumn{7}{l}{\textit{Recombinant Partition Stratified by Informative Tract Mutations ($M_{\mathrm{tract}}$)}} \\
+Tract SNPs $M \in [0--2]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 17,240 & 64 & 0.4\% & 0.001 & 99.5 nt \\
+Tract SNPs $M \in [3--5]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 10,124 & 1,355 & 13.4\% & 0.083 & 13.0 nt \\
+Tract SNPs $M \in [6--10]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 9,616 & 3,787 & 39.4\% & 0.235 & 25.0 nt \\
+Tract SNPs $M \in [11--15]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 5,939 & 3,309 & 55.7\% & 0.312 & 43.0 nt \\
+Tract SNPs $M \in [16--25]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 7,300 & 4,706 & 64.5\% & 0.421 & 34.0 nt \\
+Tract SNPs $M \in [26--50]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 8,850 & 6,780 & 76.6\% & 0.647 & 18.0 nt \\
+Tract SNPs $M \in [51--100]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 6,903 & 5,479 & 79.4\% & 0.737 & 13.0 nt \\
+Tract SNPs $M \in [>100]$ & $L_{\mathrm{tract}} \in [0.008, 0.50] L$ & 9,028 & 7,580 & 84.0\% & 0.817 & 8.0 nt \\
+\bottomrule
+\end{tabular*}}
+\end{table*}

@@ -44,3 +44,6 @@ test_sweep_500*.csv
 test_sweep_1k.csv
 test_sweep_2k.csv
 test_sweep_5k.csv
+
+# Temporary inspection screenshots
+paper/*.png

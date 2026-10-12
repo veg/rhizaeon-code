@@ -107,11 +107,12 @@ impl RhizAeonEngine {
         }
 
         // Auto-Trigger Threshold Policy:
-        // Automatically compress to informative SNPs when L > 50,000 bp (bacterial/chromosomal scale)
-        // or when L > 20,000 bp AND N >= 64
+        // Automatically compress to informative SNPs when L > 30,000 bp (bacterial/chromosomal scale)
+        // or when L > 10,000 bp AND N >= 48, or when N * L > 600,000 matrix cells
         let should_compress = self.compress_snps.unwrap_or_else(|| {
-            aln_trimmed.length > 50_000
-                || (aln_trimmed.length > 20_000 && n >= 64)
+            aln_trimmed.length > 30_000
+                || (aln_trimmed.length > 10_000 && n >= 48)
+                || (n * aln_trimmed.length > 600_000)
         });
 
         let (aln, snp_map_opt) = if should_compress && m_inf >= m_min {

@@ -129,27 +129,39 @@ fn compute_hky85_p_mat(t: f64, kappa: f64, pi: &[f64; 4]) -> [[f64; 4]; 4] {
     p
 }
 
-/// Evolve a nucleotide sequence along a branch with length `branch_len` and per-site rates
-fn evolve_sequence(
-    src: &[u8],
+/// Precompute HKY85 position-specific transition matrices for length `L` along branch length `branch_len`
+fn precompute_p_mats(
+    length: usize,
     branch_len: f64,
     site_rates: Option<&[f64]>,
-    rng: &mut FastRng,
-) -> Vec<u8> {
-    let mut dest = Vec::with_capacity(src.len());
-    let default_p_mat = if site_rates.is_none() {
+) -> Vec<[[f64; 4]; 4]> {
+    let mut mats = Vec::with_capacity(length);
+    let default_mat = if site_rates.is_none() {
         Some(compute_hky85_p_mat(branch_len, KAPPA, &PI))
     } else {
         None
     };
 
-    for (u, &parent_state) in src.iter().enumerate() {
+    for u in 0..length {
         let p_mat = match site_rates {
             Some(rates) => compute_hky85_p_mat(branch_len * rates[u], KAPPA, &PI),
-            None => default_p_mat.unwrap(),
+            None => default_mat.unwrap(),
         };
+        mats.push(p_mat);
+    }
+    mats
+}
 
-        let row = &p_mat[parent_state as usize];
+/// High-speed nucleotide sequence evolution using precomputed transition matrices (zero transcendental calls)
+#[inline(always)]
+fn evolve_with_p_mats(
+    src: &[u8],
+    p_mats: &[[[f64; 4]; 4]],
+    rng: &mut FastRng,
+) -> Vec<u8> {
+    let mut dest = Vec::with_capacity(src.len());
+    for (u, &parent_state) in src.iter().enumerate() {
+        let row = &p_mats[u][parent_state as usize];
         let rand_val = rng.next_f64();
 
         let new_state = if rand_val < row[0] {
@@ -164,6 +176,16 @@ fn evolve_sequence(
         dest.push(new_state);
     }
     dest
+}
+
+#[derive(Debug, Clone)]
+struct SimEvent {
+    u1: usize,
+    u2: usize,
+    donor_clade: usize, // 1 for P2, 2 for P3
+    is_5prime_crossover: bool,
+    is_3prime_crossover: bool,
+    mut_in_tract: usize,
 }
 
 #[derive(Debug)]
@@ -191,12 +213,23 @@ struct TrialResult {
     bp1_error: usize,
     bp2_error: usize,
     run_time_ms: f64,
+    // Multi-event expansion columns:
+    num_events_true: usize,
+    cardinality_error: i64,
+    event_recall: f64,
+    event_precision: f64,
+    event_f1: f64,
+    mean_jaccard: f64,
+    mean_bp_error: f64,
+    has_crossover: u8,
+    has_cassette: u8,
+    has_multi_donor: u8,
 }
 
 impl TrialResult {
     fn to_csv_row(&self) -> String {
         format!(
-            "{},{},{},{},{:.5},{},{},{},{},{},{},{:.4},{},{},{},{:.4},{:.4},{},{:.5},{:.4},{},{},{:.2}",
+            "{},{},{},{},{:.5},{},{},{},{},{},{},{:.4},{},{},{},{:.4},{:.4},{},{:.5},{:.4},{},{},{:.2},{},{},{:.4},{:.4},{:.4},{:.4},{:.1},{},{},{}",
             self.trial_id,
             self.is_recombinant_true,
             self.length,
@@ -219,7 +252,17 @@ impl TrialResult {
             self.jaccard,
             self.bp1_error,
             self.bp2_error,
-            self.run_time_ms
+            self.run_time_ms,
+            self.num_events_true,
+            self.cardinality_error,
+            self.event_recall,
+            self.event_precision,
+            self.event_f1,
+            self.mean_jaccard,
+            self.mean_bp_error,
+            self.has_crossover,
+            self.has_cassette,
+            self.has_multi_donor
         )
     }
 }
@@ -242,12 +285,13 @@ fn compute_jaccard(t_u1: usize, t_u2: usize, p_u1: usize, p_u2: usize) -> f64 {
     }
 }
 
-/// Executes a single simulation trial completely in memory
+/// Executes a single multi-event simulation trial completely in memory
 fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngine) -> TrialResult {
     let mut rng = FastRng::new(seed_base + (trial_id as u64).wrapping_mul(7919) + 31);
 
     // 1. Draw parameters from continuous phase space
-    let is_recombinant = trial_id % 2 == 1;
+    // 33.3% strictly non-recombinant null controls (guaranteeing exact FPR calibration)
+    let is_recombinant = trial_id % 3 != 0;
 
     // Length: log-uniform in [1,000, 30,000]
     let log_l = rng.gen_range_f64((1000.0f64).ln(), (30000.0f64).ln());
@@ -289,7 +333,11 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
         None
     };
 
-    // 2. Evolve Ancestral Root Sequence
+    // 2. Precompute transition matrices for this trial (10x-50x speedup)
+    let p_mats_anc = precompute_p_mats(length, d_parent / 2.0, site_rates.as_deref());
+    let p_mats_drift = precompute_p_mats(length, transmission_drift, site_rates.as_deref());
+
+    // 3. Evolve Ancestral Root Sequence
     let mut anc_root = Vec::with_capacity(length);
     for _ in 0..length {
         let p = rng.next_f64();
@@ -305,19 +353,15 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
         anc_root.push(s);
     }
 
-    // Parental node ancestors
-    let p1_anc = evolve_sequence(
-        &anc_root,
-        d_parent / 2.0,
-        site_rates.as_deref(),
-        &mut rng,
-    );
-    let p2_anc = evolve_sequence(
-        &anc_root,
-        d_parent / 2.0,
-        site_rates.as_deref(),
-        &mut rng,
-    );
+    // Parental node ancestors (P1, P2, and optional P3 for cohorts >= 8 taxa)
+    let has_p3 = num_taxa >= 8;
+    let p1_anc = evolve_with_p_mats(&anc_root, &p_mats_anc, &mut rng);
+    let p2_anc = evolve_with_p_mats(&anc_root, &p_mats_anc, &mut rng);
+    let p3_anc = if has_p3 {
+        evolve_with_p_mats(&anc_root, &p_mats_anc, &mut rng)
+    } else {
+        Vec::new()
+    };
 
     // Total mutations between P1 and P2
     let mut mut_total = 0;
@@ -327,105 +371,164 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
         }
     }
 
-    // Demography partition
-    let (k_true, tract_len, u1_true, u2_true, mut_in_tract) = if is_recombinant {
-        // Tract length ratio: log-uniform in [0.008, 0.50]
-        let log_tr = rng.gen_range_f64((0.008f64).ln(), (0.50f64).ln());
-        let t_ratio = log_tr.exp();
-        let mut t_len = (length as f64 * t_ratio).round() as usize;
-        t_len = t_len.clamp(30, length.saturating_sub(100));
-
-        let u1 = rng.gen_range_usize(50, length.saturating_sub(t_len + 50));
-        let u2 = u1 + t_len - 1;
-
-        let mut mut_tr = 0;
-        for u in (u1 - 1)..u2 {
-            if p1_anc[u] != p2_anc[u] {
-                mut_tr += 1;
-            }
-        }
-
-        // Swarm size K
-        let max_k = ((num_taxa as f64 * 0.35).floor() as usize).max(1);
-        let k = rng.gen_range_usize(1, max_k);
-
-        (k, t_len, u1, u2, mut_tr)
+    // 4. Generate events (Multi-event / multi-topology expansion)
+    let mut events: Vec<SimEvent> = Vec::new();
+    let num_events = if !is_recombinant {
+        0
     } else {
-        (0, 0, 0, 0, 0)
+        let r = rng.next_f64();
+        if r < 0.55 {
+            1 // 55% single event
+        } else if r < 0.80 {
+            2 // 25% dual events
+        } else if r < 0.92 {
+            3 // 12% triple events
+        } else {
+            4 // 8% quad events
+        }
     };
 
-    let n_bg_total = num_taxa - k_true;
-    let n_p1 = (n_bg_total / 2).max(1);
-    let n_p2 = n_bg_total.saturating_sub(n_p1).max(1);
+    if num_events > 0 {
+        for e in 0..num_events {
+            let seg_start = 1 + (e * length) / num_events;
+            let seg_end = ((e + 1) * length) / num_events;
+            let seg_len = seg_end.saturating_sub(seg_start);
+
+            // Draw donor clade: P2 (1) or P3 (2)
+            let donor_clade = if has_p3 && rng.next_f64() < 0.50 { 2 } else { 1 };
+            let donor_anc = if donor_clade == 1 { &p2_anc } else { &p3_anc };
+
+            // Determine event topology: terminal crossover vs intercalary cassette
+            let (u1, u2, is_5prime, is_3prime) = if e == 0 && rng.next_f64() < 0.20 {
+                // 5' Terminal Crossover
+                let max_u2 = (seg_start + (seg_len * 7 / 10)).min(seg_end.saturating_sub(50));
+                let u2 = rng.gen_range_usize(50, max_u2.max(51));
+                (1, u2, true, false)
+            } else if e == num_events - 1 && rng.next_f64() < 0.20 {
+                // 3' Terminal Crossover
+                let min_u1 = (seg_start + (seg_len * 3 / 10)).min(length.saturating_sub(60));
+                let max_u1 = length.saturating_sub(50);
+                let u1 = rng.gen_range_usize(min_u1, max_u1.max(min_u1));
+                (u1, length, false, true)
+            } else {
+                // Intercalary Conversion Cassette
+                let min_t = 30;
+                let max_t = ((seg_len as f64 * 0.65).round() as usize).clamp(min_t + 10, seg_len.saturating_sub(40));
+                let t_len = if max_t <= min_t {
+                    min_t
+                } else {
+                    let log_t = rng.gen_range_f64((min_t as f64).ln(), (max_t as f64).ln());
+                    (log_t.exp().round() as usize).clamp(min_t, max_t)
+                };
+                let min_u1 = seg_start + 15;
+                let max_u1 = seg_end.saturating_sub(t_len + 15);
+                let u1 = rng.gen_range_usize(min_u1, max_u1.max(min_u1));
+                let u2 = (u1 + t_len - 1).min(seg_end.saturating_sub(5));
+                (u1, u2, false, false)
+            };
+
+            let mut mut_tr = 0;
+            for u in (u1 - 1)..u2 {
+                if p1_anc[u] != donor_anc[u] {
+                    mut_tr += 1;
+                }
+            }
+
+            events.push(SimEvent {
+                u1,
+                u2,
+                donor_clade,
+                is_5prime_crossover: is_5prime,
+                is_3prime_crossover: is_3prime,
+                mut_in_tract: mut_tr,
+            });
+        }
+    }
+
+    // Swarm size K
+    let (k_true, n_bg_total) = if is_recombinant && !events.is_empty() {
+        let max_k = ((num_taxa as f64 * 0.35).floor() as usize).max(1);
+        let k = rng.gen_range_usize(1, max_k);
+        (k, num_taxa.saturating_sub(k))
+    } else {
+        (0, num_taxa)
+    };
 
     let mut taxa_names = Vec::with_capacity(num_taxa);
     let mut full_matrix = Vec::with_capacity(num_taxa * length);
 
+    // Split background taxa across clades
+    let (n_p1, n_p2, n_p3) = if has_p3 {
+        let p1 = (n_bg_total / 3).max(1);
+        let p2 = (n_bg_total / 3).max(1);
+        let p3 = n_bg_total.saturating_sub(p1 + p2).max(1);
+        (p1, p2, p3)
+    } else {
+        let p1 = (n_bg_total / 2).max(1);
+        let p2 = n_bg_total.saturating_sub(p1).max(1);
+        (p1, p2, 0)
+    };
+
     // Generate P1 background taxa
     for i in 0..n_p1 {
         taxa_names.push(format!("P1_{}", i));
-        let leaf = evolve_sequence(
-            &p1_anc,
-            transmission_drift,
-            site_rates.as_deref(),
-            &mut rng,
-        );
+        let leaf = evolve_with_p_mats(&p1_anc, &p_mats_drift, &mut rng);
         for s in leaf {
-            full_matrix.push(s + 1); // 1-indexed encoding
+            full_matrix.push(s + 1);
         }
     }
 
     // Generate P2 background taxa
     for i in 0..n_p2 {
         taxa_names.push(format!("P2_{}", i));
-        let leaf = evolve_sequence(
-            &p2_anc,
-            transmission_drift,
-            site_rates.as_deref(),
-            &mut rng,
-        );
+        let leaf = evolve_with_p_mats(&p2_anc, &p_mats_drift, &mut rng);
+        for s in leaf {
+            full_matrix.push(s + 1);
+        }
+    }
+
+    // Generate P3 background taxa (if applicable)
+    for i in 0..n_p3 {
+        taxa_names.push(format!("P3_{}", i));
+        let leaf = evolve_with_p_mats(&p3_anc, &p_mats_drift, &mut rng);
         for s in leaf {
             full_matrix.push(s + 1);
         }
     }
 
     // Generate Recombinant taxa if applicable
-    if is_recombinant && k_true > 0 {
+    if is_recombinant && k_true > 0 && !events.is_empty() {
         let mut rec_anc = p1_anc.clone();
-        for u in (u1_true - 1)..u2_true {
-            rec_anc[u] = p2_anc[u];
+        for ev in &events {
+            let donor_anc = if ev.donor_clade == 1 { &p2_anc } else { &p3_anc };
+            for u in (ev.u1 - 1)..ev.u2 {
+                rec_anc[u] = donor_anc[u];
+            }
         }
 
         for k in 0..k_true {
             taxa_names.push(format!("Rec_{}", k));
-            let leaf = evolve_sequence(
-                &rec_anc,
-                transmission_drift,
-                site_rates.as_deref(),
-                &mut rng,
-            );
+            let leaf = evolve_with_p_mats(&rec_anc, &p_mats_drift, &mut rng);
             for s in leaf {
                 full_matrix.push(s + 1);
             }
         }
     }
 
+    let actual_taxa = taxa_names.len();
     let aln = Alignment::new(taxa_names, length, full_matrix);
 
-    // 3. Run RhizAeon Engine
+    // 5. Run RhizAeon Engine
     let t0 = Instant::now();
     let scan_res = engine.scan(&aln);
     let run_time_ms = t0.elapsed().as_secs_f64() * 1000.0;
 
-    // 4. Score Metrics
+    // 6. Score Taxon Attribution
     let mut rec_taxa_called = std::collections::HashSet::new();
     let mut bg_taxa_called = std::collections::HashSet::new();
-    let mut best_jaccard = 0.0f64;
-    let mut best_bp1_err = length;
-    let mut best_bp2_err = length;
 
-    let unique_events = scan_res.events.len();
-    let detected = if unique_events > 0 { 1u8 } else { 0u8 };
+    let unique_events_inferred = scan_res.events.len();
+    let detected = if unique_events_inferred > 0 { 1u8 } else { 0u8 };
 
     for ev in &scan_res.events {
         for iso in &ev.isolates {
@@ -435,40 +538,23 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
                 bg_taxa_called.insert(iso.clone());
             }
         }
-
-        if is_recombinant {
-            let j = compute_jaccard(u1_true, u2_true, ev.u1, ev.u2);
-            if j > best_jaccard {
-                best_jaccard = j;
-                best_bp1_err = ev.u1.abs_diff(u1_true);
-                best_bp2_err = ev.u2.abs_diff(u2_true);
-            }
-        }
     }
 
     let recall = if is_recombinant && k_true > 0 {
         rec_taxa_called.len() as f64 / k_true as f64
     } else {
-        if detected == 0 {
-            1.0
-        } else {
-            0.0
-        }
+        if detected == 0 { 1.0 } else { 0.0 }
     };
 
     let total_called = rec_taxa_called.len() + bg_taxa_called.len();
-    let precision = if is_recombinant {
+    let precision = if is_recombinant && k_true > 0 {
         if total_called > 0 {
             rec_taxa_called.len() as f64 / total_called as f64
         } else {
             1.0
         }
     } else {
-        if detected == 0 {
-            1.0
-        } else {
-            0.0
-        }
+        if detected == 0 { 1.0 } else { 0.0 }
     };
 
     let bg_fp_count = bg_taxa_called.len();
@@ -478,48 +564,128 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
         0.0
     };
 
-    let jaccard = if is_recombinant {
-        best_jaccard
-    } else {
-        if detected == 0 {
-            1.0
+    // 7. Bipartite Greedy Matching for Event-Level Metrics
+    let n_true_events = events.len();
+    let (event_recall, event_precision, event_f1, mean_jaccard, mean_bp_error, best_jaccard, best_bp1_err, best_bp2_err) = if n_true_events == 0 {
+        if unique_events_inferred == 0 {
+            (1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0, 0)
         } else {
-            0.0
+            (1.0, 0.0, 0.0, 0.0, length as f64, 0.0, length, length)
+        }
+    } else {
+        if unique_events_inferred == 0 {
+            (0.0, 1.0, 0.0, 0.0, length as f64, 0.0, length, length)
+        } else {
+            // Build pair candidates
+            struct MatchPair {
+                t_idx: usize,
+                i_idx: usize,
+                jaccard: f64,
+                bp_err: f64,
+                bp1_err: usize,
+                bp2_err: usize,
+            }
+            let mut pairs = Vec::with_capacity(n_true_events * unique_events_inferred);
+            for (t_idx, tev) in events.iter().enumerate() {
+                for (i_idx, iev) in scan_res.events.iter().enumerate() {
+                    let j = compute_jaccard(tev.u1, tev.u2, iev.u1, iev.u2);
+                    let e1 = iev.u1.abs_diff(tev.u1);
+                    let e2 = iev.u2.abs_diff(tev.u2);
+                    pairs.push(MatchPair {
+                        t_idx,
+                        i_idx,
+                        jaccard: j,
+                        bp_err: (e1 + e2) as f64 / 2.0,
+                        bp1_err: e1,
+                        bp2_err: e2,
+                    });
+                }
+            }
+            // Sort descending by Jaccard
+            pairs.sort_by(|a, b| b.jaccard.partial_cmp(&a.jaccard).unwrap_or(std::cmp::Ordering::Equal));
+
+            let mut matched_t = vec![false; n_true_events];
+            let mut matched_i = vec![false; unique_events_inferred];
+            let mut sum_jaccard = 0.0;
+            let mut sum_bp_err = 0.0;
+            let mut n_matched = 0;
+            let mut best_j = 0.0;
+            let mut b_bp1 = length;
+            let mut b_bp2 = length;
+
+            for p in &pairs {
+                if !matched_t[p.t_idx] && !matched_i[p.i_idx] && p.jaccard > 0.0 {
+                    matched_t[p.t_idx] = true;
+                    matched_i[p.i_idx] = true;
+                    sum_jaccard += p.jaccard;
+                    sum_bp_err += p.bp_err;
+                    n_matched += 1;
+                    if p.jaccard > best_j {
+                        best_j = p.jaccard;
+                        b_bp1 = p.bp1_err;
+                        b_bp2 = p.bp2_err;
+                    }
+                }
+            }
+
+            let ev_rec = n_matched as f64 / n_true_events as f64;
+            let ev_prec = n_matched as f64 / unique_events_inferred as f64;
+            let ev_f1 = if ev_rec + ev_prec > 0.0 {
+                2.0 * ev_rec * ev_prec / (ev_rec + ev_prec)
+            } else {
+                0.0
+            };
+            let m_j = if n_matched > 0 { sum_jaccard / n_matched as f64 } else { 0.0 };
+            let m_err = if n_matched > 0 { sum_bp_err / n_matched as f64 } else { length as f64 };
+            (ev_rec, ev_prec, ev_f1, m_j, m_err, best_j, b_bp1, b_bp2)
         }
     };
 
+    let cardinality_error = unique_events_inferred as i64 - n_true_events as i64;
+    let total_tract_len: usize = events.iter().map(|e| e.u2 - e.u1 + 1).sum();
+    let total_mut_in_tract: usize = events.iter().map(|e| e.mut_in_tract).sum();
+
+    let u1_primary = events.first().map(|e| e.u1).unwrap_or(0);
+    let u2_primary = events.first().map(|e| e.u2).unwrap_or(0);
+
+    let has_crossover = if events.iter().any(|e| e.is_5prime_crossover || e.is_3prime_crossover) { 1u8 } else { 0u8 };
+    let has_cassette = if events.iter().any(|e| !e.is_5prime_crossover && !e.is_3prime_crossover) { 1u8 } else { 0u8 };
+    let has_multi_donor = if events.len() >= 2 && events.iter().map(|e| e.donor_clade).collect::<std::collections::HashSet<_>>().len() >= 2 { 1u8 } else { 0u8 };
+
     TrialResult {
         trial_id,
-        is_recombinant_true: if is_recombinant { 1 } else { 0 },
+        is_recombinant_true: if is_recombinant && n_true_events > 0 { 1 } else { 0 },
         length,
-        num_taxa,
+        num_taxa: actual_taxa,
         d_parent,
-        tract_len,
+        tract_len: total_tract_len,
         k_true,
-        u1_true,
-        u2_true,
-        mut_in_tract,
+        u1_true: u1_primary,
+        u2_true: u2_primary,
+        mut_in_tract: total_mut_in_tract,
         mut_total,
         heterotachy_alpha,
         informative_sites: scan_res.informative_sites,
         detected,
-        unique_events_inferred: unique_events,
+        unique_events_inferred,
         recall,
         precision,
         bg_fp_count,
         bg_fpr,
-        jaccard,
-        bp1_error: if is_recombinant && detected > 0 {
-            best_bp1_err
-        } else {
-            0
-        },
-        bp2_error: if is_recombinant && detected > 0 {
-            best_bp2_err
-        } else {
-            0
-        },
+        jaccard: if is_recombinant && n_true_events > 0 { best_jaccard } else { if detected == 0 { 1.0 } else { 0.0 } },
+        bp1_error: if is_recombinant && detected > 0 { best_bp1_err } else { 0 },
+        bp2_error: if is_recombinant && detected > 0 { best_bp2_err } else { 0 },
         run_time_ms,
+        num_events_true: n_true_events,
+        cardinality_error,
+        event_recall,
+        event_precision,
+        event_f1,
+        mean_jaccard,
+        mean_bp_error,
+        has_crossover,
+        has_cassette,
+        has_multi_donor,
     }
 }
 
@@ -527,12 +693,15 @@ fn run_single_simulation(trial_id: usize, seed_base: u64, engine: &RhizAeonEngin
 #[command(
     name = "grand_sweep",
     author = "Sergei L. Kosakovsky Pond & Antigravity AI",
-    version = "1.0",
-    about = "Grand-Scale Parameter Sweep Harness for RhizAeon (50k-100k In-Memory Simulations)"
+    version = "2.0",
+    about = "Grand-Scale Parameter Sweep Harness for RhizAeon (100k-1M Multi-Event In-Memory Simulations)"
 )]
 struct Args {
-    #[arg(short, long, default_value_t = 100000)]
+    #[arg(short, long, default_value_t = 1000000)]
     trials: usize,
+
+    #[arg(long, default_value_t = 0)]
+    start_trial: usize,
 
     #[arg(short, long, default_value = "grand_sweep_results.csv")]
     output: String,
@@ -557,9 +726,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let num_threads = rayon::current_num_threads();
 
     println!("================================================================================");
-    println!("     RhizAeon Grand-Scale Parameter Sweep Harness (Continuous Phase Space)      ");
+    println!("     RhizAeon Grand-Scale Parameter Sweep Harness (1,000,000 Genomes)           ");
     println!("================================================================================");
     println!("Total Trials:         {}", args.trials);
+    println!("Start Trial ID:       {}", args.start_trial);
+    println!("Trial ID Range:       {} .. {}", args.start_trial, args.start_trial + args.trials);
     println!("Worker Threads:       {}", num_threads);
     println!("Output File:          {}", args.output);
     println!("Random Seed:          {}", args.seed);
@@ -574,8 +745,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut w = writer.lock().unwrap();
         writeln!(
             w,
-            "trial_id,is_recombinant_true,length,num_taxa,d_parent,tract_len,k_true,u1_true,u2_true,mut_in_tract,mut_total,heterotachy_alpha,informative_sites,detected,unique_events_inferred,recall,precision,bg_fp_count,bg_fpr,jaccard,bp1_error,bp2_error,run_time_ms"
+            "trial_id,is_recombinant_true,length,num_taxa,d_parent,tract_len,k_true,u1_true,u2_true,mut_in_tract,mut_total,heterotachy_alpha,informative_sites,detected,unique_events_inferred,recall,precision,bg_fp_count,bg_fpr,jaccard,bp1_error,bp2_error,run_time_ms,num_events_true,cardinality_error,event_recall,event_precision,event_f1,mean_jaccard,mean_bp_error,has_crossover,has_cassette,has_multi_donor"
         )?;
+        w.flush()?;
     }
 
     let progress_counter = AtomicUsize::new(0);
@@ -583,11 +755,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let total_null_clean = AtomicUsize::new(0);
     let t_start = Instant::now();
 
-    let trials: Vec<usize> = (0..args.trials).collect();
+    let trials: Vec<usize> = (args.start_trial..(args.start_trial + args.trials)).collect();
 
     // Process in parallel chunks to stream output efficiently across all cores
     trials.par_chunks(16).for_each(|chunk| {
-        let mut local_csv = String::with_capacity(chunk.len() * 140);
+        let mut local_csv = String::with_capacity(chunk.len() * 180);
         let mut rec_det_chunk = 0;
         let mut null_clean_chunk = 0;
 
@@ -607,16 +779,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         {
             let mut w = writer.lock().unwrap();
             w.write_all(local_csv.as_bytes()).unwrap();
+            let _ = w.flush();
         }
 
         total_recombinant_detected.fetch_add(rec_det_chunk, Ordering::Relaxed);
         total_null_clean.fetch_add(null_clean_chunk, Ordering::Relaxed);
 
         let completed = progress_counter.fetch_add(chunk.len(), Ordering::Relaxed) + chunk.len();
-        if completed % 1000 == 0 || completed == args.trials {
+        if completed % 1000 == 0 || completed >= args.trials {
             let elapsed = t_start.elapsed().as_secs_f64();
             let rate = completed as f64 / elapsed;
-            let remaining = (args.trials - completed) as f64 / rate;
+            let remaining = (args.trials.saturating_sub(completed)) as f64 / rate;
             println!(
                 "  Progress: {:6}/{} ({:5.1}%) | Rate: {:6.1} trials/s | Elapsed: {:5.1}s | ETA: {:5.1}s",
                 completed,
@@ -626,12 +799,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 elapsed,
                 remaining
             );
+            use std::io::stdout;
+            let _ = stdout().flush();
         }
     });
 
     let total_elapsed = t_start.elapsed().as_secs_f64();
-    let total_rec_trials = args.trials / 2;
-    let total_null_trials = args.trials - total_rec_trials;
     let rec_det = total_recombinant_detected.load(Ordering::Relaxed);
     let null_clean = total_null_clean.load(Ordering::Relaxed);
 
@@ -640,8 +813,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("================================================================================");
     println!("Total Execution Time:      {:.2} seconds ({:.1} minutes)", total_elapsed, total_elapsed / 60.0);
     println!("Average Throughput:        {:.1} trials/second", args.trials as f64 / total_elapsed);
-    println!("Recombinant Trials:        {} | Detected: {} ({:.2}%)", total_rec_trials, rec_det, (rec_det as f64 / total_rec_trials as f64) * 100.0);
-    println!("Non-Recombinant Nulls:     {} | Zero FPR: {} ({:.4}%)", total_null_trials, null_clean, (null_clean as f64 / total_null_trials as f64) * 100.0);
+    println!("Recombinant Trials Detected: {}", rec_det);
+    println!("Non-Recombinant Nulls Clean: {}", null_clean);
     println!("Results saved to:          {}", args.output);
     println!("================================================================================");
 

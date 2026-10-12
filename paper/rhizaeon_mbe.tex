@@ -1,5 +1,5 @@
 %%% OUP Authoring Template for Molecular Biology and Evolution (MBE) %%%
-\documentclass[unnumsec,webpdf,contemporary,large,nocrop]{oup-authoring-template}%
+\documentclass[unnumsec,webpdf,contemporary,large,nocrop,namedate]{oup-authoring-template}%
 \onecolumn
 
 \usepackage{graphicx}
@@ -27,7 +27,7 @@
 \appnotes{Discoveries}
 \firstpage{1}
 
-\title[Clean Breaks: Tracking Recombination as Continuous Motion]{Clean Breaks: Tracking Recombination as Continuous Motion Across Sequence Manifolds}
+\title[Clean Breaks: Physical Force Field Deconvolution]{Clean Breaks: Physical Force Field Deconvolution of Recombination Across Sequence Manifolds}
 
 \author[1,2,$\ast$]{Sergei L.\ Kosakovsky Pond}
 \author[1,2]{Danielle Callan}
@@ -42,16 +42,23 @@
 
 \corresp[$\ast$]{Corresponding author: \href{mailto:spond@temple.edu}{spond@temple.edu}}
 
-\abstract{Homologous recombination and horizontal gene transfer assemble mosaic chromosomes from divergent evolutionary lineages, shattering the assumption of bifurcating trees. Existing detection methods remain trapped between computationally prohibitive phylogenetic changepoint algorithms that scale exponentially with breakpoint count and isolated triplet heuristics that trigger high false positive rates under mutational rate variation. We introduce \RhizAeon, an open-source framework that maps multiple sequence alignments into continuous metric spaces, tracking sequence affinities along chromosomes as continuous trajectories without navigating discrete trees or enumerating triplets. By coupling rotary phase embeddings with an unpolarized ancestral root token that absorbs autapomorphic noise, \RhizAeon deconvolves reticulation through physical force field dynamics in linear time. Across a grand simulation sweep of 150,000 whole genomes permuting diverse divergence, tract lengths, and extreme Gamma rate variation, \RhizAeon maintained a false positive rate of 0.415\% on 75,000 non-recombinant nulls, localized physical breakpoints within 16.0 nucleotides, and sustained throughput exceeding 30 genomes per second. Empirical applications across bacterial pathogens, Sarbecovirus spike chimeras, and primate MHC Class I immunogenomics resolve multi-megabase chromosomes and deep multi-domain reticulations in fractions of a second. Compiled to native Rust binaries and client-side WebAssembly, \RhizAeon executes real-time reticulation surveillance within modern web browsers without server data transfer.}
+\abstract{Homologous recombination and horizontal gene transfer assemble mosaic chromosomes from divergent evolutionary lineages. Reticulate evolution shatters bifurcating trees. Existing detection methods remain trapped between computationally prohibitive phylogenetic changepoint algorithms that scale exponentially with breakpoint count and isolated triplet heuristics that trigger high false positive rates under mutational rate variation. We introduce \RhizAeon, an open-source framework that models reticulation as continuous trajectory mechanics in empirical metric spaces without evaluating trees or enumerating triplets. By coupling continuous phylogenetic cross-attention over landmark lineages with an unpolarized ancestral root token that absorbs autapomorphic noise, \RhizAeon deconvolves reticulation through physical force field dynamics in linear time. Across extensive coalescent benchmarks, operational stress tests, and large-scale parameter sweeps, \RhizAeon maintains strict false positive control on non-recombinant nulls while sustaining throughput exceeding 30 genomes per second. Empirical applications across wildlife Sarbecovirus spike chimeras, bacterial chromosome mosaicism in \textit{Streptococcus pneumoniae}, and primate \textit{HLA} Class I immunogenomics resolve deep reticulations and fine-scale micro-conversions in fractions of a second. The platform executes client-side surveillance within standard web browsers without server data transfer.}
 
 \keywords{Recombination, Reticulate Evolution, Sequence Manifolds, Continuous Trajectory Tracking, Multidimensional Scaling, Foundation Models}
 
 \maketitle
 
+\input{sections_mbe/00_introduction.tex}
+\input{sections_mbe/00_rhizaeon_overview.tex}
 \input{sections_mbe/01_simulations_results.tex}
+\input{sections_mbe/03_empirical_results.tex}
+\input{sections_mbe/04_discussion.tex}
 \input{sections_mbe/02_simulations_methods.tex}
 
-\bibliographystyle{oup-plain}
+\bibliographystyle{oup-abbrvnat}
 \bibliography{references}
+
+\clearpage
+\input{sections_mbe/supplementary.tex}
 
 \end{document}

@@ -1,0 +1,538 @@
+{
+  "alignment": {
+    "path": "/Users/sergei/Projects/rhizaeon-code/empirical_showcase/spneumoniae_pmen1_croucher2011/data/PMEN1.aln",
+    "num_taxa": 11,
+    "length_bp": 2221315,
+    "informative_snps": 1516,
+    "compression_ratio": 1465.2
+  },
+  "performance": {
+    "load_time_sec": 0.03,
+    "snp_extract_sec": 2.366,
+    "scan_time_sec": 0.114,
+    "total_runtime_sec": 2.51
+  },
+  "background_stats": {
+    "mean_residual": 0.0702,
+    "std_residual": 0.11294
+  },
+  "changepoints_count": 127,
+  "gubbins_concordance": {
+    "total_gubbins_boundaries": 52,
+    "median_distance_bp": 92.5,
+    "mean_distance_bp": 460.11538461538464,
+    "concordance_1kb_pct": 80.8,
+    "concordance_2kb_pct": 96.2,
+    "concordance_5kb_pct": 100.0,
+    "matches": [
+      {
+        "gubbins_bp": 73625,
+        "closest_rhizaeon_bp": 76579,
+        "distance_bp": 2954,
+        "within_1kb": false,
+        "within_2kb": false,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 76475,
+        "closest_rhizaeon_bp": 76579,
+        "distance_bp": 104,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 124572,
+        "closest_rhizaeon_bp": 124814,
+        "distance_bp": 242,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 124659,
+        "closest_rhizaeon_bp": 124814,
+        "distance_bp": 155,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 124732,
+        "closest_rhizaeon_bp": 124814,
+        "distance_bp": 82,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 124841,
+        "closest_rhizaeon_bp": 124814,
+        "distance_bp": 27,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 285069,
+        "closest_rhizaeon_bp": 285068,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 292266,
+        "closest_rhizaeon_bp": 292364,
+        "distance_bp": 98,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 294385,
+        "closest_rhizaeon_bp": 295715,
+        "distance_bp": 1330,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 305751,
+        "closest_rhizaeon_bp": 305965,
+        "distance_bp": 214,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 323721,
+        "closest_rhizaeon_bp": 323814,
+        "distance_bp": 93,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 325108,
+        "closest_rhizaeon_bp": 323814,
+        "distance_bp": 1294,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 336730,
+        "closest_rhizaeon_bp": 340596,
+        "distance_bp": 3866,
+        "within_1kb": false,
+        "within_2kb": false,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 340597,
+        "closest_rhizaeon_bp": 340596,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 344860,
+        "closest_rhizaeon_bp": 346147,
+        "distance_bp": 1287,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 352271,
+        "closest_rhizaeon_bp": 352094,
+        "distance_bp": 177,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 411129,
+        "closest_rhizaeon_bp": 411386,
+        "distance_bp": 257,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 411387,
+        "closest_rhizaeon_bp": 411386,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 437571,
+        "closest_rhizaeon_bp": 437570,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 440668,
+        "closest_rhizaeon_bp": 440667,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 601344,
+        "closest_rhizaeon_bp": 601347,
+        "distance_bp": 3,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 604237,
+        "closest_rhizaeon_bp": 604236,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 698236,
+        "closest_rhizaeon_bp": 698235,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 702632,
+        "closest_rhizaeon_bp": 702631,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 732987,
+        "closest_rhizaeon_bp": 732986,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 743877,
+        "closest_rhizaeon_bp": 743876,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1154011,
+        "closest_rhizaeon_bp": 1153381,
+        "distance_bp": 630,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1154158,
+        "closest_rhizaeon_bp": 1153381,
+        "distance_bp": 777,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1156704,
+        "closest_rhizaeon_bp": 1156703,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1158831,
+        "closest_rhizaeon_bp": 1158830,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1163601,
+        "closest_rhizaeon_bp": 1163693,
+        "distance_bp": 92,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1165107,
+        "closest_rhizaeon_bp": 1166406,
+        "distance_bp": 1299,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1165278,
+        "closest_rhizaeon_bp": 1166406,
+        "distance_bp": 1128,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1166407,
+        "closest_rhizaeon_bp": 1166406,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1533749,
+        "closest_rhizaeon_bp": 1533748,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1535866,
+        "closest_rhizaeon_bp": 1535793,
+        "distance_bp": 73,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1620528,
+        "closest_rhizaeon_bp": 1620547,
+        "distance_bp": 19,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1649446,
+        "closest_rhizaeon_bp": 1649445,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1722140,
+        "closest_rhizaeon_bp": 1723710,
+        "distance_bp": 1570,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1722157,
+        "closest_rhizaeon_bp": 1723710,
+        "distance_bp": 1553,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1722646,
+        "closest_rhizaeon_bp": 1723710,
+        "distance_bp": 1064,
+        "within_1kb": false,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 1722763,
+        "closest_rhizaeon_bp": 1723710,
+        "distance_bp": 947,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2104999,
+        "closest_rhizaeon_bp": 2104998,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2107108,
+        "closest_rhizaeon_bp": 2107107,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2107183,
+        "closest_rhizaeon_bp": 2107107,
+        "distance_bp": 76,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2113473,
+        "closest_rhizaeon_bp": 2112889,
+        "distance_bp": 584,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2133459,
+        "closest_rhizaeon_bp": 2134135,
+        "distance_bp": 676,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2134136,
+        "closest_rhizaeon_bp": 2134135,
+        "distance_bp": 1,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2171136,
+        "closest_rhizaeon_bp": 2171413,
+        "distance_bp": 277,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2171296,
+        "closest_rhizaeon_bp": 2171413,
+        "distance_bp": 117,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2171346,
+        "closest_rhizaeon_bp": 2171413,
+        "distance_bp": 67,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      },
+      {
+        "gubbins_bp": 2172189,
+        "closest_rhizaeon_bp": 2171413,
+        "distance_bp": 776,
+        "within_1kb": true,
+        "within_2kb": true,
+        "within_5kb": true
+      }
+    ]
+  },
+  "landmarks": [
+    {
+      "landmark": "Penicillin-binding protein 2x (pbp2x)",
+      "start": 285069,
+      "end": 305751,
+      "status": "FOUND",
+      "changepoint": 285068,
+      "kinetic_z": 5.352,
+      "strain": "1731"
+    },
+    {
+      "landmark": "Capsular polysaccharide switch (cps, 23F->19A)",
+      "start": 336730,
+      "end": 352271,
+      "status": "FOUND",
+      "changepoint": 356248,
+      "kinetic_z": 6.418,
+      "strain": "2682"
+    },
+    {
+      "landmark": "Penicillin-binding protein 1a (pbp1a)",
+      "start": 323721,
+      "end": 325108,
+      "status": "FOUND",
+      "changepoint": 323814,
+      "kinetic_z": 3.188,
+      "strain": "3355"
+    },
+    {
+      "landmark": "Trimethoprim resistance island (folA)",
+      "start": 1620528,
+      "end": 1649446,
+      "status": "FOUND",
+      "changepoint": 1620547,
+      "kinetic_z": 6.76,
+      "strain": "1731"
+    },
+    {
+      "landmark": "Surface adhesin (pspC / cbpA)",
+      "start": 2104999,
+      "end": 2113473,
+      "status": "FOUND",
+      "changepoint": 2104998,
+      "kinetic_z": 6.39,
+      "strain": "1731"
+    },
+    {
+      "landmark": "Recombination hotspot 73kb",
+      "start": 73625,
+      "end": 76580,
+      "status": "FOUND",
+      "changepoint": 76579,
+      "kinetic_z": 5.267,
+      "strain": "1731"
+    },
+    {
+      "landmark": "Recombination hotspot 732kb",
+      "start": 732987,
+      "end": 743877,
+      "status": "FOUND",
+      "changepoint": 746458,
+      "kinetic_z": 6.579,
+      "strain": "1731"
+    },
+    {
+      "landmark": "Recombination hotspot 1.15Mb",
+      "start": 1156704,
+      "end": 1158831,
+      "status": "FOUND",
+      "changepoint": 1153381,
+      "kinetic_z": 5.483,
+      "strain": "2097"
+    },
+    {
+      "landmark": "Recombination hotspot 1.72Mb",
+      "start": 1722140,
+      "end": 1723519,
+      "status": "FOUND",
+      "changepoint": 1723710,
+      "kinetic_z": 4.219,
+      "strain": "2682"
+    },
+    {
+      "landmark": "Recombination hotspot 2.13Mb",
+      "start": 2133459,
+      "end": 2134136,
+      "status": "FOUND",
+      "changepoint": 2138664,
+      "kinetic_z": 7.432,
+      "strain": "1731"
+    }
+  ]
+}

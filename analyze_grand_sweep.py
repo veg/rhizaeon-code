@@ -220,6 +220,140 @@ def analyze_sweep(csv_path: str, out_prefix: str = "grand_sweep"):
     plt.savefig(out_fig, dpi=300)
     print(f"\nPublication figure saved to: {out_fig}")
 
+    # =========================================================================
+    # 5. Multi-Event, Topology, and Mosaicism Analysis (if columns present)
+    # =========================================================================
+    has_multievent = "num_events_true" in df.columns
+    if has_multievent:
+        print("\n================================================================================")
+        print("          MULTI-EVENT & MULTI-DONOR MOSAICISM DIAGNOSTICS                       ")
+        print("================================================================================")
+
+        # Cardinality resolution
+        print("\n--- EVENT CARDINALITY CONFUSION MATRIX (True K vs Inferred K) ---")
+        card_ct = pd.crosstab(df["num_events_true"], df["unique_events_inferred"], margins=True)
+        print(card_ct)
+
+        # Event recovery metrics stratified by True Event Count
+        print("\n--- EVENT-LEVEL RECOVERY BY COMPLEXITY ---")
+        ev_metrics = recs.groupby("num_events_true").agg(
+            n_trials=("detected", "count"),
+            power=("detected", "mean"),
+            exact_k=("cardinality_error", lambda s: (s == 0).mean()),
+            mean_recall=("event_recall", "mean"),
+            mean_precision=("event_precision", "mean"),
+            mean_f1=("event_f1", "mean"),
+            mean_jaccard=("mean_jaccard", "mean"),
+            median_bp_err=("mean_bp_error", "median")
+        )
+        for k_val, row in ev_metrics.iterrows():
+            print(f"  K_true = {k_val}: Trials={int(row['n_trials']):6d} | Power={row['power']*100:5.1f}% | "
+                  f"Exact K={row['exact_k']*100:5.1f}% | Event Recall={row['mean_recall']*100:5.1f}% | "
+                  f"Event Prec={row['mean_precision']*100:5.1f}% | F1={row['mean_f1']:.3f} | Jaccard={row['mean_jaccard']:.3f}")
+
+        # Topology comparison: Crossover vs Cassette
+        print("\n--- TOPOLOGY BREAKDOWN (TERMINAL CROSSOVER VS CASSETTE) ---")
+        cross_power = recs.groupby("has_crossover")["detected"].agg(["count", "mean"])
+        cass_power = recs.groupby("has_cassette")["detected"].agg(["count", "mean"])
+        print(f"  Has Terminal Crossover: Trials={cross_power.loc[1, 'count']} | Power={cross_power.loc[1, 'mean']*100:.1f}%")
+        print(f"  Internal Cassette Only: Trials={cross_power.loc[0, 'count']} | Power={cross_power.loc[0, 'mean']*100:.1f}%")
+
+        # Multi-donor breakdown
+        if "has_multi_donor" in recs.columns:
+            multi_trials = recs[recs["num_events_true"] >= 2]
+            if len(multi_trials) > 0:
+                print("\n--- MULTI-DONOR DISAMBIGUATION (K >= 2) ---")
+                donor_comp = multi_trials.groupby("has_multi_donor").agg(
+                    n_trials=("detected", "count"),
+                    power=("detected", "mean"),
+                    mean_f1=("event_f1", "mean"),
+                    mean_jaccard=("mean_jaccard", "mean")
+                )
+                for md_val, row in donor_comp.iterrows():
+                    label = "Multi-Donor (P1 <- P2 + P3)" if md_val == 1 else "Single-Donor (P1 <- P2)"
+                    print(f"  {label:28s}: Trials={int(row['n_trials']):5d} | Power={row['power']*100:5.1f}% | Event F1={row['mean_f1']:.3f} | Jaccard={row['mean_jaccard']:.3f}")
+
+        # Generate Multi-Event Diagnostic Figure
+        fig_me, axes_me = plt.subplots(2, 2, figsize=(13, 10), dpi=300)
+        plt.subplots_adjust(wspace=0.28, hspace=0.32)
+
+        # Plot A: Cardinality Confusion Matrix
+        ax = axes_me[0, 0]
+        max_k_plot = min(4, df["num_events_true"].max())
+        conf_mat = np.zeros((max_k_plot + 1, max_k_plot + 1))
+        for t_k in range(max_k_plot + 1):
+            sub_k = df[df["num_events_true"] == t_k]
+            for i_k in range(max_k_plot + 1):
+                conf_mat[t_k, i_k] = (sub_k["unique_events_inferred"] == i_k).sum()
+        conf_norm = conf_mat / conf_mat.sum(axis=1, keepdims=True)
+        im = ax.imshow(conf_norm, cmap="Blues", vmin=0.0, vmax=1.0)
+        ax.set_xticks(range(max_k_plot + 1))
+        ax.set_yticks(range(max_k_plot + 1))
+        ax.set_xlabel("Inferred Event Count $\\hat{K}$", fontsize=11, fontweight="bold")
+        ax.set_ylabel("True Event Count $K_{\\mathrm{true}}$", fontsize=11, fontweight="bold")
+        ax.set_title("A. Reticulation Cardinality Resolution", fontsize=12, fontweight="bold", loc="left")
+        for i in range(max_k_plot + 1):
+            for j in range(max_k_plot + 1):
+                txt_color = "white" if conf_norm[i, j] > 0.5 else "black"
+                ax.text(j, i, f"{conf_norm[i, j]*100:.1f}%\n({int(conf_mat[i, j]):,})",
+                        ha="center", va="center", color=txt_color, fontsize=8.5, fontweight="bold")
+        fig_me.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Fraction of True Replicates")
+
+        # Plot B: Event Recall, Precision & F1 by True Event Count
+        ax = axes_me[0, 1]
+        k_levels = ev_metrics.index.values
+        x = np.arange(len(k_levels))
+        width = 0.25
+        ax.bar(x - width, ev_metrics["mean_recall"] * 100, width, label="Event Recall", color="#1f77b4")
+        ax.bar(x, ev_metrics["mean_precision"] * 100, width, label="Event Precision", color="#2ca02c")
+        ax.bar(x + width, ev_metrics["mean_f1"] * 100, width, label="Event $F_1$ Score", color="#ff7f0e")
+        ax.set_xticks(x)
+        ax.set_xticklabels([f"$K={k}$" for k in k_levels], fontsize=10)
+        ax.set_ylabel("Score (%)", fontsize=11, fontweight="bold")
+        ax.set_title("B. Event Recovery by Mosaic Complexity", fontsize=12, fontweight="bold", loc="left")
+        ax.set_ylim(0, 105)
+        ax.grid(True, axis="y", ls=":", alpha=0.5)
+        ax.legend(loc="lower right", frameon=True)
+
+        # Plot C: Detection Power by Event Topology
+        ax = axes_me[1, 0]
+        top_labels = ["Terminal Crossover", "Internal Cassette"]
+        top_powers = [cross_power.loc[1, 'mean'] * 100, cross_power.loc[0, 'mean'] * 100]
+        colors = ["#9467bd", "#8c564b"]
+        bars = ax.bar(top_labels, top_powers, color=colors, width=0.5, edgecolor="black", alpha=0.85)
+        for b in bars:
+            h = b.get_height()
+            ax.text(b.get_x() + b.get_width()/2., h + 1.5, f"{h:.1f}%", ha="center", va="bottom", fontsize=10, fontweight="bold")
+        ax.set_ylabel("Empirical Detection Power (%)", fontsize=11, fontweight="bold")
+        ax.set_title("C. Sensitivity by Structural Topology", fontsize=12, fontweight="bold", loc="left")
+        ax.set_ylim(0, 105)
+        ax.grid(True, axis="y", ls=":", alpha=0.5)
+
+        # Plot D: Multi-Donor Disambiguation
+        ax = axes_me[1, 1]
+        if "has_multi_donor" in recs.columns and len(multi_trials) > 0:
+            md_labels = ["Single Donor\n($P_1 \\leftarrow P_2$)", "Multi-Donor\n($P_1 \\leftarrow P_2 + P_3$)"]
+            md_f1 = [donor_comp.loc[0, 'mean_f1'] * 100 if 0 in donor_comp.index else 0,
+                     donor_comp.loc[1, 'mean_f1'] * 100 if 1 in donor_comp.index else 0]
+            md_pwr = [donor_comp.loc[0, 'power'] * 100 if 0 in donor_comp.index else 0,
+                      donor_comp.loc[1, 'power'] * 100 if 1 in donor_comp.index else 0]
+            x_md = np.arange(len(md_labels))
+            w_md = 0.35
+            ax.bar(x_md - w_md/2, md_pwr, w_md, label="Detection Power", color="#17becf")
+            ax.bar(x_md + w_md/2, md_f1, w_md, label="Event $F_1$ Score", color="#e377c2")
+            ax.set_xticks(x_md)
+            ax.set_xticklabels(md_labels, fontsize=10)
+            ax.set_ylabel("Metric Value (%)", fontsize=11, fontweight="bold")
+            ax.set_title("D. Multi-Donor Mosaic Disambiguation", fontsize=12, fontweight="bold", loc="left")
+            ax.set_ylim(0, 105)
+            ax.grid(True, axis="y", ls=":", alpha=0.5)
+            ax.legend(loc="lower right", frameon=True)
+
+        me_fig_path = f"{out_prefix}_multievent_analysis.png"
+        plt.tight_layout()
+        plt.savefig(me_fig_path, dpi=300)
+        print(f"Multi-event publication figure saved to: {me_fig_path}")
+
     # Output detailed summary metrics to text/LaTeX table
     summary_txt = f"{out_prefix}_summary.txt"
     with open(summary_txt, "w") as f:
@@ -237,6 +371,12 @@ def analyze_sweep(csv_path: str, out_prefix: str = "grand_sweep"):
         f.write(f"Median BP1 Error:         {det_bp1_err:.1f} nt\n")
         f.write(f"Median BP2 Error:         {det_bp2_err:.1f} nt\n")
         f.write(f"Median Runtime per Trial: {df['run_time_ms'].median():.2f} ms\n")
+        if has_multievent:
+            f.write("--------------------------------------------------------------------------------\n")
+            f.write(f"Multi-Event Trials (K>=2): {len(recs[recs['num_events_true'] >= 2]):,}\n")
+            f.write(f"Terminal Crossover Trials: {len(recs[recs['has_crossover'] == 1]):,}\n")
+            f.write(f"Multi-Donor Mosaic Trials: {len(recs[recs['has_multi_donor'] == 1]):,}\n")
+            f.write(f"Mean Event F1 Score:       {recs['event_f1'].mean():.4f}\n")
         f.write("================================================================================\n")
     print(f"Summary report written to: {summary_txt}")
 

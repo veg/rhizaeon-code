@@ -1,0 +1,121 @@
+{
+  "num_taxa": 8,
+  "length": 1101,
+  "informative_sites": 90,
+  "is_non_recombinant_h0": false,
+  "screening": {
+    "v_cont": [
+      1.9905423558934228,
+      0.8702533583070489,
+      4.294730633244217,
+      0.5099555605380516,
+      1.2893208681061887,
+      1.6287832230462544,
+      5.1481162225471255,
+      5.552498193094966
+    ],
+    "v_root": [
+      0.04067664952084024,
+      0.08090530657374062,
+      0.09039778710527786,
+      0.21396031562123496,
+      0.014193787873106038,
+      0.09092115363805545,
+      0.15045197283276987,
+      0.07268854949945797
+    ],
+    "r_root": [
+      0.020025733026520345,
+      0.08505973772924161,
+      0.020614627084981133,
+      0.2955596398245875,
+      0.010888859444723117,
+      0.05287022285382785,
+      0.02839483560180061,
+      0.012921979807184136
+    ],
+    "gamma_root": [
+      0.11474526791810381,
+      0.05643489305582141,
+      0.06824830293225351,
+      0.08738922477887934,
+      0.07804704801915904,
+      0.06430687783697793,
+      0.07331198598865309,
+      0.07570320711429879
+    ],
+    "rate_burst_indices": [
+      3
+    ],
+    "ghost_candidate_indices": [],
+    "candidate_recombinant_indices": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "clonal_backbone_indices": [],
+    "median_v_cont": 1.9905423558934228,
+    "is_non_recombinant_h0": false
+  },
+  "events": [
+    {
+      "event_id": 1,
+      "isolates": [
+        "HLA_B_46_01_01"
+      ],
+      "candidate_idx": 0,
+      "candidate_name": "HLA_B_46_01_01",
+      "home_idx": 6,
+      "home_name": "HLA_C_07_01_01",
+      "donor_idx": 5,
+      "donor_name": "HLA_B_08_01_01",
+      "is_ghost_donor": false,
+      "is_crossover": true,
+      "u1": 611,
+      "u2": 1101,
+      "u1_continuous": 611.0,
+      "u2_continuous": 1101.0,
+      "tract_length": 491,
+      "s_informative": 29,
+      "p_fisher": 1.1465482841360635e-7,
+      "z_phys": 2.2141859851710035,
+      "d_flank_home": 0.04918032786885246,
+      "d_flank_donor": 0.07213114754098361,
+      "d_tract_home": 0.06889352818371608,
+      "d_tract_donor": 0.012526096033402923,
+      "is_verified": true
+    },
+    {
+      "event_id": 2,
+      "isolates": [
+        "HLA_C_01_02_01"
+      ],
+      "candidate_idx": 2,
+      "candidate_name": "HLA_C_01_02_01",
+      "home_idx": 4,
+      "home_name": "HLA_B_07_02_01",
+      "donor_idx": 6,
+      "donor_name": "HLA_C_07_01_01",
+      "is_ghost_donor": false,
+      "is_crossover": true,
+      "u1": 603,
+      "u2": 1101,
+      "u1_continuous": 603.0,
+      "u2_continuous": 1101.0,
+      "tract_length": 499,
+      "s_informative": 37,
+      "p_fisher": 0.00008944120834044352,
+      "z_phys": 2.505598459169028,
+      "d_flank_home": 0.05647840531561462,
+      "d_flank_donor": 0.03820598006644518,
+      "d_tract_home": 0.08008213552361396,
+      "d_tract_donor": 0.004106776180698152,
+      "is_verified": true
+    }
+  ],
+  "run_time_ms": 3.588292
+}

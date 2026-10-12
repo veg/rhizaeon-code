@@ -1,32 +1,191 @@
-\section{Simulation Protocols and Benchmark Frameworks}
-\label{sec:simulations_methods}
+\section{Materials and Methods}
+\label{sec:methods}
 
-\subsection{Continuous-Time Markov Substitution Modeling}
-\label{subsec:mbe_markov_sim}
-
-All simulated alignments evolved under continuous-time Markov substitution dynamics. Nucleotide evolution followed the HKY85 model with transition/transversion ratio $\kappa = 2.5$ and equilibrium base frequencies $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$ (or $\kappa = 2.0$, $\bm{\pi} = [0.40, 0.20, 0.30, 0.10]$ for Posada \& Crandall controls \citep{posada2001evaluation}). Finite-time transition probability matrices $\mathbf{P}(t)$ across branches of length $t$ were evaluated analytically via matrix exponentiation:
+\subsection{Metric Space Embedding and Gower Trajectory Projection}
+\label{subsec:methods_embedding_gower}
+Let $\mathcal{S} = \{s_1, \dots, s_M\}$ denote a multiple sequence alignment of $M$ contemporary nucleotide sequences of length $L$ over alphabet $\Sigma = \{\text{A}, \text{C}, \text{G}, \text{T}\} \cup \{-\}$.
+Pairwise evolutionary distances $D_{i,j} = d(s_i, s_j)$ are computed under the Tamura-Nei (TN93) continuous-time Markov substitution model \citep{tamura1993estimation} or normalized Hamming distance with pairwise gap deletion.
+For large cohorts ($M > 64$), \RhizAeon avoids $O(M^2 L)$ all-to-all comparisons by selecting $N \ll M$ reference landmark genomes via sequential Farthest-Point Sampling \citep{gonzalez1985clustering} in strictly $O(N M L)$ operations.
+Initial seed $s_{(1)}$ maximizes non-gap coverage.
+Each subsequent landmark $s_{(k)}$ maximizes the running minimum distance to previously selected landmarks:
 \begin{equation}
-\mathbf{P}(t) = \exp(\mathbf{Q} \cdot t),
+s_{(k)} = \arg\max_{i \notin \{s_{(1)},\dots,s_{(k-1)}\}} \min_{1 \le j < k} d(s_i, s_{(j)}).
+\label{eq:methods_fps}
 \end{equation}
-where $\mathbf{Q}$ is the normalized generator rate matrix with mean rate $-\sum_i \pi_i Q_{ii} = 1.0$. Continuous site-rate heterogeneity was modeled by drawing relative site mutation rates $r_i \sim \text{Gamma}(\alpha, \alpha)$ using Marsaglia and Tsang's exact transformation rejection algorithm. For strict molecular clock controls, $\alpha$ was clamped to $100.0$; for biological heterotachy, $\alpha$ varied continuously across $[0.05, 5.0]$.
+Farthest points span divergence.
+For $M \le 64$, all sequences serve as reference channels ($N = M$).
+When $M > 64$, Two-Pass Clonal Backbone Re-Anchoring purges candidate recombinants identified in an initial screening pass from the landmark pool, ensuring coordinates anchor strictly upon unadmixed parental lineages.
 
-\subsection{Whole-Genome Simulation Sweep Protocol}
-\label{subsec:mbe_sweep_protocol}
+From the reference distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$, we form the element-wise squared matrix $[\mathbf{D}^{(2)}]_{i,j} = D_{i,j}^2$.
+Applying geometric centering $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$ yields the doubly centered Gram matrix $\mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}$ \citep{gower1966some}.
+Spectral decomposition yields orthonormal eigenvectors $\mathbf{V} \in \mathbb{R}^{N \times N}$ and descending eigenvalues $\mathbf{\Lambda} = \operatorname{diag}(\lambda_1, \dots, \lambda_N)$.
+We retain the leading $d \le \min(4, N-1)$ dimensions with positive eigenvalues ($\mathbf{\Lambda}_d, \mathbf{V}_d$).
+Static landmark coordinates are $\mathbf{x}_i = \mathbf{\Lambda}_d^{1/2} (\mathbf{V}_d)_{i, :}^T$.
+Macroscopic tree splits project onto dominant eigenvectors \citep{buneman1974note}.
 
-The whole-genome simulation sweep was executed using the compiled native Rust benchmark harness (\texttt{grand\_sweep.rs}) under Rayon multi-threaded parallelism across 16 CPU cores. For each trial:
+To track evolutionary affinities continuously without independent sliding-window MDS rotations, \RhizAeon projects local distance vectors into canonical coordinates via analytical Gower out-of-sample interpolation \citep{gower1968adding}.
+Across an aligned sliding window of width $W$ centered at site $u$ (default $W = 300$~nt, stride $S = 10$~nt), local distances from query sequence $i$ to reference landmarks form vector $\mathbf{d}_i(u) \in \mathbb{R}^N$.
+Gower interpolation solves $\min_{\mathbf{z} \in \mathbb{R}^d} \sum_{j=1}^N (\|\mathbf{z} - \mathbf{x}_j\|^2 - d_i(j; u)^2)^2$, yielding the exact closed-form coordinate:
+\begin{equation}
+\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_d^{-1/2} \mathbf{V}_d^T \left( \bar{\mathbf{d}}^2 - \mathbf{d}_i^2(u) \right) \in \mathbb{R}^d,
+\label{eq:methods_gower}
+\end{equation}
+where $\bar{\mathbf{d}}^2 = \frac{1}{N} \mathbf{D}^{(2)} \mathbf{1}_N$.
+Evaluating \eqref{eq:methods_gower} across coordinates builds the trajectory tensor $\mathbf{Z} \in \mathbb{R}^{M \times U \times d}$.
+Zero Procrustes alignments are needed.
+Projections preserve rigid geometry.
+
+\subsection{Continuous Phylogenetic Cross-Attention and the Unpolarized Root Sink}
+\label{subsec:methods_attention_root}
+To direct attention by evolutionary divergence, \RhizAeon generalizes Rotary Position Embeddings (RoPE; \citet{su2024roformer}) from linear sequence positions to continuous metric spaces.
+From metric coordinates $\mathbf{x}_i \in \mathbb{R}^d$, we compute rotary phase angles $\bm{\theta}_i \in \mathbb{R}^{d_{\text{head}}/2}$ via frequency projection $\theta_{i, m} = \sum_{c=1}^d x_{i, c} \Theta_{m, c}$, weighted by dimension-wise spectral variance.
+Query and key vectors $\mathbf{q}_i(u), \mathbf{k}_i(u) \in \mathbb{R}^{d_{\text{head}}}$ undergo block-diagonal Givens rotations $\mathbf{R}(\bm{\theta}_i)$.
+Rotated inner products satisfy $\langle \mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u), \, \mathbf{R}(\bm{\theta}_j) \mathbf{k}_j(u) \rangle = \mathbf{q}_i(u)^T \mathbf{R}(\bm{\theta}_j - \bm{\theta}_i) \mathbf{k}_j(u)$, decaying monotonically as metric separation grows.
+Phylogenetic divergence modulates attention directly.
+
+To calibrate geometric affinities against baseline neutral substitution, we add a continuous-time Markov substitution prior to attention logits.
+Pairwise homologous identity probability under neutral substitution rate $\lambda_h$ is $P_{i,j} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h D_{i,j})$, with equilibrium frequency $\epsilon_0 = 0.25$.
+Logarithmic prior bias is $\text{PhyloBias}_{i,j} = \ln [\max(10^{-5}, P_{i,j})]$.
+Composite unnormalized attention logits become:
+\begin{equation}
+S_u(i, j) = \frac{(\mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u))^T (\mathbf{R}(\bm{\theta}_j) \mathbf{k}_j(u))}{\sqrt{d_{\text{head}}}} + \text{PhyloBias}_{i, j}.
+\label{eq:methods_logits}
+\end{equation}
+
+Lineage-specific rate variation challenges standard attention mechanisms.
+Autapomorphic bursts lack contemporary donors.
+When private substitutions surge without homologous counterparts in other leaves, standard leaf-only softmax forces mutations to affiliate with whichever contemporary taxon exhibits the smallest random mismatch, triggering false positive recombination calls.
+\RhizAeon eliminates this vulnerability by reserving index zero for an unpolarized ancestral root token $\mathbf{x}_{\text{root}} = \mathbf{0} \in \mathbb{R}^d$.
+The attention operator spans $N+1$ nodes, normalizing softmax across the ancestral root and all contemporary leaves:
+\begin{equation}
+A_u(i \to j) = \frac{\exp(S_u(i, j))}{\sum_{k=0}^N \exp(S_u(i, k))}, \quad \text{where} \quad A_u(i \to 0) + \sum_{j=1}^N A_u(i \to j) = 1.0.
+\label{eq:methods_root_softmax}
+\end{equation}
+At sites bearing private autapomorphic mutations, query-key matching against contemporary leaves is strongly depressed ($S_u(i, j) \ll 0$).
+The unmutated root token maintains baseline neutral affinity.
+Consequently, private mutational flux routes harmlessly into node zero ($\lim A_u(i \to 0) = 1.0$).
+Sinks absorb unshared noise.
+The root sink protects trajectory tracking against episodic rate acceleration, APOBEC hypermutation, and biological heterotachy.
+
+\subsection{Statistical Changepoint Inference and Multi-Scale Deconvolution}
+\label{subsec:methods_changepoints}
+Instantaneous attention weights fluctuate at individual polymorphic sites.
+\RhizAeon integrates attention across chromosome coordinates into cumulative affinity curves $C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} A_v(i \to j)$ for each phylogenetic clade $\mathcal{B}_m$.
+The home clade maximizes total chromosome affinity: $m_{\text{home}}(i) = \arg\max_m C_{i, m}(L)$.
+For any candidate donor clade $m \neq m_{\text{home}}$, the differential attention curve is:
+\begin{equation}
+Y_{i, m}(u) = C_{i, m}(u) - C_{i, m_{\text{home}}}(u).
+\label{eq:methods_diff_trajectory}
+\end{equation}
+Under clonal evolution, home attention dominates throughout the alignment.
+The differential trajectory drifts downward with negative slope.
+Recombination reverses trajectory derivative within the converted donor tract, driving an upward excursion ($dY/du > 0$).
+
+To test the clonal null hypothesis, we construct the centered Brownian bridge $B(u) = Y(u) - \frac{u}{L} Y(L)$ by subtracting linear chromosome drift.
+By Donsker's functional central limit theorem \citep{donsker1951invariance}, standardized process $W_L^0(t) = B(\lfloor t L \rfloor) / (\sigma \sqrt{L})$ converges weakly to a standard Brownian bridge.
+Its trajectory supremum follows the two-sided Kolmogorov distribution \citep{kolmogorov1933sulla}.
+To control the family-wise error rate across all $M_{\text{topo}} = \binom{N}{2} \max(1, N - 2)$ testable topologies at significance $\alpha = 0.05$, we apply the Dunn-\v{S}id\'{a}k boundary \citep{sidak1967rectangular}:
+\begin{equation}
+K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( 1 - (1 - \alpha)^{1 / M_{\text{topo}}} \right)} \approx \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2 M_{\text{topo}}} \right)}.
+\label{eq:methods_k_crit}
+\end{equation}
+Significant trajectories ($\sup |B(u)| / (\sigma \sqrt{L}) \ge K_{\text{crit}}$) reject the unreticulated null hypothesis.
+
+For short conversion tracts ($< 200$~nt), global Brownian bridge tests can suffer signal dilution across megabase chromosomes.
+\RhizAeon convolves trajectory flux $\Delta Y(u)$ with a bank of zero-mean bipolar dyadic matched filters $h_\tau(s)$ across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt, isolating step transitions in scale space.
+Running drawdown $\text{DD}(u) = \max_{v \le u} Y(v) - Y(u)$ localizes points where trajectory momentum collapses, marking tract exit boundaries.
+To separate single crossovers from intercalary cassette swaps, we evaluate the outer-to-inner energy density ratio $\mathcal{E}_{\text{ratio}}$ across flanking versus internal segments.
+Cassettes return cleanly to baseline on both flanks ($\mathcal{E}_{\text{ratio}} < 0.15$), whereas single crossovers maintain elevated offset energy across the chromosome ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
+
+Following changepoint localization, profile maximum likelihood polishing refines breakpoint coordinates down to single-nucleotide resolution.
+Scanning coordinates $c \in [u_{\text{init}} - \delta, u_{\text{init}} + \delta]$ maximizes partitioned log-likelihood $\ln \mathcal{L}(c) = \sum_{u=1}^c \ln P(s_{\text{rec}}(u) \mid s_{\text{left}}(u)) + \sum_{u=c+1}^L \ln P(s_{\text{rec}}(u) \mid s_{\text{right}}(u))$.
+Across invariant sites, the likelihood forms a flat plateau.
+\RhizAeon reports the exact 95\% confidence interval $[c_{\text{left}}, c_{\text{right}}] = \{c : \ln \mathcal{L}(c) \ge \max \ln \mathcal{L} - 1.92\}$, bounding genetic exchange by physical informative mutations.
+Continuous gap bridging iteratively coalesces adjacent donor fragments separated by non-informative intervals ($\le 150$~bp) whenever net flux across the merged span remains positive.
+
+\subsection{Physical Force Field Deconvolution and Random Matrix Halting}
+\label{subsec:methods_force_field}
+To resolve multi-way mosaics without combinatorial heuristics, \RhizAeon models trajectory excursions as displacements within a physical force field.
+The home lineage exerts a Hookean restoring force $\mathbf{f}(u) = -\lambda (\mathbf{z}(u) - \mathbf{z}_{\text{home}}) \in \mathbb{R}^d$.
+Across candidate breakpoint boundaries, flanking force vectors $\mathbf{f}_{\text{left}}$ and $\mathbf{f}_{\text{right}}$ define step velocity $v_{\text{step}} = \|\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}\|$ and deflection angle $\cos \theta = \langle \mathbf{f}_{\text{left}}, \mathbf{f}_{\text{right}} \rangle / (\|\mathbf{f}_{\text{left}}\| \|\mathbf{f}_{\text{right}}\|)$.
+Dynamic velocity reversal $R = v_{\text{step}} (1 - \cos \theta)$ captures abrupt momentum changes.
+Projecting flanking force increments onto unit parental dipole axis $\mathbf{d}_{\text{hat}} = (\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}) / \|\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}\|$ yields the scale-invariant test statistic:
+\begin{equation}
+Z_{\text{flip}} = \frac{\left| (\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}) \cdot \mathbf{d}_{\text{hat}} \right|}{\sqrt{\frac{\sigma_{\text{left}}^2}{L_{\text{left}}} + \frac{\sigma_{\text{right}}^2}{L_{\text{right}}}}}.
+\label{eq:methods_z_flip}
+\end{equation}
+
+For chromosomes bearing multiple reticulations, spatio-temporal force vectors form matrix $\mathbf{F} \in \mathbb{R}^{N \times L}$.
+Singular value decomposition $\mathbf{F} = \sum_{m=1}^r s_m \mathbf{u}_m \mathbf{v}_m^T$ isolates distinct reticulation modes.
+Iterative mode peeling subtracts each verified component $s_m \mathbf{u}_m \mathbf{v}_m^T$ from residual forces.
+Peeling must halt when residual variance reflects neutral coalescent drift.
+By random matrix theory, singular values of an $N \times L$ noise matrix follow the Marchenko-Pastur distribution \citep{marchenko1967distribution}.
+The upper edge of the bulk spectral noise edge is:
+\begin{equation}
+s_{\text{bulk}} = \frac{L}{\pi} \sigma_{\text{noise}} \left( 1 + \sqrt{\frac{P}{L}} \right),
+\label{eq:methods_marchenko_pastur}
+\end{equation}
+where $P = \min(N, d)$ and $\sigma_{\text{noise}}$ is the empirical force increment standard deviation.
+Peeling terminates when leading residual singular values satisfy $s_m \le s_{\text{bulk}}$, halting iteration without arbitrary threshold tuning.
+
+\subsection{Reticulation Graph Adjudication and Ancestral Event Grouping}
+\label{subsec:methods_adjudication}
+In reciprocal triplet scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ frequently triggers reciprocal false alarms ($D$ recombinant between $C$ and $H$).
+This reciprocal artifact creates mutual two-cycles in candidate reticulation graphs ($C \leftrightarrow D$).
+\RhizAeon resolves orientation by evaluating transition contrast $\Delta_{\text{trans}} = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$, where $\Delta d_{\text{home}} = \max(0, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank}))$.
+Authentic recombinant children leave their home background within the tract ($\Delta d_{\text{home}} \gg 0$).
+Stationary clonal parents remain within home background across the alignment ($\Delta d_{\text{home}} \approx 0$).
+Comparing transition contrast purges reciprocal parent false alarms.
+
+In expanding epidemic outbreaks, multiple descendant isolates inherit identical mosaic tracts from a common recombinant ancestor.
+Reporting each isolate as an independent recombination event inflates event counts and misrepresents evolutionary history.
+\RhizAeon clusters candidate events into shared ancestral recombination events using an interval overlap criterion.
+Events sharing identical resolved Home and Donor lineages whose breakpoint intervals overlap by $\ge 50\%$ of the shorter tract:
+\begin{equation}
+\frac{\min(u_2^{(1)}, u_2^{(2)}) - \max(u_1^{(1)}, u_1^{(2)}) + 1}{\min(u_2^{(1)} - u_1^{(1)} + 1, \, u_2^{(2)} - u_1^{(2)} + 1)} \ge 0.50,
+\label{eq:methods_ancestral_overlap}
+\end{equation}
+collapse into a single ancestral event.
+Grouped events aggregate the complete roster of co-recombinant isolates ($\mathcal{I} = \{s_1, \dots, s_k\}$).
+Consensus breakpoints span the outer envelope $[\min_k u_{1, k}, \max_k u_{2, k}]$, while retaining maximal statistical significance across member isolates.
+Each unique event receives a persistent sequential identifier ($1, 2, \dots$), reporting both unique evolutionary events and total recombinant isolates across the alignment inventory.
+
+\subsection{Coalescent Simulation Suites and Bipartite Hungarian Evaluation}
+\label{subsec:methods_benchmarks}
+Synthetic alignments were generated under Hudson's neutral coalescent model with recombination \citep{hudson1983properties,posada2001evaluation} across 3,200 alignments spanning 16 parameter regimes.
+Simulations crossed sequence divergence $\theta \in \{2, 10, 50\}$, recombination rate $\rho \in \{0, 4, 16, 64\}$, and rate heterogeneity $\alpha \in \{0.5, \infty\}$.
+To evaluate operational challenges, four specialized scenario suites were simulated under HKY85 substitution dynamics ($\kappa = 2.5, \pi = [0.3, 0.2, 0.2, 0.3]$) across 2,280 alignments:
 \begin{enumerate}
-    \item \textit{Dimensional Parameter Sampling}: Genome length was drawn from $L \sim \text{Uniform}(1{,}000, 30{,}000)$~nt; cohort size from $N \sim \text{Uniform}(4, 250)$~taxa; parental sequence divergence from $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.25)$~subs/site; and Gamma shape $\alpha$ was sampled from $\text{Uniform}(0.05, 5.0)$ with probability 0.75 and set to $100.0$ (clock-like) with probability 0.25.
-    \item \textit{Topological Construction}: Clonal backbones were generated as balanced or comb star-like coalescent trees with terminal branch lengths scaled to maintain target pairwise divergence.
-    \item \textit{Recombinant Implantation}: For recombinant trials, a recipient leaf $R$ and donor leaf $D$ were selected uniformly at random. A recombinant tract of length $L_{\mathrm{tract}} \sim \text{Uniform}(0.008 \cdot L, 0.50 \cdot L)$ was implanted at start coordinate $u_1 \sim \text{Uniform}(0, L - L_{\mathrm{tract}})$. Across $[u_1, u_1 + L_{\mathrm{tract}}]$, sequence characters in $R$ were replaced by those of $D$ prior to terminal transmission drift ($\delta \sim \text{Uniform}(0.001, 0.005)$).
-    \item \textit{Automated Scanning}: Each alignment was streamed directly to a \texttt{rhizaeon\_core::Alignment} struct and evaluated using \texttt{RhizAeonEngine::scan()} with significance threshold $\alpha = 0.05$ and $K \le 32$ spectral landmarks. No trials were post-filtered or discarded.
+\item \textbf{Epidemic Clonal Expansion}: Recombinant ancestors sprouting $K \in \{2, 5, 8, 10, 15\}$ descendants with transmission drift ($\delta = 0.002$) alongside 40 parental background isolates ($N = 42\text{--}55$, $L = 5,000$~nt; 300 alignments).
+\item \textbf{Multi-Way Mosaic Swarms}: Dual-cassette transfers, nested Russian doll introgressions, and triple crossover cascades with $K \in \{1, 5, 10\}$ descendants across $d \in \{0.02, 0.05, 0.10\}$ ($N = 46\text{--}55$, $L = 6,000$~nt; 540 alignments).
+\item \textbf{Ghost Donor Introgression}: Pure unsampled donor, surrogate sister clade, and deep reservoir donor regimes across swarm sizes $K \in \{2, 5, 10\}$ ($N = 32\text{--}40$, $L = 5,000$~nt; 540 alignments).
+\item \textbf{Micro-Conversion Resolution}: Conversion tracts spanning $L_{\text{tract}} \in \{50, 100, 200, 400, 800\}$~nt across three divergence tiers ($N = 32\text{--}40$, $L = 5,000$~nt; 900 alignments).
+\end{enumerate}
+In addition, a grand parameter sweep of 150,000 whole genomes was evaluated across continuous distributions: $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d \in [0.005, 0.25]$~subs/site, and Gamma rate shape $\alpha \in [0.05, 5.0]$.
+
+Ground truth was evaluated via maximum-weight bijective bipartite matching using the Hungarian algorithm \citep{kuhn1955hungarian}.
+For true event $E = (C, H, D, \mathcal{I})$ and inferred event $\hat{E} = (\hat{C}, \hat{H}, \hat{D}, \hat{\mathcal{I}})$, event affinity combines genealogical triad affinity and informative SNP Jaccard similarity:
+\begin{equation}
+s(E, \hat{E}) = \left[ w(C, \hat{C}) \times \frac{w(H, \hat{H}) + w(D, \hat{D})}{2} \right] \times \frac{|\mathcal{S}_{\text{true}} \cap \mathcal{S}_{\text{inferred}}|}{|\mathcal{S}_{\text{true}} \cup \mathcal{S}_{\text{inferred}}|},
+\label{eq:methods_event_affinity}
+\end{equation}
+where $w(X, Y) = \exp(-d_{\text{tree}}(X, Y) / \sigma_{\text{clade}})$.
+Across the optimal matching $\mathcal{M}$, reticulation precision and recall are $\text{PPV}_{\mathcal{R}} = \frac{1}{\hat{K}} \sum_{\mathcal{M}} s(E_i, \hat{E}_j)$ and $\text{TPR}_{\mathcal{R}} = \frac{1}{K} \sum_{\mathcal{M}} s(E_i, \hat{E}_j)$.
+The composite Reticulation Fidelity Index is their harmonic mean $\mathcal{R}_{F_1} = 2 \cdot \text{PPV}_{\mathcal{R}} \cdot \text{TPR}_{\mathcal{R}} / (\text{PPV}_{\mathcal{R}} + \text{TPR}_{\mathcal{R}})$.
+Every unmatched true event penalizes recall; every ungrounded prediction penalizes precision.
+
+\subsection{Empirical Genomic Datasets and Implementation}
+\label{subsec:methods_empirical}
+Empirical evaluations analyzed three natural evolutionary cohorts:
+\begin{enumerate}
+\item \textbf{Sarbecovirus Genomes}: 83 whole genomes of bat, pangolin, and human sarbecoviruses (30,950~nt; \citet{lytras2022exploring}), including SARS-CoV-2 reference NC\_045512.2 and close relatives RaTG13, BANAL-20-52, and RmYN02.
+\item \textbf{Bacterial Chromosomes}: 11 clinical isolates of multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 (2,221,315~nt; \citet{croucher2011rapid}) spanning global penicillin-resistant outbreaks.
+\item \textbf{Primate Immunogenomics}: 379 classical primate MHC Class~I alleles (\textit{HLA-A}, \textit{HLA-B}, \textit{HLA-C}, and non-human hominoid orthologs; 1,130~nt; \citet{maccari2017ipd}).
 \end{enumerate}
 
-\subsection{Targeted Failure Mode Benchmarks and Scoring Standards}
-\label{subsec:mbe_scoring_standards}
-
-Targeted failure mode benchmarks were executed using Python harnesses incorporating \texttt{scipy.linalg.expm} and automated calls to the compiled \texttt{rhizaeon} binary and \texttt{3seq} \citep[v1.7;][]{lam20183seq}:
-\begin{itemize}
-    \item \textit{Breakpoint Spatial Accuracy}: Evaluated via Informative SNP Jaccard Index ($J_{\mathrm{SNP}}$) over the flanking informative polymorphisms $[u_{\mathrm{left}}, u_{\mathrm{right}}]$ bounding the physical exchange. Exact plateau containment ($E_{\mathrm{SNP}} = 0$) achieves $J = 1.00$.
-    \item \textit{Cardinality and Lineage Attribution}: Inferred events were paired to ground truth via 1-to-1 bijective bipartite matching using the Hungarian algorithm (\texttt{scipy.optimize.linear\_sum\_assignment}) on spatial boundary distance. Spurious extra calls were penalized as false alarms (deflating precision $\text{PPV}$); missed events deflated recall.
-    \item \textit{Parental Specificity}: The parental false positive rate ($\text{FPR}_{\mathrm{parent}}$) measured the proportion of un-introgressed background parental lineages falsely classified as recombinant children.
-\end{itemize}
+\RhizAeon is implemented in native Rust with Rayon multicore parallelization and PyO3 Python bindings.
+The algorithmic core compiles to WebAssembly (WASM).
+Surveillance pipelines execute client-side within standard web browsers without remote server transmission.
+All computation executes locally on client hardware without transmitting sequence data across external networks.
+Interactive dashboards render synchronized signal inspectors, 2D metric subspace projections, and midpoint-rooted phylogenetic trees within browser canvas.
+Source code, documentation, and benchmark workflows are freely available under the MIT license at \url{https://github.com/veg/rhizaeon-code}.

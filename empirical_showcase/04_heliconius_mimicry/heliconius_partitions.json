@@ -1,0 +1,119 @@
+{
+  "study": "Pardo-Diaz et al. (2012) PLoS Genetics 8(6): e1002752",
+  "locus_order": [
+    "rabkinesin",
+    "HmB00012",
+    "HmB449k",
+    "HmB453k",
+    "optix",
+    "HmB520k"
+  ],
+  "partitions": {
+    "rabkinesin": [
+      1,
+      750,
+      750
+    ],
+    "HmB00012": [
+      751,
+      987,
+      237
+    ],
+    "HmB449k": [
+      988,
+      1763,
+      776
+    ],
+    "HmB453k": [
+      1764,
+      2650,
+      887
+    ],
+    "optix": [
+      2651,
+      3381,
+      731
+    ],
+    "HmB520k": [
+      3382,
+      3677,
+      296
+    ]
+  },
+  "total_length": 3677,
+  "taxa": [
+    [
+      "H_tim_tim_9227",
+      "9227",
+      "Heliconius timareta timareta",
+      "Peruvian rayed mimic"
+    ],
+    [
+      "H_tim_tim_9185",
+      "9185",
+      "Heliconius timareta timareta",
+      "Peruvian rayed mimic"
+    ],
+    [
+      "H_tim_tim_9182",
+      "9182",
+      "Heliconius timareta timareta",
+      "Peruvian rayed mimic"
+    ],
+    [
+      "H_mel_mal_2312",
+      "2312",
+      "Heliconius melpomene malleti",
+      "Amazonian rayed co-mimic donor"
+    ],
+    [
+      "H_mel_mal_1261",
+      "1261",
+      "Heliconius melpomene malleti",
+      "Amazonian rayed co-mimic donor"
+    ],
+    [
+      "H_mel_agl_1385",
+      "1385",
+      "Heliconius melpomene aglaope",
+      "Amazonian rayed co-mimic donor"
+    ],
+    [
+      "H_mel_ros_1023",
+      "1023",
+      "Heliconius melpomene rosina",
+      "Central American postman race"
+    ],
+    [
+      "H_cyd_cor_2182",
+      "2182",
+      "Heliconius cydno cordula",
+      "White/yellow sister"
+    ],
+    [
+      "H_cyd_cor_2253",
+      "2253",
+      "Heliconius cydno cordula",
+      "White/yellow sister"
+    ],
+    [
+      "H_cyd_chi_2424",
+      "2424",
+      "Heliconius cydno chioneus",
+      "White/yellow sister"
+    ],
+    [
+      "H_cyd_wey_1911",
+      "1911",
+      "Heliconius cydno weymeri",
+      "Polymorphic sister"
+    ],
+    [
+      "H_num_2387",
+      "2387",
+      "Heliconius numata",
+      "Silvaniform outgroup"
+    ]
+  ],
+  "sha256": "1b6695c9341602ccec83f41a2c3fbfc4096edf880eadd71513e396ecdf5e4022"
+}

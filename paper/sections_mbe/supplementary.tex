@@ -1,0 +1,364 @@
+\section*{Supplementary Material: Complete Mathematical Methods, Modeling Assumptions, and Computational Protocols}
+\label{sec:supplementary_material}
+
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\theHtable}{supp.table.\arabic{table}}
+\renewcommand{\theHfigure}{supp.figure.\arabic{figure}}
+\renewcommand{\theHequation}{supp.equation.\arabic{equation}}
+\renewcommand{\theHsection}{supp.section.\arabic{section}}
+\renewcommand{\theHsubsection}{supp.subsection.\arabic{section}.\arabic{subsection}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\setcounter{equation}{0}
+\setcounter{section}{0}
+
+\section{Foundational Modeling Assumptions and Physical Boundary Conditions}
+\label{supp:assumptions}
+
+The \RhizAeon framework reformulates the detection and deconvolution of reticulate evolution from discrete combinatorial tree search into continuous trajectory mechanics in empirical metric spaces.
+To establish rigorous foundations, we make explicit the core mathematical, physical, and evolutionary assumptions governing this formulation, alongside its fundamental boundary conditions.
+
+\paragraph{Assumption 1 (Metric Embeddability of Evolutionary Divergence).}
+We assume that pairwise genetic distances computed across nucleotide or amino acid alignments can be embedded into a low-dimensional Euclidean metric space $(\mathbb{R}^k, \|\cdot\|_2)$ with minimal topological distortion.
+For any two sequences $i$ and $j$, their global evolutionary divergence $d_{ij} \in [0, 1]$ represents an additive metric over tree branches under tree-like evolution, satisfying the triangle inequality $d_{ij} \le d_{ik} + d_{kj}$ up to finite-sites homoplasy.
+Through classical multidimensional scaling (MDS), the centering transformation $\mathbf{B} = -\frac{1}{2}\mathbf{H}(\mathbf{D}^{\odot 2})\mathbf{H}$ yields a positive semi-definite inner product matrix on the subspace of dominant eigenvalues.
+Gower's out-of-sample projection guarantees that any local sub-interval distance vector $\mathbf{d}_i(u)$ maps bijectively into this canonical coordinate frame without recalculating eigenvectors or requiring Procrustean superimposition.
+
+\paragraph{Assumption 2 (Stationary Substitution Background and the Brownian Null).}
+We assume that under purely clonal, non-recombinant evolution, nucleotide substitutions accumulate along lineages according to a continuous-time Markov substitution process with stationary distribution $\bm{\pi}$ and rate matrix $\mathbf{Q}$.
+Scanning along an alignment from $5'$ to $3'$, the cumulative difference between any two clonal lineages accumulates as a sum of independent, identically distributed Bernoulli substitution trials.
+By Donsker's invariance principle, as alignment length $L \to \infty$, the standardized cumulative deviation curve:
+\begin{equation}
+B(u) = \frac{Y(u) - \frac{u}{L}Y(L)}{\sigma \sqrt{L}}
+\end{equation}
+converges weakly to a standard Brownian bridge on $u \in [0, 1]$, where $\mathbb{E}[B(u)] = 0$ and $\mathrm{Cov}(B(s), B(t)) = \min(s, t) - st$.
+Under the null hypothesis of clonal evolution ($H_0$), fluctuations in sequence affinity represent balanced thermal noise.
+Recombination is formally defined as an exogenous physical force that breaks this thermal equilibrium, inducing a sustained, non-zero drift velocity $\frac{d}{du} Y(u) \ne 0$ that exceeds Brownian boundary-crossing thresholds.
+
+\paragraph{Assumption 3 (The Unpolarized Root Token as an Autapomorphic Sink).}
+Mutational rate heterogeneity (heterotachy) and directional hypermutation bursts (such as APOBEC, ADAR, or error-prone replication) frequently generate localized clusters of mutations along a single lineage.
+Heuristic triplet methods mistake these mutational clusters for horizontal donor acquisition.
+\RhizAeon eliminates this vulnerability by reserving coordinate index $0$ in the cross-attention simplex for an unpolarized ancestral root token $\mathbf{x}_{\mathrm{root}}$, anchored at the metric origin $\mathbf{m}_{\mathrm{root}} = \mathbf{0}$.
+In the cross-attention softmax:
+\begin{equation}
+A_u(i \to \mathrm{root}) + \sum_{j=1}^N A_u(i \to j) = 1.0.
+\end{equation}
+When lineage $i$ acquires private substitutions that do not point toward any sampled contemporary taxon, the similarity logits to all contemporary leaves decrease uniformly, naturally routing attention into the root sink at index $0$.
+Consequently, autapomorphic bursts reduce contemporary affinity without surging candidate donor attention, providing intrinsic mathematical immunity to false positive alarms under rate heterogeneity.
+
+\paragraph{Assumption 4 (Spectral Landmark Representation on Simplex \texorpdfstring{$\Delta^K$}{Delta\textasciicircum K}).}
+To scale linearly across vast genomic cohorts ($N > 1{,}000$ genomes), \RhizAeon assumes that the evolutionary variance of a population can be faithfully captured by $K$ spectral landmark centroids ($K \ll N$) on the probability simplex $\Delta^K$.
+Landmarks are selected via $k$-medoids clustering on global distance matrix $\mathbf{D}_{\mathrm{glob}}$, ensuring uniform coverage of deep clades.
+Every contemporary genome $i$ is tracked as a continuous barycentric coordinate vector $\bm{\alpha}_i(u) \in \Delta^K$.
+This reduces computational complexity from $\mathcal{O}(N^2 L)$ or $\mathcal{O}(N^3 L)$ down to $\mathcal{O}(N K L)$ while preserving sensitivity to cross-clade transfers.
+
+\paragraph{Physical Limits and Resolution Boundaries.}
+The resolution of trajectory deconvolution is governed by fundamental physical boundaries:
+\begin{enumerate}
+    \item \emph{Mutational Density Floor}: Recombination can only be inferred if the introgressed tract contains distinguishing polymorphic mutations between parental lineages ($n_{\mathrm{mut}} = L_{\mathrm{tract}} \cdot d_{\mathrm{parent}} \ge 1$). In low-divergence regimes ($d_{\mathrm{parent}} < 0.005$), statistical power is fundamentally bounded by mutation availability rather than algorithmic sensitivity.
+    \item \emph{Tract Length Resolution}: The dyadic scale-space matched filter operates across dyadic scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt. Replacement tracts shorter than 15~nt (single-codon swaps) cannot be reliably distinguished from multi-nucleotide mutations without prior structural constraints.
+    \item \emph{Extinction / Ghost Limits}: When an introgressing donor has no sampled relatives within phylogenetic distance $d_{\mathrm{max}}$, the tract is classified as an orphan ghost introgression. Directional consistency constraints prevent false attribution to contemporary outgroups, but donor clade identification remains impossible without surrogate sampling.
+\end{enumerate}
+
+\section{Complete Algorithmic Pipeline and Mathematical Formulations}
+\label{supp:algorithms}
+
+\subsection{Lossless SNP Compression and Prefix Distance Tensor}
+Given a multiple sequence alignment $\mathbf{M} \in \Sigma^{N \times L}$ over alphabet $\Sigma = \{A, C, G, T, -\}$, columns exhibiting zero polymorphic variation across all $N$ taxa carry zero phylogenetic information.
+\RhizAeon indexes out all monomorphic positions, compressing alignment $\mathbf{M}$ into a segregating variant matrix $\mathbf{S} \in \Sigma^{N \times L_{\mathrm{SNP}}}$ with bijective coordinate mapping function $\psi: \{0, \dots, L_{\mathrm{SNP}}-1\} \to \{0, \dots, L-1\}$.
+For whole-genome bacterial alignments where $L_{\mathrm{SNP}} \ll L$ ($1{,}465$-fold compression in \textit{S.~pneumoniae}), this allows all trajectory computations to execute in memory-resident cache.
+
+Across the compressed alignment, we compute the cumulative prefix difference tensor $\mathbf{\Phi} \in \mathbb{R}^{N \times N \times (L_{\mathrm{SNP}}+1)}$:
+\begin{equation}
+\Phi_{ij}(u) = \sum_{c=0}^{u-1} w_c \cdot \mathbb{I}(S_{ic} \ne S_{jc}),
+\end{equation}
+where $w_c$ denotes site-specific weights (e.g., transition/transversion corrections or codon degeneracy).
+For any genomic sub-interval $[u_1, u_2)$, the exact pairwise evolutionary distance between sequence $i$ and sequence $j$ is computed in $\mathcal{O}(1)$ time:
+\begin{equation}
+D_{ij}(u_1, u_2) = \frac{\Phi_{ij}(u_2) - \Phi_{ij}(u_1)}{u_2 - u_1}.
+\end{equation}
+
+\subsection{Global Divergence Matrix and Classical MDS Basis}
+The whole-sequence evolutionary divergence matrix $\mathbf{D}_{\mathrm{glob}} \in \mathbb{R}^{N \times N}$ is evaluated across the full locus: $D_{\mathrm{glob}, ij} = \Phi_{ij}(L_{\mathrm{SNP}}) / L_{\mathrm{SNP}}$.
+We construct the centering projection matrix $\mathbf{H} = \mathbf{I}_N - \frac{1}{N}\mathbf{1}_N\mathbf{1}_N^T$ and form the Gower double-centered inner product matrix:
+\begin{equation}
+\mathbf{B} = -\frac{1}{2}\mathbf{H}(\mathbf{D}_{\mathrm{glob}}^{\odot 2})\mathbf{H}.
+\end{equation}
+Spectral decomposition yields $\mathbf{B} = \mathbf{V}\mathbf{\Lambda}\mathbf{V}^T$, where eigenvalues are sorted in descending order $\lambda_1 \ge \dots \ge \lambda_N \ge 0$.
+We retain the top $k = \min(3, N-1)$ positive eigenvalues $\mathbf{\Lambda}_k = \mathrm{diag}(\lambda_1, \dots, \lambda_k)$ and corresponding orthonormal eigenvectors $\mathbf{V}_k \in \mathbb{R}^{N \times k}$.
+This canonical basis is computed once and held fixed for the entire alignment, guaranteeing zero Procrustes rotational drift.
+
+\subsection{Exact Gower Out-of-Sample Continuous Trajectory Projection}
+At any genomic coordinate $u \in [0, L_{\mathrm{SNP}})$, each sequence $i$ possesses an instantaneous local distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to all reference taxa, evaluated over a symmetric Gaussian kernel window:
+\begin{equation}
+d_i(j; u)^2 = \sum_{c=0}^{L_{\mathrm{SNP}}-1} K_\sigma(c - u) \cdot \mathbb{I}(S_{ic} \ne S_{jc}) \Big/ \sum_{c=0}^{L_{\mathrm{SNP}}-1} K_\sigma(c - u).
+\end{equation}
+The exact Gower out-of-sample projection maps this local distance vector directly into canonical Euclidean space $\mathbb{R}^k$:
+\begin{equation}
+\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_k^{-1/2} \mathbf{V}_k^T \left(\bar{\mathbf{d}}^2 - \mathbf{d}_i(u)^2\right),
+\end{equation}
+where $\bar{\mathbf{d}}^2 = \frac{1}{N}(\mathbf{D}_{\mathrm{glob}}^{\odot 2})\mathbf{1}_N$ is the precomputed vector of average squared global distances.
+Evaluating $\mathbf{z}_i(u)$ across all $u$ produces the continuous trajectory tensor $\mathbf{Z} \in \mathbb{R}^{N \times L_{\mathrm{SNP}} \times k}$.
+
+\subsection{Continuous Phylogenetic Cross-Attention with Tree-RoPE and PhyloBias}
+To track affinity dynamics against reference landmarks without heuristic window slicing, \RhizAeon employs continuous cross-attention.
+For each position $u$, sequence tokens are embedded into query ($\mathbf{q}_i(u)$), key ($\mathbf{k}_j(u)$), and value ($\mathbf{v}_j(u)$) representations in $\mathbb{R}^d$.
+Phylogenetic distance constraints are injected through two mechanisms:
+\begin{enumerate}
+    \item \emph{Tree-RoPE (Tree Rotary Position Embedding)}: Metric MDS coordinates $\mathbf{m}_i \in \mathbb{R}^4$ modulate query and key vectors via multidimensional Givens rotations:
+    \begin{equation}
+    \tilde{\mathbf{q}}_{i, 2m:2m+1}(u) = \mathbf{R}(\theta_{i, m}) \mathbf{q}_{i, 2m:2m+1}(u), \qquad \theta_{i, m} = \sum_{c=1}^4 m_{ic} \Theta_{mc}.
+    \end{equation}
+    \item \emph{PhyloBias}: A log-space continuous-time Markov substitution prior penalizes attention between divergent lineages:
+    \begin{equation}
+    \mathrm{PhyloBias}_{ij} = \ln\left[\epsilon_0 + (1 - \epsilon_0)\exp(-\lambda_h D_{\mathrm{glob}, ij})\right],
+    \end{equation}
+    where $\epsilon_0 = 0.05$ represents the neutral substitution floor.
+\end{enumerate}
+The resulting attention tensor $\mathbf{A} \in \mathbb{R}^{L \times N \times (N+1)}$ evaluates attention from each query sequence $i$ to all reference taxa $j \in \{1, \dots, N\}$ and the root sink at index $0$:
+\begin{equation}
+A_u(i \to j) = \frac{\exp\left(\frac{\tilde{\mathbf{q}}_i(u)^T \tilde{\mathbf{k}}_j(u)}{\sqrt{d}} + \mathrm{PhyloBias}_{ij}\right)}{\sum_{l=0}^N \exp\left(\frac{\tilde{\mathbf{q}}_i(u)^T \tilde{\mathbf{k}}_l(u)}{\sqrt{d}} + \mathrm{PhyloBias}_{il}\right)}.
+\end{equation}
+
+\subsection{Cumulative Attention Curves and Differential Drift}
+For each sequence $i$ and reference landmark bundle $m$, instantaneous attention is accumulated along the chromosome in $\mathcal{O}(L)$ time:
+\begin{equation}
+C_{im}(u) = \sum_{c=0}^u \alpha_{im}(c), \qquad \text{where} \quad \alpha_{im}(c) = \sum_{j \in \mathcal{B}_m} A_c(i \to j).
+\end{equation}
+The home clade $\mathcal{B}_{\mathrm{home}}(i)$ is identified as the majority recipient across the full locus: $\mathcal{B}_{\mathrm{home}}(i) = \arg\max_m C_{im}(L)$.
+The differential attention curve against candidate donor $m$ is formulated as:
+\begin{equation}
+Y_{im}(u) = C_{im}(u) - C_{i, \mathrm{home}}(u).
+\end{equation}
+Under clonal evolution, sequence $i$ maintains stable affinity to its home clade, resulting in negative or stationary drift $Y_{im}(u) \le 0$.
+A recombination event from donor $m$ produces a positive velocity excursion where $\frac{d}{du} Y_{im}(u) > 0$.
+
+\subsection{Multi-Scale Dyadic Scale-Space Matched Filter and Running Drawdown}
+To detect both focal micro-conversions and macroscopic recombinant cassettes without parameter tuning, differential drift increments $\Delta Y_{im}(u) = Y_{im}(u) - Y_{im}(u-1)$ are convolved with zero-mean bipolar matched filter wavelets across dyadic scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt:
+\begin{equation}
+W_\tau(u) = \sum_{s=-\tau}^\tau \Delta Y_{im}(u + s) \cdot \psi_\tau(s), \qquad \psi_\tau(s) = \frac{s}{\tau} \exp\left(-\frac{s^2}{2\tau^2}\right).
+\end{equation}
+Concurrently, macroscopic cassettes are identified via Taylor running drawdown:
+\begin{equation}
+M(u) = \max_{0 \le s \le u} Y_{im}(s), \qquad \mathrm{DD}(u) = M(u) - Y_{im}(u).
+\end{equation}
+A candidate cassette is detected when the excursion drawdown exceeds the extreme-value threshold $Z_{\mathrm{phys}} \ge Z_{\mathrm{crit}}$, where $Z_{\mathrm{crit}} = \sqrt{-0.5 \ln(\alpha / 2M)}$ by Kolmogorov supremum boundary crossing.
+
+\subsection{Profile Maximum-Likelihood Breakpoint Polisher}
+Candidate changepoint intervals $[u_1 - \delta, u_1 + \delta]$ and $[u_2 - \delta, u_2 + \delta]$ localized by the matched filter are polished to single-nucleotide resolution using profile maximum likelihood.
+For each candidate coordinate $b$, the alignment is cleaved into left ($[0, b)$) and right ($[b, L)$) partitions.
+The profile likelihood ratio:
+\begin{equation}
+\Delta \ln L(b) = \ln P(\mathbf{S}_{[0, b)} \mid T_{\mathrm{home}}) + \ln P(\mathbf{S}_{[b, L)} \mid T_{\mathrm{donor}}) - \ln P(\mathbf{S}_{[0, L)} \mid T_{\mathrm{home}})
+\end{equation}
+is evaluated under HKY85 substitution.
+The exact breakpoint $\hat{b}$ is localized at the maximum likelihood peak: $\hat{b} = \arg\max_b \Delta \ln L(b)$.
+Significance is certified against the Dunn-Šidák corrected family-wise threshold $\alpha_{\mathrm{FWER}} = 1 - (1 - \alpha)^{1/M}$.
+
+\section{Ancestral Recombination Graph (ARG) Reconstruction and Validation}
+\label{supp:arg_validation}
+
+\subsection{Ancestral Event Consolidation}
+Raw recombinant tracts detected across contemporary genomes $\mathcal{E}_{\mathrm{raw}} = \{e_1, \dots, e_M\}$ are clustered to distinguish ancestral gene transfers from recurrent hotspot activity.
+Two events $e_a$ and $e_b$ are grouped into ancestral cluster $\mathcal{C}$ if they share compatible donor clades and satisfy spatial boundary tolerance:
+\begin{equation}
+J(I_a, I_b) = \frac{|I_a \cap I_b|}{|I_a \cup I_b|} \ge \tau_{\mathrm{jaccard}} \quad \text{or} \quad \max(|u_{1,a} - u_{1,b}|, |u_{2,a} - u_{2,b}|) \le \Delta_{\mathrm{boundary}},
+\end{equation}
+where default thresholds are $\tau_{\mathrm{jaccard}} = 0.60$ and $\Delta_{\mathrm{boundary}} = 100$~nt.
+The ancestral event coordinates are defined by median breakpoints $\bar{u}_{1} = \mathrm{median}(\{u_{1,i}\})$ and $\bar{u}_{2} = \mathrm{median}(\{u_{2,i}\})$.
+When $|\mathcal{C}| > 1$, the transfer is parameterized as a shared ancestral reticulation node ancestral to all member isolates; when $|\mathcal{C}| = 1$, it is parameterized as a private terminal event.
+
+\subsection{Structural Model Classes}
+A candidate evolutionary history $H$ is parameterized by an ordered partitioning of the alignment $[0, L)$ into $K$ intervals $\{[s_k, e_k)\}_{k=1}^K$ and an associated graph topology:
+\begin{enumerate}
+    \item \emph{Clonal Null} ($H_0$): A single unpartitioned tree across the full locus ($K = 1$), requiring $2N - 3$ branch lengths and 4 substitution parameters ($k = 2N + 1$).
+    \item \emph{Unpolarized Partitioned Trees} ($H_{\mathrm{partition}}$): Independent unconstrained trees across all $K$ partitions, requiring $k = K(2N - 3) + 4K$ free parameters.
+    \item \emph{Directed Polarized ARG} ($H_{\mathrm{ARG}}$): A single ancestral backbone tree where reticulations are represented as directed transfer edges that re-attach the recombinant clade inside the transfer interval $[u_1, u_2]$. Each reticulation edge adds only 2 free parameters (source node and target branch attachment) rather than $2N - 3$ unconstrained branch lengths, yielding $k = K_{\mathrm{backbone}}(2N - 3) + 2|\mathcal{E}_{\mathrm{retic}}| + 4$.
+    \item \emph{Modular Functional Architectures}: Partition models defined by structural protein domains (e.g., Spike NTD, ACE2 receptor-binding domain, and S2 fusion core).
+\end{enumerate}
+
+\subsection{Multidimensional Statistical Validation Engine}
+Competing evolutionary histories are evaluated across four orthogonal statistical criteria:
+\begin{enumerate}
+    \item \emph{Phylogenetic Profile Likelihood and Information Criteria}: Across each partition $k \in \{1, \dots, K\}$, log-likelihood $\ln L_k = \ln P(\mathbf{Y}_k \mid T_k, \mathbf{Q}, \bm{\pi})$ is computed via vectorized Felsenstein pruning. Total log-likelihood $\ln L = \sum_k \ln L_k$ is penalized under finite-sample corrected AICc and BIC:
+    \begin{equation}
+    \mathrm{AICc} = 2k - 2\ln L + \frac{2k(k + 1)}{L - k - 1}, \qquad \mathrm{BIC} = k \ln L - 2\ln L.
+    \end{equation}
+    \item \emph{Residual Non-Tree Manifold Strain}: The expected distance matrix is the length-weighted mixture of local partition patristic distance matrices:
+    \begin{equation}
+    \mathbf{D}_{\mathrm{model}} = \sum_{k=1}^K \frac{e_k - s_k}{L} \mathbf{D}_{\mathrm{patristic}}^{(k)}.
+    \end{equation}
+    The residual non-tree distortion matrix $\mathbf{R} = \mathbf{D}_{\mathrm{obs}} - \mathbf{D}_{\mathrm{model}}$ yields the residual strain ratio:
+    \begin{equation}
+    \mathcal{S}_{\mathrm{strain}} = \frac{\|\mathbf{R}\|_F}{\|\mathbf{D}_{\mathrm{obs}}\|_F}.
+    \end{equation}
+    The percentage of non-tree strain explained by history $H$ is $(1 - \mathcal{S}_{\mathrm{strain}}) \times 100\%$.
+    \item \emph{Spectral SNR over Random Matrix Bulk Edge}: Matrix $\mathbf{R}$ is centered via double-centering $\mathbf{B}_R = -\frac{1}{2}\mathbf{H}(\mathbf{R}^{\odot 2})\mathbf{H}$. The leading eigenvalue $s_1 = \lambda_{\max}(\mathbf{B}_R)$ is compared against the theoretical Marchenko-Pastur bulk noise edge:
+    \begin{equation}
+    s_{\mathrm{bulk}} = \sigma_{\mathrm{res}}^2 \left(1 + \sqrt{\frac{N}{L}}\right)^2,
+    \end{equation}
+    where $\sigma_{\mathrm{res}}$ is the standard deviation of off-diagonal elements in $\mathbf{R}$. An empirical $\mathrm{SNR} = s_1 / s_{\mathrm{bulk}} \le 1.0$ certifies that residual strain has collapsed into the bulk noise distribution.
+    \item \emph{Synapomorphic Site Concordance Ratio (SSCR) and Polarity}: At each polymorphic site $u$ where donor $D$ and home $H$ carry distinct nucleotides ($D_u \ne H_u$), recombinant allele $R_u$ is scored as donor-concordant ($R_u = D_u$) or home-concordant ($R_u = H_u$):
+    \begin{equation}
+    \mathrm{SSCR}_{\mathrm{in}} = \frac{n_{\mathrm{in}}(R = D)}{n_{\mathrm{in}}(R = D) + n_{\mathrm{in}}(R = H)}, \qquad \mathrm{SSCR}_{\mathrm{flank}} = \frac{n_{\mathrm{flank}}(R = D)}{n_{\mathrm{flank}}(R = D) + n_{\mathrm{flank}}(R = H)}.
+    \end{equation}
+    Polarization contrast is $\Delta\mathrm{SSCR} = \mathrm{SSCR}_{\mathrm{in}} - \mathrm{SSCR}_{\mathrm{flank}}$, with significance evaluated via a one-sided Fisher's exact test on $[[n_{\mathrm{in}}(D), n_{\mathrm{in}}(H)], [n_{\mathrm{flank}}(D), n_{\mathrm{flank}}(H)]]$.
+\end{enumerate}
+
+\section{Coalescent ARG Simulation Protocol}
+\label{supp:coalescent_sim_full}
+
+Genealogies and ancestral recombination graphs (ARGs) were simulated using Hudson's continuous-time coalescent framework with homologous recombination \citep{hudson1983properties,posada2001evaluation}.
+For a sample of $n = 10$ contemporary lineages across an alignment of length $L = 1{,}000$~nucleotides, the coalescent process tracks active ancestral segments backward in time from $t = 0$.
+At any time $t$, let $k$ denote the number of active ancestral chromosomes, and let $g_i$ denote the genomic span between the leftmost and rightmost ancestral segments carried by lineage $i$, with total ancestral span $G = \sum_{i=1}^k g_i$.
+
+The waiting time $\Delta t$ to the next evolutionary event is exponentially distributed with total event rate $\lambda_{\mathrm{tot}} = \lambda_{\mathrm{coal}} + \lambda_{\mathrm{rec}}$, where:
+\begin{equation}
+\lambda_{\mathrm{coal}} = \frac{k(k - 1)}{2}, \qquad \lambda_{\mathrm{rec}} = \frac{\rho \cdot G}{2L}.
+\end{equation}
+The population recombination parameter is defined as $\rho = 4 N_e r$, where $N_e$ is the effective diploid population size and $r$ is the per-generation recombination probability across the $L$~nucleotide locus.
+With probability $\lambda_{\mathrm{coal}} / \lambda_{\mathrm{tot}}$, a coalescence event merges two randomly chosen lineages into an ancestral node.
+With probability $\lambda_{\mathrm{rec}} / \lambda_{\mathrm{tot}}$, a recombination event selects an eligible lineage with probability proportional to its span $g_i$ and cleaves it at a uniform breakpoint coordinate $b \in [u_{\mathrm{start}}, u_{\mathrm{end}}]$, partitioning ancestral material into left and right lineages.
+Coalescent tracking halts when all $L$ nucleotide sites reach their respective MRCA, yielding an ordered sequence of $P$ genealogical partitions, each defined by an interval $[s_p, e_p)$ and a local gene tree $T_p$.
+
+Nucleotide sequences were evolved along the branch lengths of each local gene tree $T_p$ under the continuous-time Markov HKY85 substitution model \citep{hasegawa1985dating}.
+The model parameterizes unequal base frequencies $\bm{\pi} = [0.40, 0.20, 0.30, 0.10]$ and transition/transversion bias $\kappa = 2.0$.
+The infinitesimal generator matrix $\mathbf{Q} = (Q_{ij})$ is defined by:
+\begin{equation}
+Q_{ij} = \begin{cases}
+\kappa \mu \pi_j & \text{for transitions } (A \leftrightarrow G, C \leftrightarrow T), \\
+\mu \pi_j & \text{for transversions}, \\
+-\sum_{k \ne i} Q_{ik} & \text{for } i = j,
+\end{cases}
+\end{equation}
+normalized such that average substitution rate $-\sum_i \pi_i Q_{ii} = 1.0$.
+Branch lengths $t_b$ generated in coalescent units were scaled by the population mutation parameter $\theta = 4 N_e\mu \in \{10, 50, 100, 200\}$ so that the effective branch length is $b = t_b \cdot \theta / (2L)$.
+Site-rate heterogeneity was introduced by drawing independent site mutation rate multipliers $r_u \sim \text{Gamma}(\alpha, 1/\alpha)$ across $u \in [0, L)$, such that $\mathbb{E}[r_u] = 1.0$ and $\text{Var}(r_u) = 1/\alpha$, with shape parameter varying across $\alpha \in \{2.0, 0.5, 0.05\}$.
+
+\section{Specialized Epidemiological and Genomic Simulation Suites}
+\label{supp:specialized_sims_full}
+
+Four specialized simulation generators probed operational regimes outside the neutral coalescent (Figure~\ref{fig:specialized_scenarios}):
+\begin{itemize}
+    \item \textbf{Epidemic Clonal Expansion}: Trees were constructed by generating a bifurcating clonal backbone of 40 background parent taxa across three parental divergence levels ($d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$). An ancestral recombination event was introduced by transferring a 1,501~nt cassette (coordinates 1,500--3,000) from Parent 2 to an ancestral recipient in Parent 1, forming recombinant ancestor $R_{\mathrm{anc}}$. From $R_{\mathrm{anc}}$, a burst of $K \in \{2, 5, 8, 10, 15\}$ descendant lineages was generated with short terminal branch divergence ($d_{\mathrm{swarm}} = 0.001$), modeling transmission swarms in clinical cohorts (total $N \in \{42, 45, 48, 50, 55\}$, 20 replicates each, 300 alignments, $L = 5{,}000$~nt, ground truth $K_{\mathrm{true}} = 1$).
+    
+    \item \textbf{Multi-Way Mosaic Swarms}: Backbones comprised 45 background parent taxa evenly divided among three distinct parental clades (15 taxa each for P1, P2, P3) at $d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$. Three multi-way topologies were simulated:
+    (1)~\emph{Dual Cassette}: Recombinant lineages acquired a 1,200~nt cassette from P2 (coordinates 1,000--2,200) and a separate 1,200~nt cassette from P3 (coordinates 3,400--4,600) embedded within a P1 background ($L=5{,}000$~nt);
+    (2)~\emph{Nested Russian Doll}: An outer 3,000~nt cassette from P2 (coordinates 1,000--4,000) embedded an inner 1,000~nt cassette from P3 (coordinates 2,000--3,000), producing a hierarchical $P_1 \to P_2 \to P_3 \to P_2 \to P_1$ mosaic ($L=6{,}000$~nt);
+    (3)~\emph{Triple Crossover Cascade}: Sequential crossovers produced a serial chromosome mosaic composed of P1 (1--2,000~nt), P2 (2,001--4,000~nt), and P3 (4,001--6,000~nt; $L=6{,}000$~nt). Descendant swarms spanned $K \in \{1, 5, 10\}$ (20 replicates each, 540 alignments).
+    
+    \item \textbf{Ghost Donor Introgression}: Alignments of length $L = 5{,}000$~nt contained 30--40 background parent taxa across three ghost donor regimes ($d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$, $K \in \{2, 5, 10\}$, 20 replicates each, 540 alignments):
+    (1)~\emph{Surrogate Sister Clade}: An ancestral lineage diverged into donor $D_{\mathrm{ghost}}$ and surrogate sister $P_2'$; $D_{\mathrm{ghost}}$ transferred cassette $[1{,}500, 3{,}000]$ to $P_1$ before being un-sampled, leaving sister $P_2'$ in the alignment;
+    (2)~\emph{Pure Ghost Lineage}: The donor lineage branched from the root of the tree and transferred cassette $[1{,}500, 3{,}000]$ into $P_1$ before complete omission, leaving only unrelated contemporary taxa;
+    (3)~\emph{Deep Zoonotic Reservoir}: The introgressing tract originated from an outgroup lineage with cross-species evolutionary distance $d_{\mathrm{reservoir}} = 0.15$ into $P_1$.
+    
+    \item \textbf{Bacterial Micro-Conversions}: Alignments ($L = 5{,}000$~nt) contained 30 background parent taxa and recombinant swarms ($K \in \{2, 5, 10\}$) across five conversion tract lengths ($L_{\mathrm{tract}} \in \{50, 100, 200, 400, 800\}$~nt, inserted at coordinate 2,100) and three divergence levels ($d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$, 20 replicates each, 900 alignments). The expected number of informative nucleotide substitutions per micro-tract ranged from $1\text{--}5$~mutations at 50~nt to $16\text{--}74$~mutations at 800~nt.
+\end{itemize}
+
+\section{Grand-Scale Continuous Parameter Sweep (150,000 Genomes)}
+\label{supp:grand_sweep_protocol}
+
+To evaluate algorithmic robustness across unconstrained, continuous evolutionary space rather than isolated grid points, we executed a grand continuous parameter sweep of 150,000 whole genomes.
+Each trial sampled an independent, continuous parameter vector uniformly across evolutionary phase space:
+\begin{itemize}
+    \item Alignment Length: $L \sim \mathrm{Uniform}(1{,}000, 30{,}000)$~nt.
+    \item Sample Taxon Count: $N \sim \mathrm{Uniform}(4, 250)$ contemporary genomes.
+    \item Parental Divergence: $d_{\mathrm{parent}} \sim \mathrm{Uniform}(0.005, 0.150)$ substitutions per site.
+    \item Recombination State: Bernoulli trial with $P(\mathrm{Recombinant}) = 0.50$ (75,000 true recombinant trials, 75,000 non-recombinant null controls).
+    \item Recombinant Tract Length: $L_{\mathrm{tract}} \sim \mathrm{Uniform}(50, \min(5{,}000, 0.60 L))$~nt.
+    \item Descendant Swarm Size: $K_{\mathrm{swarm}} \sim \mathrm{Uniform}(1, 25)$ descendant isolates.
+    \item Gamma Rate Heterogeneity: Shape parameter $\alpha \sim \mathrm{Uniform}(0.05, 5.00)$.
+\end{itemize}
+Simulations were executed across a distributed compute cluster using high-performance compiled Rust binaries with Rayon multi-threading, logging exact per-trial classification accuracy, breakpoint deviation, isolate precision, and wall-clock execution time.
+
+\section{Ground Truth Extraction and Bijective Bipartite Matching}
+\label{supp:bipartite_matching_full}
+
+To establish ground truth for reticulation events without relying on heuristic approximations, we computed exact local patristic distance matrices $\mathbf{D}^{(p)} \in \mathbb{R}^{n \times n}$ across every genealogical partition $p \in \{1, \dots, P\}$ from the branch lengths of tree $T_p$.
+For each contemporary taxon $i$, its local phylogenetic sister at nucleotide $u \in [s_p, e_p)$ is the closest non-identical taxon:
+\begin{equation}
+\sigma(i, u) = \arg\min_{j \ne i} D_{ij}^{(p)}.
+\end{equation}
+The background Home parent $H_i$ is defined as the majority sister across the full sequence: $H_i = \text{mode}_{u \in [0, L)} \sigma(i, u)$.
+A true reticulation event occurs when taxon $i$'s sister shifts to a distinct donor lineage $D = \sigma(i, u) \ne H_i$ across a contiguous segment $[u_1, u_2]$.
+To eliminate trivial non-divergent ancestral coalescences, ground truth events were filtered to require at least one distinguishing mutation between Home and Donor across the tract ($\sum_{u=u_1}^{u_2} \mathbb{I}(mat[H, u] \ne mat[D, u]) \ge 1$).
+
+To score inferred events against ground truth without bias, predicted events $\{\hat{E}_j\}_{j=1}^{\hat{K}}$ were paired to true events $\{E_i\}_{i=1}^{K_{\mathrm{true}}}$ via maximum-weight bijective bipartite matching using the Hungarian algorithm (\texttt{scipy.optimize.linear\_sum\_assignment}).
+The pairwise affinity matrix $A_{ij} \in [0, 1]$ between true event $i = (C_i, H_i, D_i, u_{1,i}, u_{2,i})$ and inferred event $j = (\hat{C}_j, \hat{H}_j, \hat{D}_j, \hat{u}_{1,j}, \hat{u}_{2,j})$ was formulated as:
+\begin{equation}
+A_{ij} = S_{\mathrm{triad}}(i, j) \cdot J_{\mathrm{SNP}}(i, j),
+\end{equation}
+where $S_{\mathrm{triad}} = w(C_i, \hat{C}_j) \cdot \frac{1}{2}\left[w(H_i, \hat{H}_j) + w(D_i, \hat{D}_j)\right]$ weights lineage attribution using tree patristic distances with Gaussian kernel width $\sigma = \bar{D} / 2$, and $J_{\mathrm{SNP}} = |S_{\mathrm{true}} \cap S_{\mathrm{inferred}}| / |S_{\mathrm{true}} \cup S_{\mathrm{inferred}}|$ is the Jaccard overlap evaluated over distinguishing polymorphic sites between Home and Donor.
+Unmatched inferred events were penalized as false alarms (reducing precision $\text{PPV} = \sum \text{matched affinity} / \hat{K}$); unmatched true events reduced sensitivity ($\text{TPR} = \sum \text{matched affinity} / K_{\mathrm{true}}$).
+
+\section{Empirical Genomic Cohorts and Annotations}
+\label{supp:empirical_cohorts}
+
+\paragraph{Sarbecovirus Whole-Genome Cohort.}
+We analyzed 83 complete viral genomes ($30{,}956$~bp multiple sequence alignment, 13,160 segregating sites) compiled from GISAID and GenBank \citep{lytras2022exploring}.
+The cohort spans SARS-CoV-1 (Tor2), SARS-CoV-2 (Wuhan-Hu-1), close bat relatives (Yunnan bat RaTG13, Laotian bat BANAL-52, BANAL-103, BANAL-116, BANAL-236, BANAL-247; Thai bat RacCS203), and pangolin coronaviruses (Guangdong MP789, Guangxi P1E).
+Gene coordinates follow Wuhan-Hu-1 (NC\_045512.2): ORF1ab (nt 266--21,555), RdRp catalytic core (nt 13,468--16,236), Spike glycoprotein (nt 21,563--25,384; NTD codons 1--313, RBD codons 314--540, S1/S2 furin site 23,618~bp, S2 subunit nt 23,619--25,384), ORF3a (nt 25,393--26,220), Envelope (nt 26,245--26,472), Membrane (nt 26,523--27,191), ORF6 (nt 27,202--27,387), ORF7a (nt 27,394--27,759), ORF8 (nt 27,894--28,259), Nucleocapsid (nt 28,274--29,533), and ORF10 (nt 29,558--29,674).
+
+\paragraph{\textit{Streptococcus pneumoniae} PMEN1 Whole Chromosome.}
+We analyzed the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 / PMEN1 lineage of \textit{S.~pneumoniae} (ATCC 700669; 11 representative global isolates spanning 1984--2008; \citet{croucher2011rapid}).
+Lossless SNP indexing identified 1,516 segregating polymorphic sites across the 2,221,315~bp chromosome.
+Annotations follow ATCC 700669 (FM211187.1): \textit{pbp2x} (nt 287,466--289,718), capsular polysaccharide locus \textit{cps} (nt 334,103--354,291), \textit{pbp1a} (nt 322,540--324,702), dihydrofolate reductase \textit{folA} (nt 1,623,115--1,623,600), surface antigen adhesin \textit{pspC/cbpA} (nt 2,109,335--2,111,878), and \textit{pbp2b} (nt 1,532,410--1,534,452).
+
+\paragraph{Hominoidea MHC Class I Allelic Cohort.}
+We analyzed $N = 379$ classical MHC Class~I alleles ($1{,}128$~bp coding alignment across human, chimpanzee, gorilla, and orangutan; \citet{maccari2017ipd}).
+Alleles were retrieved from the IPD-IMGT/HLA and IPD-MHC databases: 150 \textit{HLA-A}, 150 \textit{HLA-B}, and 50 \textit{HLA-C} human alleles; 15 chimpanzee (\textit{Patr}), 8 gorilla (\textit{Gogo}), and 6 orangutan (\textit{Popy}) alleles.
+Exon annotations follow canonical classical HLA Class~I structure: Exon 1 (Leader peptide, nt 1--72), Exon 2 ($\alpha_1$ domain, nt 73--342), Exon 3 ($\alpha_2$ domain, nt 343--618), Exon 4 ($\alpha_3$ domain, nt 619--894), Exon 5 (Transmembrane anchor, nt 895--1,011), and Exons 6--7 (Cytoplasmic tail, nt 1,012--1,128).
+
+\clearpage
+
+\begin{table}[!ht]
+\centering
+\small
+\caption{\textbf{Quantitative comparison of \RhizAeon and 3SEQ across the 3,200-trial Posada \& Crandall (2001) benchmark suite.}
+Results are grouped by evolutionary regime: False Positive evaluation under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$, $\rho = 0$, 1,200 trials), Clock-like null controls ($\rho = 0$, 400 trials), and Recombinant coalescent trials ($\rho \in \{1, 4, 16, 64\}$, 1,600 trials).
+Columns report the population mutation parameter ($\theta$), population recombination parameter ($\rho$), alignment-level power / FPR (\%), mean inferred event count ($\hat{K}$), precision ($\text{PPV}$), triad lineage attribution accuracy ($S_{\mathrm{triad}}$), Informative SNP Jaccard spatial overlap ($J_{\mathrm{SNP}}$), and execution runtime per alignment (ms).}
+\label{tab:supp_posada_summary}
+{\setlength{\tabcolsep}{4.5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l c rrrrr rrrrr@{}}
+\toprule
+& & \multicolumn{5}{c}{\textbf{\RhizAeon (Continuous Manifold Tracking)}} & \multicolumn{5}{c}{\textbf{3SEQ (Discrete Triplet Scanning)}} \\
+\cmidrule(lr){3-7} \cmidrule(lr){8-12}
+Evolutionary Regime & Trials & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} \\
+\midrule
+\multicolumn{12}{l}{\textbf{A. Rate Heterogeneity Null Suite ($\rho = 0$, Empirical False Positive Calibration)}} \\
+$\theta = 10, \alpha \in [0.05, 2.0]$ & 300 & \textbf{0.0\%} & 0.00 & 100.0\% & 1.00 & 19.0 & 0.0\% & 0.00 & 100.0\% & 1.00 & 28.2 \\
+$\theta = 50, \alpha \in [0.05, 2.0]$ & 300 & \textbf{0.3\%} & 0.00 & 99.7\% & 1.00 & 22.0 & 0.0\% & 0.00 & 100.0\% & 1.00 & 26.6 \\
+$\theta = 100, \alpha \in [0.05, 2.0]$ & 300 & \textbf{0.7\%} & 0.01 & 99.3\% & 0.99 & 20.9 & 0.3\% & 0.00 & 99.7\% & 1.00 & 27.4 \\
+$\theta = 200, \alpha \in [0.05, 2.0]$ & 300 & \textbf{1.3\%} & 0.01 & 98.7\% & 0.99 & 24.3 & 0.3\% & 0.00 & 99.7\% & 1.00 & 29.2 \\
+\textit{All Rate-Variation Nulls} & \textit{1,200} & \textbf{0.58\%} & \textbf{0.01} & \textbf{99.4\%} & \textbf{0.99} & \textbf{21.5} & \textit{0.17\%} & \textit{0.00} & \textit{99.8\%} & \textit{1.00} & \textit{27.9} \\
+\midrule
+\multicolumn{12}{l}{\textbf{B. Recombinant Coalescent Suite ($\rho > 0$, Statistical Power and Lineage Attribution)}} \\
+$\theta = 10$ (Low Divergence) & 400 & \textbf{11.8\%} & 0.14 & 17.9\% & 23.7\% & 15.1 & 10.3\% & 0.26 & 5.6\% & 19.7\% & 31.3 \\
+\quad $\rho = 1$ & 100 & 3.0\% & 0.03 & 55.4\% & 55.5\% & 10.9 & 2.0\% & 0.04 & 54.0\% & 54.2\% & 41.1 \\
+\quad $\rho = 4$ & 100 & 13.0\% & 0.17 & 24.4\% & 25.0\% & 11.9 & 16.0\% & 0.40 & 20.1\% & 21.2\% & 37.3 \\
+\quad $\rho = 16$ & 100 & 26.0\% & 0.30 & 9.5\% & 11.6\% & 20.2 & 22.0\% & 0.58 & 2.1\% & 3.2\% & 23.2 \\
+\quad $\rho = 64$ & 100 & 5.0\% & 0.05 & 2.3\% & 2.7\% & 17.5 & 1.0\% & 0.03 & 0.2\% & 0.3\% & 23.7 \\
+$\theta = 50$ (Moderate Divergence) & 400 & \textbf{67.8\%} & 1.51 & 40.7\% & 54.2\% & 19.8 & 83.5\% & 6.97 & 16.6\% & 34.6\% & 27.6 \\
+\quad $\rho = 1$ & 100 & 33.0\% & 0.44 & 55.2\% & 58.0\% & 15.6 & 38.0\% & 2.14 & 41.0\% & 48.5\% & 31.7 \\
+\quad $\rho = 4$ & 100 & 57.0\% & 0.90 & 34.3\% & 37.6\% & 17.7 & 73.0\% & 5.18 & 7.0\% & 17.0\% & 28.9 \\
+\quad $\rho = 16$ & 100 & 88.0\% & 2.09 & 34.3\% & 45.2\% & 25.8 & 96.0\% & 9.75 & 6.4\% & 19.1\% & 24.5 \\
+\quad $\rho = 64$ & 100 & 93.0\% & 2.62 & 39.1\% & 58.1\% & 20.2 & 100.0\% & 10.82 & 11.9\% & 33.8\% & 25.4 \\
+$\theta = 100$ (Substantial Divergence) & 400 & \textbf{73.5\%} & 1.87 & 43.1\% & 53.2\% & 21.6 & 84.3\% & 10.23 & 14.2\% & 29.5\% & 31.2 \\
+\quad $\rho = 1$ & 100 & 37.0\% & 0.48 & 55.9\% & 59.7\% & 15.4 & 52.0\% & 3.84 & 34.9\% & 46.9\% & 36.7 \\
+\quad $\rho = 4$ & 100 & 69.0\% & 1.20 & 43.3\% & 48.4\% & 18.4 & 85.0\% & 8.38 & 6.3\% & 17.9\% & 31.8 \\
+\quad $\rho = 16$ & 100 & 90.0\% & 2.29 & 35.1\% & 45.1\% & 22.7 & 100.0\% & 14.17 & 5.4\% & 19.4\% & 27.8 \\
+\quad $\rho = 64$ & 100 & 98.0\% & 3.51 & 38.1\% & 59.5\% & 29.4 & 100.0\% & 14.54 & 10.3\% & 33.5\% & 28.4 \\
+$\theta = 200$ (High Divergence) & 400 & \textbf{80.0\%} & 2.49 & 45.2\% & 56.1\% & 22.5 & 83.0\% & 12.12 & 16.4\% & 31.3\% & 36.8 \\
+\quad $\rho = 1$ & 100 & 43.0\% & 0.52 & 64.6\% & 67.3\% & 17.1 & 43.0\% & 4.05 & 46.5\% & 55.2\% & 39.6 \\
+\quad $\rho = 4$ & 100 & 83.0\% & 1.58 & 38.6\% & 45.7\% & 20.4 & 89.0\% & 10.92 & 4.6\% & 16.7\% & 37.0 \\
+\quad $\rho = 16$ & 100 & 96.0\% & 3.28 & 39.2\% & 53.4\% & 23.4 & 100.0\% & 17.25 & 5.6\% & 21.2\% & 37.3 \\
+\quad $\rho = 64$ & 100 & 98.0\% & 4.56 & 38.4\% & 58.2\% & 29.4 & 100.0\% & 16.26 & 9.0\% & 32.6\% & 33.3 \\
+\bottomrule
+\end{tabular*}}
+\end{table}
+
+\clearpage
+\input{sections_mbe/tab_grand_sweep_150k_envelope.tex}

@@ -1,0 +1,49 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Homologous recombination and horizontal gene transfer assemble mosaic chromosomes from divergent evolutionary lineages \citep{simonloriere2011recombination,didelot2010impact}.
+By splicing divergent genetic material into a single chromosome during co-infection, genetic exchange circumvents the slow waiting times imposed by clonal interference.
+Point mutations accumulate gradually.
+Recombination generates instantaneous evolutionary leaps, combining distant adaptive alleles and breaking genome-wide linkage disequilibrium within a single replication cycle.
+In viral and bacterial epidemics, mosaicism alters transmission dynamics, shifts antigenic presentation, and accelerates the acquisition of antimicrobial resistance determinants \citep{alfonsi2024data,didelot2010impact}.
+These dynamics govern circulating recombinant forms of human immunodeficiency virus (HIV-1), recombinant variants of SARS-CoV-2, and multi-drug resistant bacterial clones.
+In eukaryotes, meiotic crossover and adaptive introgression purge deleterious mutational load, drive ecological speciation, and assemble complex hybrid phenotypes across plant and animal taxa \citep{rieseberg2003major,mcvean2004fine}.
+Resolving physical crossover boundaries remains foundational across evolutionary biology.
+
+Molecular phylogenetics presumes that sequence evolution follows bifurcating trees.
+Reticulate evolution shatters trees.
+Because distinct genomic segments inherit conflicting ancestral genealogies, forcing mosaic alignments into a single bifurcating phylogeny distorts every downstream evolutionary inference \citep{schierup2000consequences,kosakovsky2006gard}.
+Topological reconstructions manufacture artificial clades, compress basal divergence times, and spuriously inflate terminal branch lengths.
+Downstream molecular clocks fail just as severely.
+Reticulate histories violate substitution rate constancy across sites, corrupting evolutionary rate estimates, node calibrations, transmission cluster reconstructions, and phylodynamic projections.
+In comparative codon models, reciprocal exchanges generate apparent homoplasies that map to multiple tree branches, mimicking convergent amino acid substitutions.
+Standard selection tests, including MEME and BUSTED \citep{murrell2012detecting,murrell2015gene}, mistake reticulate homoplasies for diversifying positive selection, inflating false positive rates across neutral codons.
+Partitioning mosaic alignments into tree-congruent segments safeguards all downstream evolutionary inference.
+
+Existing detection tools remain split between two incompatible paradigms \citep{posada2002evaluation,martin2015rdp4}.
+Phylogenetic changepoint methods, exemplified by GARD \citep{kosakovsky2006gard}, formulate crossover detection as model selection across partitioned trees under continuous-time Markov substitution models.
+These methods optimize partition boundaries through likelihood ratio criteria while fitting independent branch lengths across candidate segments.
+The computational arithmetic is punishing.
+Because the joint combinatorial space of partition boundaries and tree topologies scales exponentially with breakpoint count and cubically with taxon count ($\mathcal{O}(L^K \cdot N^3)$ for $K$ breakpoints across $N$ taxa of length $L$), multi-breakpoint searches across hundreds of genomes require days of cluster compute.
+Sequence heuristics take the opposite extreme.
+Suites such as 3Seq \citep{lam20183seq} and RDP5 \citep{martin2021rdp5} scan sequence triplets for localized clustering of polymorphic mutations within sliding windows.
+They evaluate rapidly, yet they operate without a global phylogenetic reference frame.
+When substitution rates vary across sites and lineages, localized mutational clustering mimics reciprocal genetic exchange.
+Under realistic Gamma rate heterogeneity, this mutational clustering inflates heuristic false positive rates beyond thirty percent \citep{posada2001evaluation,kosakovsky2006gard}.
+When recombinant segments descend from unsampled ancestral lineages, heuristics either fail entirely or misidentify recombinant lineages as parental donors, placing arbitrary point boundaries inside flat, uninformative genomic plateaus without confidence intervals.
+
+Resolving reticulate evolution at genome scale requires abandoning discrete trees while retaining topological protection against mutational rate variation.
+Genomes trace continuous trajectories through sequence space.
+Scanning from 5\textquotesingle\ to 3\textquotesingle\ along an alignment, clonal lineages maintain stable relative divergence, flowing through sequence space like parallel currents.
+A recombinant chromosome breaks this parallel flow.
+It travels within the current of one parental lineage, then deflects sharply across sequence space into an alternative parental current at the crossover junction.
+We introduce \RhizAeon, an open-source framework that models reticulate evolution through continuous trajectory mechanics and zero-drift force field dynamics in linear time ($\mathcal{O}(N K L)$ for $K$ reference landmarks).
+Its name derives from the Greek \textit{rhiza} (root), evoking the reticulated, interconnected network of the biological rhizome across deep evolutionary time (\textit{aeon}) to supplant strictly bifurcating arboreal trees.
+By measuring instantaneous sequence affinity against reference lineages and absorbing lineage-specific rate variation into an unpolarized ancestral root sink, \RhizAeon transforms recombination detection into physical trajectory deconvolution.
+Clonal evolution produces balanced thermal fluctuations that cancel out as a centered Brownian bridge.
+Recombination breaks this physical equilibrium, imparting sustained directional momentum that pinpoints crossover boundaries and consolidates co-recombinant transmission swarms into unified ancestral events.
+
+We validated \RhizAeon across coalescent benchmarks, specialized operational stress tests, and a grand continuous parameter sweep of 150,000 whole genomes.
+Across the canonical 3,200-trial coalescent benchmark of \citet{posada2001evaluation}, \RhizAeon maintained an empirical false positive rate of 0.58\% under extreme Gamma rate heterogeneity while recovering calibrated ancestral event counts.
+In operational stress tests modeling epidemic swarms, multi-parent cascades, ghost donor introgression, and micro-conversions down to 50 base pairs, trajectory deconvolution eliminated the combinatorial false alarms that cripple pairwise heuristics.
+Empirical evaluations across 30.9~kb Sarbecovirus genomes, the 2.22~Mb multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 chromosome, and 379 primate \textit{HLA} Class~I alleles demonstrate that \RhizAeon resolves complex whole-genome mosaicism and polarized Ancestral Recombination Graphs in fractions of a second without taxon subsampling.
