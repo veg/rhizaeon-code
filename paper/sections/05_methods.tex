@@ -560,3 +560,17 @@ The micro-conversion tract was centered at nucleotide 2,500 ($[2,500 - L_{\text{
 The ancestral recombinant sprouted $K \in \{2, 5, 10\}$ contemporary descendant isolates accumulating independent transmission drift ($\delta = 0.002$), alongside 30 non-recombinant background parental taxa (15 in $P_1$, 15 in $P_2$; total $N \in \{32, 35, 40\}$).
 Each tract length was evaluated across three parental divergence tiers: $d_{\text{parent}} \in \{0.02, 0.05, 0.10\}$.
 Performance was evaluated under exact, un-faked scoring metrics: inferred event cardinality ($\hat{K}$), recombinant isolate recall and precision, background parental false positive rate ($\text{FPR}_{\text{parent}}$), spatial Jaccard overlap ($J$), and execution runtime in milliseconds.
+
+\paragraph{Scenario 1.5: The One-Million-Genome Grand Continuous Parameter Sweep.}
+To map the operational flight envelope and empirical power phase boundaries of \RhizAeon across unconstrained evolutionary space, we executed a grand continuous parameter sweep of 1,000,000 independent synthetic whole genomes ($333{,}334$ non-recombinant clonal nulls and $666{,}666$ recombinant chimeras).
+Each trial sampled an independent parameter vector from continuous distributions:
+chromosome length $L \sim \text{LogUniform}(1{,}000, 30{,}000)$~nt (median $5{,}450$~nt);
+sample taxon count $N \in [4, 250]$ stratified across small (40\%, $N \in [4, 30]$), medium (40\%, $N \in [31, 100]$), and large (20\%, $N \in [101, 250]$) surveillance regimes;
+parental sequence divergence $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.250)$ substitutions per site;
+and HKY85 substitution dynamics ($\kappa = 2.0$, $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$).
+Biological heterotachy was modeled by drawing relative site mutation rates from Gamma($\alpha, \alpha$) with $\alpha \sim \text{LogUniform}(0.05, 5.0)$ in 75\% of trials, alongside strict molecular clock controls ($\alpha = 1{,}000.0$) in 25\% of trials.
+Reticulation architectures spanned single events ($K=1$, 55.0\% of recombinants; 5' terminal crossovers, 3' terminal crossovers, and intercalary conversion cassettes), dual events ($K=2$, 25.0\%), triple events ($K=3$, 12.0\%), and quadruple events ($K=4$, 8.0\%), including multi-donor mosaics ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$ trials).
+Terminal transmission drift ($d_{\mathrm{drift}} \sim \text{Uniform}(0.0005, 0.0035)$ subs/site) was applied to all contemporary isolates.
+The benchmark was implemented in native compiled Rust (\texttt{grand\_sweep.rs}) and executed across 512 distributed CPU cores on cluster infrastructure (50 Slurm array tasks $\times$ 20,000 trials).
+The suite maintained a sustained throughput of $\approx 380$ complete whole-genome simulations and scans per second, executing all 1,000,000 trials in 43.8 minutes.
+Event-level precision and recall were evaluated via bijective bipartite matching with maximum-weight Hungarian assignment (Section~\ref{subsec:methods_scoring_framework}).

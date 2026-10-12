@@ -161,7 +161,7 @@ To evaluate operational challenges, four specialized scenario suites were simula
 \item \textbf{Ghost Donor Introgression}: Pure unsampled donor, surrogate sister clade, and deep reservoir donor regimes across swarm sizes $K \in \{2, 5, 10\}$ ($N = 32\text{--}40$, $L = 5,000$~nt; 540 alignments).
 \item \textbf{Micro-Conversion Resolution}: Conversion tracts spanning $L_{\text{tract}} \in \{50, 100, 200, 400, 800\}$~nt across three divergence tiers ($N = 32\text{--}40$, $L = 5,000$~nt; 900 alignments).
 \end{enumerate}
-In addition, a grand parameter sweep of 150,000 whole genomes was evaluated across continuous distributions: $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d \in [0.005, 0.25]$~subs/site, and Gamma rate shape $\alpha \in [0.05, 5.0]$.
+In addition, a grand continuous parameter sweep of 1,000,000 whole genomes was evaluated across continuous distributions: $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d \in [0.005, 0.25]$~subs/site, Gamma rate shape $\alpha \in [0.05, 5.0]$, single and multi-event mosaic topologies ($K_{\mathrm{true}} \in \{0, 1, 2, 3, 4\}$), and multi-donor introgressions ($P_1 \leftarrow P_2 + P_3$).
 
 Ground truth was evaluated via maximum-weight bijective bipartite matching using the Hungarian algorithm \citep{kuhn1955hungarian}.
 For true event $E = (C, H, D, \mathcal{I})$ and inferred event $\hat{E} = (\hat{C}, \hat{H}, \hat{D}, \hat{\mathcal{I}})$, event affinity combines genealogical triad affinity and informative SNP Jaccard similarity:

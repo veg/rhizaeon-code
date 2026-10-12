@@ -258,21 +258,43 @@ Four specialized simulation generators probed operational regimes outside the ne
     \item \textbf{Bacterial Micro-Conversions}: Alignments ($L = 5{,}000$~nt) contained 30 background parent taxa and recombinant swarms ($K \in \{2, 5, 10\}$) across five conversion tract lengths ($L_{\mathrm{tract}} \in \{50, 100, 200, 400, 800\}$~nt, inserted at coordinate 2,100) and three divergence levels ($d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$, 20 replicates each, 900 alignments). The expected number of informative nucleotide substitutions per micro-tract ranged from $1\text{--}5$~mutations at 50~nt to $16\text{--}74$~mutations at 800~nt.
 \end{itemize}
 
-\section{Grand-Scale Continuous Parameter Sweep (150,000 Genomes)}
+\section{Grand-Scale Continuous Parameter Sweep (1,000,000 Genomes)}
 \label{supp:grand_sweep_protocol}
 
-To evaluate algorithmic robustness across unconstrained, continuous evolutionary space rather than isolated grid points, we executed a grand continuous parameter sweep of 150,000 whole genomes.
-Each trial sampled an independent, continuous parameter vector uniformly across evolutionary phase space:
+To evaluate algorithmic robustness, false positive rate calibration, and multi-event mosaic resolution across unconstrained continuous evolutionary space rather than isolated grid points or hand-crafted scenarios, we executed a grand continuous parameter sweep of 1,000,000 independent whole-genome alignments ($333{,}334$ non-recombinant clonal nulls and $666{,}666$ recombinant chimeras; Table~\ref{tab:grand_sweep_1m_envelope}, Figures~\ref{fig:grand_sweep_1m_phase_diagram} and \ref{fig:grand_sweep_1m_multievent}).
+Each trial sampled an independent parameter vector uniformly or log-uniformly across evolutionary phase space:
 \begin{itemize}
-    \item Alignment Length: $L \sim \mathrm{Uniform}(1{,}000, 30{,}000)$~nt.
-    \item Sample Taxon Count: $N \sim \mathrm{Uniform}(4, 250)$ contemporary genomes.
-    \item Parental Divergence: $d_{\mathrm{parent}} \sim \mathrm{Uniform}(0.005, 0.150)$ substitutions per site.
-    \item Recombination State: Bernoulli trial with $P(\mathrm{Recombinant}) = 0.50$ (75,000 true recombinant trials, 75,000 non-recombinant null controls).
-    \item Recombinant Tract Length: $L_{\mathrm{tract}} \sim \mathrm{Uniform}(50, \min(5{,}000, 0.60 L))$~nt.
-    \item Descendant Swarm Size: $K_{\mathrm{swarm}} \sim \mathrm{Uniform}(1, 25)$ descendant isolates.
-    \item Gamma Rate Heterogeneity: Shape parameter $\alpha \sim \mathrm{Uniform}(0.05, 5.00)$.
+    \item \textbf{Alignment Length ($L$)}: Sampled log-uniformly from $L \sim \text{LogUniform}(1{,}000, 30{,}000)$~nt, discretized to multiples of $50$~nt ($L \in [1{,}000, 30{,}000]$~nt, median $5{,}450$~nt).
+    \item \textbf{Sample Taxon Count ($N$)}: Stratified across three cohort surveillance regimes: 40\% small viral/microbial outbreak cohorts ($N \sim \text{Uniform}(4, 30)$ taxa), 40\% medium surveillance cohorts ($N \sim \text{Uniform}(31, 100)$ taxa), and 20\% large population cohorts ($N \sim \text{Uniform}(101, 250)$ taxa).
+    \item \textbf{Parental Divergence ($d_{\mathrm{parent}}$)}: Log-uniformly distributed across $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.250)$ substitutions per site (with pairwise tree divergence extending to $0.350$ subs/site across deep branches).
+    \item \textbf{Substitution Dynamics}: Continuous-time Markov substitution under the HKY85 model with transition/transversion ratio $\kappa = 2.0$ and empirical base frequencies $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$. Position-specific finite-time transition matrices $\mathbf{P}(t)$ were precomputed analytically per trial for rapid, exact simulation without transcendental overhead.
+    \item \textbf{Site Rate Heterogeneity and Biological Heterotachy ($\alpha$)}:
+    \begin{itemize}
+        \item \textit{Strict Molecular Clock} (25\% of trials, $N = 250{,}000$ overall; $83{,}311$ in null partition): $\alpha = 1{,}000.0$ (uniform substitution rates across all sites).
+        \item \textit{Continuous Gamma Heterotachy} (75\% of trials, $N = 750{,}000$ overall; $250{,}023$ in null partition): Shape parameter drawn log-uniformly from $\alpha \sim \text{LogUniform}(0.05, 5.00)$, with position-specific relative mutation rates $r_u \sim \text{Gamma}(\alpha, \alpha)$ sampled independently per site and clamped to $[0.01, 50.0]$.
+    \end{itemize}
+    \item \textbf{Lineage Architecture and Transmission Drift}: The ancestral root sequence evolved into parental nodes $P_1$, $P_2$, and optional $P_3$ (for cohorts with $N \ge 8$ taxa). Contemporary leaves accumulated post-recombination private mutations along terminal branches with transmission drift $d_{\mathrm{drift}} \sim \text{Uniform}(0.0005, 0.0035)$ subs/site.
+    \item \textbf{Reticulation Cardinality ($K_{\mathrm{true}}$)}:
+    \begin{itemize}
+        \item $K_{\mathrm{true}} = 0$ (33.33\% of trials, $N = 333{,}334$): Strictly non-recombinant clonal nulls to calibrate empirical false positive rates under severe rate variation.
+        \item $K_{\mathrm{true}} = 1$ (36.64\% of trials, $N = 366{,}396$; 55.0\% of recombinant partition): Single reticulation event per genome.
+        \item $K_{\mathrm{true}} = 2$ (16.70\% of trials, $N = 166{,}974$; 25.0\% of recombinants): Dual independent recombination events across segmented partitions.
+        \item $K_{\mathrm{true}} = 3$ (7.99\% of trials, $N = 79{,}881$; 12.0\% of recombinants): Triple independent recombination events (multi-way mosaicism).
+        \item $K_{\mathrm{true}} = 4$ (5.34\% of trials, $N = 53{,}415$; 8.0\% of recombinants): Quadruple reticulations, including complex nested architectures.
+    \end{itemize}
+    \item \textbf{Structural Event Topologies}:
+    \begin{itemize}
+        \item \textit{5' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at genome start ($u_1 = 1$) and terminates at $u_2 \sim \text{Uniform}(50, \text{segment bound})$.
+        \item \textit{3' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at $u_1 \sim \text{Uniform}(\text{segment start}, L - 50)$ and extends to chromosome end ($u_2 = L$).
+        \item \textit{Intercalary Conversion Cassettes} (60\% of events): Internal tracts ($1 < u_1 < u_2 < L$) with tract length $L_{\mathrm{tract}}$ sampled log-uniformly from $30$~bp to $0.65 \times \text{segment length}$.
+    \end{itemize}
+    \item \textbf{Multi-Donor Mosaicism ($P_1 \leftarrow P_2 + P_3$)}:
+    In cohorts with $N \ge 8$ taxa ($N = 179{,}233$ trials), recombinant chimeras were generated with multiple distinct donor clades, where distinct segments of the same genome were inherited from independent ancestral lineages $P_2$ and $P_3$ relative to recipient background $P_1$.
 \end{itemize}
-Simulations were executed across a distributed compute cluster using high-performance compiled Rust binaries with Rayon multi-threading, logging exact per-trial classification accuracy, breakpoint deviation, isolate precision, and wall-clock execution time.
+Simulations were implemented in native compiled Rust (\texttt{crates/rhizaeon-cli/src/bin/grand\_sweep.rs}) leveraging Rayon data parallelism.
+The 1,000,000 trials were distributed across cluster infrastructure as a 50-task Slurm array (50 tasks $\times$ 20,000 trials, 32 CPU threads and 48 GB RAM per task, totaling 512 distributed CPU cores).
+The benchmark maintained a sustained throughput of $\approx 380$ complete whole-genome simulations and scans per second, executing all 1,000,000 trials in 43.8 minutes.
+Outputs were aggregated, deduplicated, and verified using \texttt{scripts/simulations/merge\_sweep\_1m.py} to ensure exact, reproducible execution across the entire corpus.
 
 \section{Ground Truth Extraction and Bijective Bipartite Matching}
 \label{supp:bipartite_matching_full}
