@@ -1,0 +1,33 @@
+{
+  "num_taxa": 379,
+  "length": 1128,
+  "informative_snps": 526,
+  "bg_mean": 0.1278014450502008,
+  "bg_std": 0.07121398042449785,
+  "num_significant_taxa_z3": 316,
+  "runtime_seconds": 16.34068202972412,
+  "domain_distribution": {
+    "Exon 2 (alpha-1 ARS)": 154,
+    "Exon 5 (Transmembrane)": 108,
+    "Exon 3 (alpha-2 ARS)": 34,
+    "Exon 4 (alpha-3 Stalk)": 10,
+    "Exons 6-7 (Cytoplasmic)": 6,
+    "Exon 1 (Signal)": 4
+  },
+  "b46_changepoint": {
+    "taxon": "HLA_B_46_01_01_01",
+    "max_z": 2.685500646563433,
+    "snp_idx": 135,
+    "bp": 268,
+    "flank": 15,
+    "domain": "Exon 2 (alpha-1 ARS)"
+  },
+  "pal_changepoint": {
+    "taxon": "Patr_AL_01_01_01_01",
+    "max_z": 5.311036384308064,
+    "snp_idx": 467,
+    "bp": 990,
+    "flank": 15,
+    "domain": "Exon 5 (Transmembrane)"
+  }
+}

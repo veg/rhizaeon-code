@@ -1,0 +1,107 @@
+{
+  "ORF1ab": {
+    "ref_start": 266,
+    "ref_end": 21555,
+    "aln_start": 318,
+    "aln_end": 21788,
+    "aln_length": 21471
+  },
+  "RdRp": {
+    "ref_start": 13442,
+    "ref_end": 16236,
+    "aln_start": 13674,
+    "aln_end": 16468,
+    "aln_length": 2795
+  },
+  "Spike": {
+    "ref_start": 21563,
+    "ref_end": 25384,
+    "aln_start": 21796,
+    "aln_end": 25701,
+    "aln_length": 3906
+  },
+  "Spike_NTD": {
+    "ref_start": 21599,
+    "ref_end": 22474,
+    "aln_start": 21858,
+    "aln_end": 22770,
+    "aln_length": 913
+  },
+  "Spike_RBD": {
+    "ref_start": 22517,
+    "ref_end": 23185,
+    "aln_start": 22813,
+    "aln_end": 23490,
+    "aln_length": 678
+  },
+  "Spike_RBM": {
+    "ref_start": 22874,
+    "ref_end": 23126,
+    "aln_start": 23173,
+    "aln_end": 23431,
+    "aln_length": 259
+  },
+  "ORF3a": {
+    "ref_start": 25393,
+    "ref_end": 26220,
+    "aln_start": 25710,
+    "aln_end": 26544,
+    "aln_length": 835
+  },
+  "E": {
+    "ref_start": 26245,
+    "ref_end": 26472,
+    "aln_start": 26569,
+    "aln_end": 26799,
+    "aln_length": 231
+  },
+  "M": {
+    "ref_start": 26523,
+    "ref_end": 27191,
+    "aln_start": 26850,
+    "aln_end": 27540,
+    "aln_length": 691
+  },
+  "ORF6": {
+    "ref_start": 27202,
+    "ref_end": 27387,
+    "aln_start": 27551,
+    "aln_end": 27736,
+    "aln_length": 186
+  },
+  "ORF7a": {
+    "ref_start": 27394,
+    "ref_end": 27759,
+    "aln_start": 28274,
+    "aln_end": 28654,
+    "aln_length": 381
+  },
+  "ORF7b": {
+    "ref_start": 27756,
+    "ref_end": 27887,
+    "aln_start": 28651,
+    "aln_end": 28797,
+    "aln_length": 147
+  },
+  "ORF8": {
+    "ref_start": 27894,
+    "ref_end": 28259,
+    "aln_start": 28804,
+    "aln_end": 29234,
+    "aln_length": 431
+  },
+  "N": {
+    "ref_start": 28274,
+    "ref_end": 29533,
+    "aln_start": 29249,
+    "aln_end": 30520,
+    "aln_length": 1272
+  },
+  "ORF10": {
+    "ref_start": 29558,
+    "ref_end": 29674,
+    "aln_start": 30547,
+    "aln_end": 30663,
+    "aln_length": 117
+  }
+}
