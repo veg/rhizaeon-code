@@ -1,11 +1,11 @@
 This is BibTeX, Version 0.99d (TeX Live 2020)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
-The top-level auxiliary file: paper_build/main.aux
+The top-level auxiliary file: main.aux
 The style file: plainnat.bst
 Database file #1: references.bib
 You've used 51 entries,
             2773 wiz_defined-function locations,
-            970 strings with 18043 characters,
+            970 strings with 18019 characters,
 and the built_in function-call counts, 32022 in all, are:
 = -- 2786
 > -- 2564

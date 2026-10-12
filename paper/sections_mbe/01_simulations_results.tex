@@ -112,19 +112,19 @@ The fundamental governing physical quantity is the count of informative mutation
 Below three informative mutations ($M_{\mathrm{tract}} \le 2$), detection power is 0.5\% (402 detections out of 85,564 trials).
 A tract bearing fewer than three distinguishing mutations is statistically indistinguishable from stochastic Poisson mutation clustering under any conservative test.
 Power lifts to 6.8\% at $M_{\mathrm{tract}} \in [3, 5]$ (4,678 / 68,609), accelerates to 29.2\% at $M_{\mathrm{tract}} \in [6, 10]$ (22,646 / 77,568), reaches 52.4\% at $M_{\mathrm{tract}} \in [11, 15]$ (27,587 / 52,607), 71.5\% at $M_{\mathrm{tract}} \in [16, 25]$ (51,096 / 71,427), 85.5\% at $M_{\mathrm{tract}} \in [26, 50]$ (82,714 / 96,694), 91.2\% at $M_{\mathrm{tract}} \in [51, 100]$ (77,213 / 84,676), and plateaus at 95.5\% when $M_{\mathrm{tract}} > 100$ (123,692 / 129,521).
-The operational stall boundary forms a clean hyperbola in parameter space: certified detection requires $L_{\mathrm{tract}} \times d_{\mathrm{parent}} \ge 6\text{--}10$~informative SNPs.
+The operational stall boundary forms a clean hyperbola in parameter space: certified detection requires $L_{\mathrm{tract}} \times d_{\mathrm{parent}} \ge 6\text{--}10$~informative SNPs (Supplementary Figure~\ref{fig:grand_sweep_1m_phase_diagram}).
 
-Across 333,334 non-recombinant null alignments, \RhizAeon maintained an overall alignment-level false positive rate of 0.3570\% (1,190 false alerts), well below the nominal 5\% ceiling.
+Across 333,334 non-recombinant null alignments, \RhizAeon maintained an overall alignment-level false positive rate of 0.3570\% (1,190 false alerts), well below the nominal 5\% ceiling (Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}A).
 Under a strict molecular clock ($\alpha \ge 50$), the false positive rate was 0.3253\% (271 out of 83,311 trials).
 Under continuous Gamma heterotachy ($\alpha \in [0.2, 5.0]$), the rate remained strictly controlled at 0.3676\% (919 out of 250,023 trials).
 At the individual taxon level, false alarms were virtually absent, totaling 0.01166\% (2,651 false taxa across 22,744,905 evaluated leaves; $>99.988\%$ per-taxon specificity).
 The unpolarized ancestral root token functions as a passive aerodynamic damper, absorbing private autapomorphic bursts into node zero without destabilizing trajectory tracking.
 
-Spatial breakpoint resolution landed within sub-gene margins.
+Spatial breakpoint resolution landed within sub-gene margins (Supplementary Figure~\ref{fig:grand_sweep_1m_phase_diagram}C).
 Median absolute error was 15.0~nt for single events ($K=1$) and 14.0~nt for dual events ($K=2$), sharpening to 9.0~nt for tracts carrying $>100$ informative SNPs.
-Across multi-event architectures ($K_{\mathrm{true}} \ge 2$), bipartite event precision remained above 97\% ($97.3\%$ for dual events, $98.5\%$ for triple events, and $99.0\%$ for quad events).
-Multi-donor mosaics ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$) were resolved with 59.7\% power and 0.416 event $F_1$ score.
-Terminal crossovers exhibited higher sensitivity (71.4\% power across $N = 239{,}767$ trials) than intercalary conversion cassettes (51.3\% power across $N = 426{,}899$ trials).
+Across multi-event architectures ($K_{\mathrm{true}} \ge 2$), bipartite event precision remained above 97\% ($97.3\%$ for dual events, $98.5\%$ for triple events, and $99.0\%$ for quad events; Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}B).
+Multi-donor mosaics ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$) were resolved with 59.7\% power and 0.416 event $F_1$ score, matching single-donor hybrids without mutual dipole interference (Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}D).
+Terminal crossovers exhibited higher sensitivity (71.4\% power across $N = 239{,}767$ trials) than intercalary conversion cassettes (51.3\% power across $N = 426{,}899$ trials; Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}C).
 Across 512 distributed CPU cores on cluster infrastructure, sustained throughput reached $\approx 380$ genomes per second, completing the entire 1,000,000-trial suite in under 45 minutes.
 For genomic surveillance, defining this operational envelope provides actionable interpretability: outside the three-SNP stall limit, negative results are biologically informative.
 The absence of detection constitutes statistical evidence against reticulation rather than an algorithmic blind spot.

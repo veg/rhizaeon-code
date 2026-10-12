@@ -362,3 +362,26 @@ $\theta = 200$ (High Divergence) & 400 & \textbf{80.0\%} & 2.49 & 45.2\% & 56.1\
 
 \clearpage
 \input{sections_mbe/tab_grand_sweep_1m_envelope.tex}
+
+\clearpage
+\begin{figure*}[p!]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_phase_diagram.pdf}
+\caption{\textbf{Empirical aeronautical operational flight envelope, information-theoretic observability frontier, and sub-gene breakpoint precision of \RhizAeon across 1,000,000 independent continuous simulation trials ($N = 4\text{--}250$ taxa, $L = 300\text{--}30{,}000$ nt).}
+\textbf{A:} Aeronautical flight operating envelope in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space with continuous empirical power contours. The 50\% operational boundary (white) and 90\% certified threshold (gold) demarcate the high-confidence flight corridor from the shaded Informational Stall Zone ($M_{\mathrm{tract}} < 3$ SNPs, $P < 1\%$, red diagonal hatching). Overlaid biological landmarks highlight real-world recombinant architectures: \textit{Streptococcus pneumoniae} PMEN1 ($d=0.08, r=0.20$), HIV-1 CRF01\_AE ($d=0.12, r=0.16$), Sarbecovirus Spike RBD ($d=0.04, r=0.035$), and Primate MHC micro-conversion ($d=0.05, r=0.07$).
+\textbf{B:} Information-theoretic observability frontier as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$). Power transitions sharply from $0.5\%$ at the stall horizon ($M_{\mathrm{tract}} \le 2$ SNPs) to $52.4\%$ at $M_{\mathrm{tract}} \in [11, 15]$, $85.5\%$ at $M_{\mathrm{tract}} \in [26, 50]$, and achieves a $99.51\%$ saturation plateau for $M_{\mathrm{tract}} \ge 500$ SNPs ($N = 21{,}064$ trials). The non-recombinant null false positive rate floor is rigorously controlled at $0.357\%$ (green horizontal span).
+\textbf{C:} Breakpoint spatial resolution error $|\hat{u} - u^*|$ across matched events as a function of tract mutations $M_{\mathrm{tract}}$. Median spatial error decreases monotonically from $20.0$~nt at $M_{\mathrm{tract}} = 6$ down to $5.0$~nt at $M_{\mathrm{tract}} \ge 500$ SNPs, with interquartile precision (shaded ribbon) tightly bounded within the sub-15 nt gene margin (dotted reference line).}
+\label{fig:grand_sweep_1m_phase_diagram}
+\end{figure*}
+
+\clearpage
+\begin{figure*}[p!]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_multievent_analysis.pdf}
+\caption{\textbf{Continuous multi-event reticulation resolution, structural topology sensitivity, and multi-donor mosaic disambiguation across the 1,000,000-trial continuous simulation sweep.}
+\textbf{A:} Reticulation cardinality confusion matrix comparing true event count ($K_{\mathrm{true}}$) against inferred event count ($\hat{K}$). On true clonal nulls ($K_{\mathrm{true}} = 0$), $99.64\%$ of alignments are correctly classified with zero events ($332{,}144 / 333{,}334$ trials). On single events ($K_{\mathrm{true}} = 1$), exact cardinality recovery reaches $50.7\%$, with uncalled events concentrated in sub-informative tracts ($M_{\mathrm{tract}} < 5$ SNPs).
+\textbf{B:} Continuous event-level $F_1$ score resolution curves as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$ on logarithmic scale), stratified across mosaic complexities $K_{\mathrm{true}} \in \{1, 2, 3, 4\}$ with shaded 95\% bootstrap confidence ribbons. All curves converge to an asymptotic $F_1 \ge 0.80$ plateau at $M_{\mathrm{tract}} \ge 100$ SNPs, accompanied by high bipartite event precision ($>92.8\%\text{--}99.0\%$).
+\textbf{C:} Continuous empirical detection power as a function of relative tract length ($L_{\mathrm{tract}}/L$) comparing Terminal Crossovers ($N = 239{,}767$) versus Intercalary Conversion Cassettes ($N = 426{,}899$), highlighting the consistent topological power advantage of crossovers ($\Delta +4\text{--}8\%$; shaded corridor) and elevated spatial boundary fidelity (median Jaccard $J = 0.968$ vs $0.923$).
+\textbf{D:} Continuous multi-donor mosaic disambiguation across $M_{\mathrm{tract}}$, comparing single-donor chimeras ($P_1 \leftarrow P_2$) against multi-donor chimeras ($P_1 \leftarrow P_2 + P_3$). Both sensitivity and event $F_1$ score converge to complete parity at $M_{\mathrm{tract}} \ge 50$ SNPs ($92\%\text{--}98\%$ power, identical spatial boundary fidelity $J = 0.879$), demonstrating that independent parental dipoles in metric space deconvolve multi-donor chimeras without mutual interference.}
+\label{fig:grand_sweep_1m_multievent}
+\end{figure*}
