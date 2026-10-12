@@ -646,41 +646,56 @@ The tool localized both 5'-terminal crossovers (such as sequence H at nucleotide
 To enable friction-free deployment, \RhizAeon compiles to native Rust command-line binaries and zero-install client-side WebAssembly.
 Researchers execute full genomic scans within standard web browsers in seconds, processing sensitive pathogen sequences locally without transmitting private genomic data over external networks.
 
-\subsection{The Empirical Operational Phase Envelope Across 150,000 Whole Genomes}
-\label{subsec:grand_sweep_150k}
+\subsection{The Empirical Operational Phase Envelope Across 1,000,000 Whole Genomes}
+\label{subsec:grand_sweep_1m}
 
 Evaluating recombination software across a handful of hand-picked alignments risks serious selection bias.
 Curated alignments flatter fragile methods.
-An algorithm tuned to detect extended 1,500~bp crossovers in divergent viral clades frequently collapses when deployed across low-divergence bacterial transmission clusters or dense, multi-megabase chromosomes.
-To systematically delineate the operational envelope of \RhizAeon without parametric shortcuts or cherry-picked test cases, we executed a massive grand simulation sweep comprising 150,000 independent synthetic alignments ($N = 75{,}000$ recombinant trials, $N = 75{,}000$ non-recombinant clonal nulls; Table~\ref{tab:grand_sweep_150k_envelope}; Figure~\ref{fig:grand_sweep_150k_phase_diagram}).
-The simulation grid systematically permuted five orthogonal evolutionary dimensions: genome length spanning compact viral genes to bacterial chromosomes ($L \in [1{,}000, 30{,}000]$~nt), cohort size ($N \in [4, 250]$~taxa), parental sequence divergence ($d_{\mathrm{parent}} \in [0.005, 0.25]$~subs/site), recombinant tract length ratio ($L_{\mathrm{tract}} / L \in [0.008, 0.50]$), and continuous Gamma site-rate heterogeneity ($\alpha \in [0.05, 5.0]$) alongside strict molecular clock controls ($\alpha \ge 50$).
+An algorithm tuned to detect extended 1,500~bp crossovers in divergent viral clades frequently collapses when deployed across low-divergence bacterial transmission clusters, multi-event mosaic swarms, or dense chromosomal datasets.
+To systematically delineate the operational envelope of \RhizAeon without parametric shortcuts or cherry-picked test cases, we executed a massive grand continuous simulation sweep comprising 1,000,000 independent synthetic alignments ($N = 666{,}666$ recombinant trials across single and multi-event topologies, $N = 333{,}334$ non-recombinant clonal nulls; Table~\ref{tab:grand_sweep_1m_envelope}; Figures~\ref{fig:grand_sweep_1m_phase_diagram} and~\ref{fig:grand_sweep_1m_multievent}).
+The simulation grid continuously sampled six orthogonal evolutionary dimensions: genome length spanning compact viral genes to bacterial chromosomes ($L \in [300, 30{,}000]$~nt), cohort size ($N \in [4, 250]$~taxa), mean sequence divergence ($d \in [0.005, 0.35]$~subs/site), transition/transversion ratio ($\kappa \in [1.5, 6.0]$), continuous Gamma site-rate heterogeneity ($\alpha \in [0.2, 5.0]$) alongside strict molecular clock controls ($\alpha \ge 50$), and event cardinality $K_{\mathrm{true}} \in \{0, 1, 2, 3, 4\}$ incorporating 5'/3' terminal crossovers, intercalary conversion cassettes, and multi-donor reticulations ($P_1 \leftarrow P_2 + P_3$).
 
-\input{sections/tab_grand_sweep_150k_envelope.tex}
+\input{sections/tab_grand_sweep_1m_envelope.tex}
 
-Across all 75,000 non-recombinant null alignments, \RhizAeon demonstrated exceptional false positive rate calibration, triggering only 311 false alarms (overall alignment-level $\text{FPR} = 0.415\%$; $>99.58\%$ specificity; Figure~\ref{fig:grand_sweep_150k_phase_diagram}B).
-On strict molecular clock controls ($\alpha \ge 50$), the false alarm rate was $0.160\%$ (30 / 18,749).
-Under extreme biological heterotachy ($\alpha \le 0.50$), rate variation inflated the false alarm rate to only $0.500\%$ (281 / 56,251), confirming that the unpolarized ancestral root token effectively drains autapomorphic rate bursts without triggering horizontal donor attribution.
-At the individual taxon level, out of 5,099,969 non-recombinant leaves evaluated across the null corpus, only 503 leaves were falsely flagged as recombinant ($\text{FPR}_{\text{taxon}} = 0.0099\%$; $>99.99\%$ per-taxon specificity).
+Across all 333,334 non-recombinant null alignments, \RhizAeon demonstrated exceptional false positive rate calibration, triggering only 1,190 false alarms (overall alignment-level $\text{FPR} = 0.3570\%$; $>99.64\%$ specificity; Figure~\ref{fig:grand_sweep_1m_multievent}A).
+On strict molecular clock controls ($\alpha \ge 50$), the false alarm rate was $0.3253\%$ (271 / 83,311).
+Under continuous biological heterotachy ($\alpha \le 5.0$), rate variation inflated the false alarm rate to only $0.3676\%$ (919 / 250,023), confirming that the unpolarized ancestral root token effectively drains autapomorphic rate bursts without triggering horizontal donor attribution.
+At the individual taxon level, out of 22,744,905 non-recombinant leaves evaluated across the null corpus, only 2,651 leaves were falsely flagged as recombinant ($\text{FPR}_{\text{taxon}} = 0.01166\%$; $>99.988\%$ per-taxon specificity).
 \RhizAeon remains virtually impervious to false alarms across un-reticulated populations.
 
 \begin{figure*}[t!]
 \centering
-\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_150k_phase_diagram.png}
-\caption{Empirical operational phase envelope and information-theoretic observability horizon of \RhizAeon across 150,000 independent simulation trials ($N = 4\text{--}250$ taxa, $L = 1{,}000\text{--}30{,}000$ nt).
-Panel~A: Continuous empirical power phase diagram in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space. Detection follows the hyperbolic informational boundary $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}} = \text{const}$, separating the unobservable information horizon ($M < 5$ SNPs, dark navy) from the saturation regime ($M > 25$ SNPs, bright yellow, power $> 80\%$).
-Panel~B: Alignment-level false positive rate across non-recombinant nulls ($N = 75{,}000$) stratified by evolutionary rate variation $\alpha$. Strict molecular clock ($\alpha \ge 50$, $0.160\%$) and extreme Gamma heterotachy ($\alpha \le 0.5$, $0.500\%$) maintain strict false positive rate control ($<0.50\%$).
-Panel~C: Breakpoint spatial resolution error $|\hat{b} - b_{\mathrm{true}}|$ as a function of tract mutations $M_{\mathrm{tract}}$. At $M \ge 25$ SNPs, median spatial error stabilizes at $\le 18.0$~nt, reaching $8.0$~nt for $M > 100$.
-Panel~D: Execution throughput and scaling across genome lengths ($L$) and cohort sizes ($N$), confirming sustained execution at $>30$~trials per second across diverse phylogenetic regimes.}
-\label{fig:grand_sweep_150k_phase_diagram}
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_phase_diagram.png}
+\caption{Empirical operational phase envelope and information-theoretic observability horizon of \RhizAeon across 1,000,000 independent continuous simulation trials ($N = 4\text{--}250$ taxa, $L = 300\text{--}30{,}000$ nt).
+Panel~A: Continuous empirical power phase diagram in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space. Detection follows the hyperbolic informational boundary $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}} = \text{const}$, separating the unobservable information horizon ($M < 5$ SNPs, dark navy) from the saturation regime ($M > 25$ SNPs, bright yellow, power $> 80\%$). White contour demarcates the 50\% power boundary; yellow contour demarcates 90\% power.
+Panel~B: Information-theoretic resolution limit as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$). Power transitions sharply from $0.5\%$ at $M \le 2$ SNPs to $52.4\%$ at $M \in [11, 15]$, $85.5\%$ at $M \in [26, 50]$, and plateaus at $95.5\%$ for $M > 100$ SNPs.
+Panel~C: Breakpoint spatial resolution error $|\hat{u} - u^*|$ as a function of tract mutations $M_{\mathrm{tract}}$. At $M \ge 25$ SNPs, median spatial error stabilizes at $\le 17.0$~nt, reaching $9.0$~nt for $M > 100$.
+Panel~D: Execution throughput and scaling across alignment problem size ($N \times L / 10^3$ matrix cells), confirming linear-time scaling $\mathcal{O}(N M U)$ with auto-compression activating at $N \times L > 6 \times 10^5$ cells.}
+\label{fig:grand_sweep_1m_phase_diagram}
 \end{figure*}
 
-On the recombinant partition ($N = 75{,}000$), \RhizAeon's empirical power phase diagram maps a clear physical phase transition governed by the Informative Mutation Horizon $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}}$ (Figure~\ref{fig:grand_sweep_150k_phase_diagram}A).
+On the recombinant partition ($N = 666{,}666$), \RhizAeon's empirical power phase diagram maps a clear physical phase transition governed by the Informative Mutation Horizon $M_{\mathrm{tract}} = d_{\mathrm{parent}} \cdot L_{\mathrm{tract}}$ (Figure~\ref{fig:grand_sweep_1m_phase_diagram}A).
 Mutations dictate detection.
-When an imported cassette contains fewer than three informative mutations ($M_{\mathrm{tract}} \le 2$), detection power drops to $0.4\%$, reflecting the fundamental information-theoretic limit where phylogenetic incongruence cannot be distinguished from random neutral substitutions.
-As informative mutational density increases, detection escalates sharply: power reaches $39.4\%$ at $M_{\mathrm{tract}} \in [6, 10]$ SNPs, passes $64.5\%$ at $M_{\mathrm{tract}} \in [16, 25]$ SNPs, and plateaus at $84.0\%$ for $M_{\mathrm{tract}} > 100$ SNPs (Table~\ref{tab:grand_sweep_150k_envelope}).
-Spatial accuracy mirrors this informative transition (Figure~\ref{fig:grand_sweep_150k_phase_diagram}C).
-When detected, the median breakpoint error decreases from 25.0~nt at $M_{\mathrm{tract}} \in [6, 10]$ to 18.0~nt at $M_{\mathrm{tract}} \in [26, 50]$ and 8.0~nt for $M_{\mathrm{tract}} > 100$, while mean tract overlap achieves a Jaccard index of $0.817$.
-Furthermore, across the entire 150,000-trial suite, \RhizAeon maintained an average throughput of 31.2~trials per second (Figure~\ref{fig:grand_sweep_150k_phase_diagram}D), completing the entire 150k sweep in under 90 minutes.
+When an imported cassette contains fewer than three informative mutations ($M_{\mathrm{tract}} \le 2$), detection power drops to $0.5\%$, reflecting the fundamental information-theoretic limit where phylogenetic incongruence cannot be distinguished from random neutral substitutions.
+As informative mutational density increases, detection escalates sharply: power reaches $29.2\%$ at $M_{\mathrm{tract}} \in [6, 10]$ SNPs, passes $71.5\%$ at $M_{\mathrm{tract}} \in [16, 25]$ SNPs, $91.2\%$ at $M_{\mathrm{tract}} \in [51, 100]$, and plateaus at $95.5\%$ for $M_{\mathrm{tract}} > 100$ SNPs (Table~\ref{tab:grand_sweep_1m_envelope}; Figure~\ref{fig:grand_sweep_1m_phase_diagram}B).
+Spatial accuracy mirrors this informative transition (Figure~\ref{fig:grand_sweep_1m_phase_diagram}C).
+When detected, the median breakpoint error decreases from 23.0~nt at $M_{\mathrm{tract}} \in [6, 10]$ to 17.0~nt at $M_{\mathrm{tract}} \in [26, 50]$ and 9.0~nt for $M_{\mathrm{tract}} > 100$, while mean tract overlap achieves an overall Jaccard index of $0.7987$.
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_multievent_analysis.png}
+\caption{Multi-event reticulation resolution, structural topology sensitivity, and multi-donor mosaic disambiguation across the 1,000,000-trial continuous simulation sweep.
+Panel~A: Reticulation cardinality confusion matrix comparing true event count ($K_{\mathrm{true}}$) against inferred event count ($\hat{K}$). On true clonal nulls ($K_{\mathrm{true}} = 0$), $99.64\%$ of alignments are correctly classified with zero events. On single events ($K_{\mathrm{true}} = 1$), exact cardinality recovery reaches $50.7\%$, with $43.0\%$ uncalled (concentrated in sub-informative tracts $M < 5$) and only $6.3\%$ over-split.
+Panel~B: Bipartite event recovery metrics (Recall, Precision, and $F_1$ score) stratified by mosaic complexity $K_{\mathrm{true}} \in \{1, 2, 3, 4\}$. Event precision remains extraordinarily high across all regimes ($92.8\%$ for $K=1$, $97.3\%$ for $K=2$, $98.5\%$ for $K=3$, and $99.0\%$ for $K=4$).
+Panel~C: Empirical detection sensitivity stratified by structural topology, showing elevated sensitivity on Terminal Crossovers ($71.4\%$ power across $N = 239{,}767$ trials) compared to Intercalary Conversion Cassettes ($51.3\%$ power across $N = 426{,}899$ trials).
+Panel~D: Multi-donor mosaic disambiguation in complex reticulations ($K_{\mathrm{true}} \ge 2$), showing robust detection power ($59.7\%$) and event $F_1$ score ($0.416$) on multi-donor chimeras ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$ trials) virtually matching single-donor hybrids ($61.1\%$ power, $F_1 = 0.431$, $N = 121{,}037$ trials).}
+\label{fig:grand_sweep_1m_multievent}
+\end{figure*}
+
+Multi-event and multi-donor diagnostics further establish the robustness of continuous manifold tracking across complex topologies (Figure~\ref{fig:grand_sweep_1m_multievent}).
+Across 300,270 multi-event trials ($K_{\mathrm{true}} \ge 2$), \RhizAeon maintained an overall event precision exceeding $97\%$ ($97.3\%$ for dual events, $98.5\%$ for triple events, and $99.0\%$ for quad events; Figure~\ref{fig:grand_sweep_1m_multievent}B), demonstrating that the engine avoids spurious event fragmentation.
+Across 179,233 multi-donor trials ($P_1 \leftarrow P_2 + P_3$), detection power reached $59.7\%$ with an event $F_1$ score of $0.416$ (Figure~\ref{fig:grand_sweep_1m_multievent}D), demonstrating that independent parental dipole trajectories successfully disambiguate multiple distinct donor lineages within a single mosaic genome.
+Finally, across the entire 1,000,000-trial sweep executed across 512 distributed CPU cores on cluster infrastructure, \RhizAeon maintained a sustained throughput of $\approx 380$ genomes per second, completing the entire one-million-genome benchmark in under 45 minutes.
 
 \subsection{Whole-Genome Sarbecovirus Reticulation and Recombination Landscapes}
 \label{subsec:sarbecovirus_origins_reanalysis}
