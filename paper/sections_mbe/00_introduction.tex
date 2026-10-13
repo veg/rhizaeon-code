@@ -4,9 +4,9 @@
 Homologous recombination and horizontal gene transfer assemble mosaic chromosomes from divergent evolutionary lineages \citep{simonloriere2011recombination,didelot2010impact}.
 By splicing divergent genetic material into a single chromosome during co-infection, genetic exchange circumvents the slow waiting times imposed by clonal interference.
 Point mutations accumulate gradually.
-Recombination generates instantaneous evolutionary leaps, combining distant adaptive alleles and breaking genome-wide linkage disequilibrium within a single replication cycle.
+Recombination generates instantaneous evolutionary leaps by uniting distant adaptive alleles and breaking genome-wide linkage disequilibrium within a single replication cycle.
 In viral and bacterial epidemics, mosaicism alters transmission dynamics, shifts antigenic presentation, and accelerates the acquisition of antimicrobial resistance determinants \citep{alfonsi2024data,didelot2010impact}.
-These dynamics govern circulating recombinant forms of human immunodeficiency virus (HIV-1), recombinant variants of SARS-CoV-2, and multi-drug resistant bacterial clones.
+Mosaic architectures govern circulating recombinant forms of human immunodeficiency virus (HIV-1), recombinant variants of SARS-CoV-2, and multi-drug resistant bacterial clones.
 In eukaryotes, meiotic crossover and adaptive introgression purge deleterious mutational load, drive ecological speciation, and assemble complex hybrid phenotypes across plant and animal taxa \citep{rieseberg2003major,mcvean2004fine}.
 Resolving physical crossover boundaries remains foundational across evolutionary biology.
 
@@ -15,36 +15,39 @@ Reticulate evolution shatters trees.
 Because distinct genomic segments inherit conflicting ancestral genealogies, forcing mosaic alignments into a single bifurcating phylogeny distorts every downstream evolutionary inference \citep{schierup2000consequences,kosakovsky2006gard}.
 Topological reconstructions manufacture artificial clades, compress basal divergence times, and spuriously inflate terminal branch lengths.
 Downstream molecular clocks fail just as severely.
-Reticulate histories violate substitution rate constancy across sites, corrupting evolutionary rate estimates, node calibrations, transmission cluster reconstructions, and phylodynamic projections.
-In comparative codon models, reciprocal exchanges generate apparent homoplasies that map to multiple tree branches, mimicking convergent amino acid substitutions.
-Standard selection tests, including MEME and BUSTED \citep{murrell2012detecting,murrell2015gene}, mistake reticulate homoplasies for diversifying positive selection, inflating false positive rates across neutral codons.
+Because reticulate histories violate substitution rate constancy across sites, unmodeled recombination corrupts evolutionary rate estimates, node calibrations, transmission cluster reconstructions, and phylodynamic projections.
+In comparative codon models, reciprocal exchanges generate apparent homoplasies across multiple tree branches and mimic convergent amino acid substitutions.
+Under standard selection tests, including MEME and BUSTED \citep{murrell2012detecting,murrell2015gene}, reticulate homoplasies produce spurious signals of diversifying positive selection and inflate false positive rates across neutral codons.
 Partitioning mosaic alignments into tree-congruent segments safeguards all downstream evolutionary inference.
 
 Existing detection tools remain split between two incompatible paradigms \citep{posada2002evaluation,martin2015rdp4}.
 Phylogenetic changepoint methods, exemplified by GARD \citep{kosakovsky2006gard}, formulate crossover detection as model selection across partitioned trees under continuous-time Markov substitution models.
-These methods optimize partition boundaries through likelihood ratio criteria while fitting independent branch lengths across candidate segments.
+Partitioning algorithms optimize breakpoint boundaries through likelihood ratio criteria while fitting independent branch lengths across candidate segments.
 The computational arithmetic is punishing.
 Because the joint combinatorial space of partition boundaries and tree topologies scales exponentially with breakpoint count and cubically with taxon count ($\mathcal{O}(L^K \cdot N^3)$ for $K$ breakpoints across $N$ taxa of length $L$), multi-breakpoint searches across hundreds of genomes require days of cluster compute.
 Sequence heuristics take the opposite extreme.
 Suites such as 3Seq \citep{lam20183seq} and RDP5 \citep{martin2021rdp5} scan sequence triplets for localized clustering of polymorphic mutations within sliding windows.
-While evaluating rapidly across small cohorts, they require $\mathcal{O}(N^3 L)$ comparisons across all sequence triplets, becoming computationally burdensome as surveillance cohorts scale.
+While evaluating rapidly across small cohorts, triplet scans require $\mathcal{O}(N^3 L)$ comparisons across all sequence triplets and stall as surveillance cohorts scale.
 More fundamentally, pairwise and triplet scans operate without a global phylogenetic reference frame.
 Historically, early statistical heuristics based on uncorrected homoplasy or compatibility suffered severe false positive inflation under rate heterogeneity across sites \citep{posada2001evaluation,posada2002evaluation}.
-Modern triplet methods have achieved tighter control on non-recombinant nulls, yet they suffer from severe combinatorial event overcounting: when a recombinant lineage expands into an outbreak swarm or carries multiple donor segments, triplet scanning evaluates every combination of descendant and parental leaves independently, reporting dozens of redundant, fractured events per genuine reticulation.
-Furthermore, when recombinant segments descend from unsampled ancestral lineages, closed-world triplet algorithms are forced to misattribute foreign tracts to innocent contemporary leaves.
+Modern triplet methods achieve tighter control on non-recombinant nulls, yet they suffer from severe combinatorial event overcounting.
+When a recombinant lineage expands into an outbreak swarm or carries multiple donor segments, triplet scanning evaluates every combination of descendant and parental leaves independently and reports dozens of redundant, fractured events per genuine reticulation.
+Furthermore, when recombinant segments descend from unsampled ancestral lineages, closed-world triplet algorithms necessarily misattribute foreign tracts to contemporary reference leaves.
 
 Resolving reticulate evolution at genome scale requires abandoning discrete trees while retaining topological protection against mutational rate variation.
 Genomes trace continuous trajectories through sequence space.
-Scanning from 5\textquotesingle\ to 3\textquotesingle\ along an alignment, clonal lineages maintain stable relative divergence, flowing through sequence space like parallel currents.
+Scanning from 5\textquotesingle\ to 3\textquotesingle\ along an alignment, clonal lineages maintain stable relative divergence and trace parallel currents through sequence space.
 A recombinant chromosome breaks this parallel flow.
 It travels within the current of one parental lineage, then deflects sharply across sequence space into an alternative parental current at the crossover junction.
 We introduce \RhizAeon, an open-source framework that models reticulate evolution through continuous trajectory mechanics and zero-drift force field dynamics in linear time ($\mathcal{O}(N K L)$ for $K$ reference landmarks).
-Its name derives from the Greek \textit{rhiza} (root), evoking the reticulated, interconnected network of the biological rhizome across deep evolutionary time (\textit{aeon}) to supplant strictly bifurcating arboreal trees.
+Its name derives from the Greek \textit{rhiza} (root).
+The term evokes the interconnected network of the biological rhizome across deep evolutionary time (\textit{aeon}) to supplant strictly bifurcating arboreal trees.
 By measuring instantaneous sequence affinity against reference lineages and absorbing lineage-specific rate variation into an unpolarized ancestral root sink, \RhizAeon transforms recombination detection into physical trajectory deconvolution.
 Clonal evolution produces balanced thermal fluctuations that cancel out as a centered Brownian bridge.
-Recombination breaks this physical equilibrium, imparting sustained directional momentum that pinpoints crossover boundaries and consolidates co-recombinant transmission swarms into unified ancestral events.
+Recombination breaks this physical equilibrium and imparts sustained directional momentum that pinpoints crossover boundaries while consolidating co-recombinant transmission swarms into unified ancestral events.
 
 We validated \RhizAeon across coalescent benchmarks, specialized operational stress tests, and a grand continuous parameter sweep of 1,000,000 whole genomes.
-Across the canonical 3,200-trial coalescent benchmark of \citet{posada2001evaluation}, \RhizAeon maintained an empirical false positive rate of 0.58\% (95\% Wilson CI [0.28\%, 1.20\%]) across 1,200 null alignments under Gamma rate heterogeneity (compared to 0.17\% for 3SEQ, 95\% CI [0.05\%, 0.60\%]), while strictly suppressing the combinatorial event overcounting that inflates triplet scans by up to ten-fold.
+Across the canonical 3,200-trial coalescent benchmark of \citet{posada2001evaluation}, \RhizAeon maintained an empirical false positive rate of 0.58\% (95\% Wilson CI [0.28\%, 1.20\%]) across 1,200 null alignments under Gamma rate heterogeneity (compared to 0.17\% for 3SEQ, 95\% CI [0.05\%, 0.60\%]).
+Across recombinant trials, ancestral clustering suppressed the combinatorial event overcounting that inflates triplet scans by up to ten-fold.
 In operational stress tests modeling epidemic swarms, multi-parent cascades, ghost donor introgression, and micro-conversions down to 50 base pairs, trajectory deconvolution eliminated the combinatorial false alarms that cripple pairwise heuristics.
-Empirical evaluations across 30.9~kb Sarbecovirus genomes, the 2.22~Mb multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 chromosome, and 379 primate \textit{HLA} Class~I alleles demonstrate that \RhizAeon resolves complex whole-genome mosaicism and polarized Ancestral Recombination Graphs in fractions of a second without taxon subsampling.
+Empirical evaluations across 30.9~kb Sarbecovirus genomes, the 2.22~Mb multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 chromosome, and 379 primate \textit{HLA} Class~I alleles confirm that continuous trajectory deconvolution reconstructs complex whole-genome mosaicism and polarized Ancestral Recombination Graphs in fractions of a second without taxon subsampling.
