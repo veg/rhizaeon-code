@@ -9,7 +9,7 @@
 \BOOKMARK [4][-]{section*.6}{Bacterial Micro-Conversions}{section*.3}% 9
 \BOOKMARK [2][-]{subsection.3.3}{The Continuous Operational Phase Envelope of Reticulation Deconvolution}{section.3}% 10
 \BOOKMARK [1][-]{section.4}{Empirical Genomic Applications}{}% 11
-\BOOKMARK [2][-]{subsection.4.1}{Deconvolving Recombination Landscapes and Mosaic Genomes in Sarbecoviruses}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Deconvolving Recombination Profiles and Mosaic Genomes in Sarbecoviruses}{section.4}% 12
 \BOOKMARK [2][-]{subsection.4.2}{Bacterial AMR Mosaicism and Vaccine Escape in Streptococcus pneumoniae}{section.4}% 13
 \BOOKMARK [2][-]{subsection.4.3}{Ectopic Gene Conversion and Inter-Locus Chimerism in Primate MHC Class I}{section.4}% 14
 \BOOKMARK [1][-]{section.5}{Discussion}{}% 15
@@ -25,29 +25,30 @@
 \BOOKMARK [2][-]{subsection.6.5}{Reticulation Graph Adjudication and Ancestral Event Grouping}{section.6}% 25
 \BOOKMARK [2][-]{subsection.6.6}{Coalescent Simulation Suites and Bipartite Hungarian Evaluation}{section.6}% 26
 \BOOKMARK [2][-]{subsection.6.7}{Empirical Genomic Datasets, Software Availability, and Data Distribution}{section.6}% 27
-\BOOKMARK [1][-]{section.supp.section.1}{Foundational Modeling Assumptions and Physical Boundary Conditions}{}% 28
-\BOOKMARK [2][-]{section*.12}{Assumption 1 \(Metric Embeddability of Evolutionary Divergence\).}{section.supp.section.1}% 29
-\BOOKMARK [3][-]{section*.13}{Assumption 2 \(Stationary Substitution Background and the Brownian Null\).}{section*.12}% 30
-\BOOKMARK [4][-]{section*.14}{Assumption 3 \(The Unpolarized Root Token as an Autapomorphic Sink\).}{section*.13}% 31
-\BOOKMARK [4][-]{section*.15}{Assumption 4 \(Spectral Landmark Representation on Simplex Delta\136K\).}{section*.13}% 32
-\BOOKMARK [4][-]{section*.16}{Physical Limits and Resolution Boundaries.}{section*.13}% 33
-\BOOKMARK [1][-]{section.supp.section.2}{Complete Algorithmic Pipeline and Mathematical Formulations}{}% 34
-\BOOKMARK [2][-]{subsection.supp.subsection.2.1}{Lossless SNP Compression and Prefix Distance Tensor}{section.supp.section.2}% 35
-\BOOKMARK [2][-]{subsection.supp.subsection.2.2}{Global Divergence Matrix and Classical MDS Basis}{section.supp.section.2}% 36
-\BOOKMARK [2][-]{subsection.supp.subsection.2.3}{Exact Gower Out-of-Sample Continuous Trajectory Projection}{section.supp.section.2}% 37
-\BOOKMARK [2][-]{subsection.supp.subsection.2.4}{Continuous Phylogenetic Cross-Attention with Tree-RoPE and PhyloBias}{section.supp.section.2}% 38
-\BOOKMARK [2][-]{subsection.supp.subsection.2.5}{Cumulative Attention Curves and Differential Drift}{section.supp.section.2}% 39
-\BOOKMARK [2][-]{subsection.supp.subsection.2.6}{Multi-Scale Dyadic Scale-Space Matched Filter and Running Drawdown}{section.supp.section.2}% 40
-\BOOKMARK [2][-]{subsection.supp.subsection.2.7}{Profile Maximum-Likelihood Breakpoint Polisher}{section.supp.section.2}% 41
-\BOOKMARK [1][-]{section.supp.section.3}{Ancestral Recombination Graph \(ARG\) Reconstruction and Validation}{}% 42
-\BOOKMARK [2][-]{subsection.supp.subsection.3.1}{Ancestral Event Consolidation}{section.supp.section.3}% 43
-\BOOKMARK [2][-]{subsection.supp.subsection.3.2}{Structural Model Classes}{section.supp.section.3}% 44
-\BOOKMARK [2][-]{subsection.supp.subsection.3.3}{Multidimensional Statistical Validation Engine}{section.supp.section.3}% 45
-\BOOKMARK [1][-]{section.supp.section.4}{Coalescent ARG Simulation Protocol}{}% 46
-\BOOKMARK [1][-]{section.supp.section.5}{Specialized Epidemiological and Genomic Simulation Suites}{}% 47
-\BOOKMARK [1][-]{section.supp.section.6}{Grand-Scale Continuous Parameter Sweep \(1,000,000 Genomes\)}{}% 48
-\BOOKMARK [1][-]{section.supp.section.7}{Ground Truth Extraction and Bijective Bipartite Matching}{}% 49
-\BOOKMARK [1][-]{section.supp.section.8}{Empirical Genomic Cohorts and Annotations}{}% 50
-\BOOKMARK [2][-]{section*.17}{Sarbecovirus Whole-Genome Cohort.}{section.supp.section.8}% 51
-\BOOKMARK [3][-]{section*.18}{Streptococcus pneumoniae PMEN1 Whole Chromosome.}{section*.17}% 52
-\BOOKMARK [4][-]{section*.19}{Hominoidea MHC Class I Allelic Cohort.}{section*.18}% 53
+\BOOKMARK [2][-]{subsection.6.8}{Data Governance and Biosafety Compliance}{section.6}% 28
+\BOOKMARK [1][-]{section.supp.section.1}{Foundational Modeling Assumptions and Physical Boundary Conditions}{}% 29
+\BOOKMARK [2][-]{section*.12}{Assumption 1 \(Metric Embeddability of Evolutionary Divergence\).}{section.supp.section.1}% 30
+\BOOKMARK [3][-]{section*.13}{Assumption 2 \(Stationary Substitution Background and the Brownian Null\).}{section*.12}% 31
+\BOOKMARK [4][-]{section*.14}{Assumption 3 \(The Unpolarized Root Token as an Autapomorphic Sink\).}{section*.13}% 32
+\BOOKMARK [4][-]{section*.15}{Assumption 4 \(Spectral Landmark Representation on Simplex Delta\136K\).}{section*.13}% 33
+\BOOKMARK [4][-]{section*.16}{Physical Limits and Resolution Boundaries.}{section*.13}% 34
+\BOOKMARK [1][-]{section.supp.section.2}{Complete Algorithmic Pipeline and Mathematical Formulations}{}% 35
+\BOOKMARK [2][-]{subsection.supp.subsection.2.1}{Lossless SNP Compression and Prefix Distance Tensor}{section.supp.section.2}% 36
+\BOOKMARK [2][-]{subsection.supp.subsection.2.2}{Global Divergence Matrix and Classical MDS Basis}{section.supp.section.2}% 37
+\BOOKMARK [2][-]{subsection.supp.subsection.2.3}{Exact Gower Out-of-Sample Continuous Trajectory Projection}{section.supp.section.2}% 38
+\BOOKMARK [2][-]{subsection.supp.subsection.2.4}{Continuous Phylogenetic Cross-Attention with Tree-RoPE and PhyloBias}{section.supp.section.2}% 39
+\BOOKMARK [2][-]{subsection.supp.subsection.2.5}{Cumulative Attention Curves and Differential Drift}{section.supp.section.2}% 40
+\BOOKMARK [2][-]{subsection.supp.subsection.2.6}{Multi-Scale Dyadic Scale-Space Matched Filter and Running Drawdown}{section.supp.section.2}% 41
+\BOOKMARK [2][-]{subsection.supp.subsection.2.7}{Profile Maximum-Likelihood Breakpoint Polisher}{section.supp.section.2}% 42
+\BOOKMARK [1][-]{section.supp.section.3}{Ancestral Recombination Graph \(ARG\) Reconstruction and Validation}{}% 43
+\BOOKMARK [2][-]{subsection.supp.subsection.3.1}{Ancestral Event Consolidation}{section.supp.section.3}% 44
+\BOOKMARK [2][-]{subsection.supp.subsection.3.2}{Structural Model Classes}{section.supp.section.3}% 45
+\BOOKMARK [2][-]{subsection.supp.subsection.3.3}{Multidimensional Statistical Validation Engine}{section.supp.section.3}% 46
+\BOOKMARK [1][-]{section.supp.section.4}{Coalescent ARG Simulation Protocol}{}% 47
+\BOOKMARK [1][-]{section.supp.section.5}{Specialized Epidemiological and Genomic Simulation Suites}{}% 48
+\BOOKMARK [1][-]{section.supp.section.6}{Grand-Scale Continuous Parameter Sweep \(1,000,000 Genomes\)}{}% 49
+\BOOKMARK [1][-]{section.supp.section.7}{Ground Truth Extraction and Bijective Bipartite Matching}{}% 50
+\BOOKMARK [1][-]{section.supp.section.8}{Empirical Genomic Cohorts and Annotations}{}% 51
+\BOOKMARK [2][-]{section*.17}{Sarbecovirus Whole-Genome Cohort.}{section.supp.section.8}% 52
+\BOOKMARK [3][-]{section*.18}{Streptococcus pneumoniae PMEN1 Whole Chromosome.}{section*.17}% 53
+\BOOKMARK [4][-]{section*.19}{Hominoidea MHC Class I Allelic Cohort.}{section*.18}% 54
