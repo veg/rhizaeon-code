@@ -1,0 +1,867 @@
+[
+  {
+    "history_id": "H0_Clonal_Null",
+    "name": "Genome-Wide Clonal Null",
+    "description": "Single unpartitioned phylogenetic tree across the entire 31,214 nt genome.",
+    "num_partitions": 1,
+    "num_reticulations": 0,
+    "phylogenetics": {
+      "total_lnL": -450387.05625085364,
+      "k_parameters": 123,
+      "num_partitions": 1,
+      "aicc": 901021.093653203,
+      "bic": 902046.9930066129,
+      "partitions": [
+        {
+          "u1": 0,
+          "u2": 31214,
+          "length_nt": 31214,
+          "lnL": -450387.05625085364
+        }
+      ],
+      "delta_aicc": 171224.04357761017,
+      "delta_bic": 149195.816881889
+    },
+    "manifold_strain": {
+      "frobenius_norm_obs": 11.565236202814427,
+      "frobenius_norm_residual": 1.1324613340731864,
+      "residual_strain_ratio": 0.09791942976465966,
+      "strain_explained_pct": 90.20805702353404,
+      "top_residual_eigenvalue": 0.02105298315089206,
+      "marchenko_pastur_bulk_edge": 0.00037579853554953733,
+      "spectral_snr": 56.02199359320515,
+      "is_within_mp_bulk": false,
+      "strain_excess": 0.07921094209438442
+    },
+    "synapomorphic_concordance": {
+      "events_evaluated": 0,
+      "mean_sscr_in": 0.0,
+      "mean_sscr_flank": 0.0,
+      "mean_delta_sscr": 0.0,
+      "all_events": []
+    },
+    "evaluation_time_sec": 7.0
+  },
+  {
+    "history_id": "H_GARD_Partitions",
+    "name": "GARD 22-Partition Model",
+    "description": "22 unpolarized chromosomal partitions based on Lytras et al. Table S3 mapped to Darren's alignment.",
+    "num_partitions": 23,
+    "num_reticulations": 0,
+    "phylogenetics": {
+      "total_lnL": -361787.46225594747,
+      "k_parameters": 2829,
+      "num_partitions": 23,
+      "aicc": 729797.0500755928,
+      "bic": 752851.1761247239,
+      "partitions": [
+        {
+          "u1": 0,
+          "u2": 1753,
+          "length_nt": 1753,
+          "lnL": -20542.088206580207
+        },
+        {
+          "u1": 1753,
+          "u2": 3195,
+          "length_nt": 1442,
+          "lnL": -22040.685193848116
+        },
+        {
+          "u1": 3195,
+          "u2": 3817,
+          "length_nt": 622,
+          "lnL": -7421.855547707694
+        },
+        {
+          "u1": 3817,
+          "u2": 5225,
+          "length_nt": 1408,
+          "lnL": -19296.771157308394
+        },
+        {
+          "u1": 5225,
+          "u2": 8474,
+          "length_nt": 3249,
+          "lnL": -41640.92735923225
+        },
+        {
+          "u1": 8474,
+          "u2": 11715,
+          "length_nt": 3241,
+          "lnL": -35845.59343115185
+        },
+        {
+          "u1": 11715,
+          "u2": 12902,
+          "length_nt": 1187,
+          "lnL": -10876.366030146966
+        },
+        {
+          "u1": 12902,
+          "u2": 14688,
+          "length_nt": 1786,
+          "lnL": -15746.507460744624
+        },
+        {
+          "u1": 14688,
+          "u2": 16241,
+          "length_nt": 1553,
+          "lnL": -12894.99595974732
+        },
+        {
+          "u1": 16241,
+          "u2": 17214,
+          "length_nt": 973,
+          "lnL": -8683.244195302761
+        },
+        {
+          "u1": 17214,
+          "u2": 20265,
+          "length_nt": 3051,
+          "lnL": -31892.890575395482
+        },
+        {
+          "u1": 20265,
+          "u2": 20819,
+          "length_nt": 554,
+          "lnL": -6475.275818787811
+        },
+        {
+          "u1": 20819,
+          "u2": 21500,
+          "length_nt": 681,
+          "lnL": -7922.9166224924575
+        },
+        {
+          "u1": 21500,
+          "u2": 21714,
+          "length_nt": 214,
+          "lnL": -2474.312044068996
+        },
+        {
+          "u1": 21714,
+          "u2": 22936,
+          "length_nt": 1222,
+          "lnL": -25618.384517093218
+        },
+        {
+          "u1": 22936,
+          "u2": 23919,
+          "length_nt": 983,
+          "lnL": -18553.91787905788
+        },
+        {
+          "u1": 23919,
+          "u2": 24685,
+          "length_nt": 766,
+          "lnL": -11454.11149574356
+        },
+        {
+          "u1": 24685,
+          "u2": 25384,
+          "length_nt": 699,
+          "lnL": -9564.716648185018
+        },
+        {
+          "u1": 25384,
+          "u2": 26872,
+          "length_nt": 1488,
+          "lnL": -17634.504350799114
+        },
+        {
+          "u1": 26872,
+          "u2": 28490,
+          "length_nt": 1618,
+          "lnL": -11249.39939167141
+        },
+        {
+          "u1": 28490,
+          "u2": 28797,
+          "length_nt": 307,
+          "lnL": -3353.427877794557
+        },
+        {
+          "u1": 28797,
+          "u2": 29903,
+          "length_nt": 1106,
+          "lnL": -12370.273975743856
+        },
+        {
+          "u1": 29903,
+          "u2": 31214,
+          "length_nt": 1311,
+          "lnL": -8234.296517343875
+        }
+      ],
+      "delta_aicc": 0.0,
+      "delta_bic": 0.0
+    },
+    "manifold_strain": {
+      "frobenius_norm_obs": 11.565236202814427,
+      "frobenius_norm_residual": 0.21636807890417442,
+      "residual_strain_ratio": 0.01870848767027523,
+      "strain_explained_pct": 98.12915123297248,
+      "top_residual_eigenvalue": 0.0003117916135883281,
+      "marchenko_pastur_bulk_edge": 1.2819401722924581e-05,
+      "spectral_snr": 24.32185372822507,
+      "is_within_mp_bulk": false,
+      "strain_excess": 0.0
+    },
+    "synapomorphic_concordance": {
+      "events_evaluated": 0,
+      "mean_sscr_in": 0.0,
+      "mean_sscr_flank": 0.0,
+      "mean_delta_sscr": 0.0,
+      "all_events": []
+    },
+    "evaluation_time_sec": 11.67
+  },
+  {
+    "history_id": "H_RhizAeon_ARG",
+    "name": "RhizAeon Consolidated ARG",
+    "description": "Directed ARG: 9 consolidated chromosomal blocks coupled to 41 ancestral reticulations.",
+    "num_partitions": 9,
+    "num_reticulations": 41,
+    "phylogenetics": {
+      "total_lnL": -379121.1845816321,
+      "k_parameters": 1157,
+      "num_partitions": 9,
+      "aicc": 760645.5231425029,
+      "bic": 770215.7248069698,
+      "partitions": [
+        {
+          "u1": 0,
+          "u2": 3804,
+          "length_nt": 3804,
+          "lnL": -51872.41897517248
+        },
+        {
+          "u1": 3804,
+          "u2": 8387,
+          "length_nt": 4583,
+          "lnL": -61698.9111747629
+        },
+        {
+          "u1": 8387,
+          "u2": 13036,
+          "length_nt": 4649,
+          "lnL": -50083.944870849795
+        },
+        {
+          "u1": 13036,
+          "u2": 20331,
+          "length_nt": 7295,
+          "lnL": -71388.4855485055
+        },
+        {
+          "u1": 20331,
+          "u2": 21866,
+          "length_nt": 1535,
+          "lnL": -19478.667517113292
+        },
+        {
+          "u1": 21866,
+          "u2": 24753,
+          "length_nt": 2887,
+          "lnL": -59902.09735006626
+        },
+        {
+          "u1": 24753,
+          "u2": 25925,
+          "length_nt": 1172,
+          "lnL": -14991.346970300703
+        },
+        {
+          "u1": 25925,
+          "u2": 28960,
+          "length_nt": 3035,
+          "lnL": -28118.735836483316
+        },
+        {
+          "u1": 28960,
+          "u2": 31214,
+          "length_nt": 2254,
+          "lnL": -21586.576338377818
+        }
+      ],
+      "delta_aicc": 30848.473066910054,
+      "delta_bic": 17364.54868224589
+    },
+    "manifold_strain": {
+      "frobenius_norm_obs": 11.565236202814427,
+      "frobenius_norm_residual": 0.3078412869228846,
+      "residual_strain_ratio": 0.02661781234074326,
+      "strain_explained_pct": 97.33821876592567,
+      "top_residual_eigenvalue": 0.0015229438536956406,
+      "marchenko_pastur_bulk_edge": 2.743569078477984e-05,
+      "spectral_snr": 55.50958660536098,
+      "is_within_mp_bulk": false,
+      "strain_excess": 0.00790932467046803
+    },
+    "synapomorphic_concordance": {
+      "events_evaluated": 37,
+      "mean_sscr_in": 0.7217827850708044,
+      "mean_sscr_flank": 0.2520442289164601,
+      "mean_delta_sscr": 0.4697385561543444,
+      "all_events": [
+        {
+          "event_id": 1,
+          "recipient": "RpYN06",
+          "donor": "MG772934",
+          "u1": 20331,
+          "u2": 24650,
+          "in_tract_donor_matches": 782,
+          "in_tract_home_matches": 220,
+          "flank_donor_matches": 446,
+          "flank_home_matches": 3200,
+          "sscr_in": 0.780439121756487,
+          "sscr_flank": 0.12232583653318706,
+          "delta_sscr": 0.6581132852232999,
+          "p_fisher": 0.0
+        },
+        {
+          "event_id": 2,
+          "recipient": "PrC31|Bat-R_spp|Yunnan|EPI_ISL_1098866|2018-08",
+          "donor": "DQ412042",
+          "u1": 13036,
+          "u2": 25817,
+          "in_tract_donor_matches": 1210,
+          "in_tract_home_matches": 832,
+          "flank_donor_matches": 247,
+          "flank_home_matches": 4436,
+          "sscr_in": 0.5925563173359452,
+          "sscr_flank": 0.05274396754217382,
+          "delta_sscr": 0.5398123497937714,
+          "p_fisher": 0.0
+        },
+        {
+          "event_id": 3,
+          "recipient": "YN2018C|Bat-R_affinis|Yunnan-Kunming|MK211377|2016",
+          "donor": "279_2005|Bat-R_macrotis|Hubei|DQ648857|2004-11",
+          "u1": 21440,
+          "u2": 26325,
+          "in_tract_donor_matches": 649,
+          "in_tract_home_matches": 189,
+          "flank_donor_matches": 108,
+          "flank_home_matches": 2280,
+          "sscr_in": 0.7744630071599046,
+          "sscr_flank": 0.04522613065326633,
+          "delta_sscr": 0.7292368765066383,
+          "p_fisher": 0.0
+        },
+        {
+          "event_id": 4,
+          "recipient": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "donor": "KF569996",
+          "u1": 7,
+          "u2": 9159,
+          "in_tract_donor_matches": 771,
+          "in_tract_home_matches": 96,
+          "flank_donor_matches": 349,
+          "flank_home_matches": 1702,
+          "sscr_in": 0.889273356401384,
+          "sscr_flank": 0.17016089712335447,
+          "delta_sscr": 0.7191124592780296,
+          "p_fisher": 1.993722843254821e-308
+        },
+        {
+          "event_id": 5,
+          "recipient": "KP886809",
+          "donor": "DQ412042",
+          "u1": 21690,
+          "u2": 25274,
+          "in_tract_donor_matches": 733,
+          "in_tract_home_matches": 84,
+          "flank_donor_matches": 607,
+          "flank_home_matches": 2107,
+          "sscr_in": 0.8971848225214198,
+          "sscr_flank": 0.2236551215917465,
+          "delta_sscr": 0.6735297009296733,
+          "p_fisher": 6.697290626848658e-276
+        },
+        {
+          "event_id": 6,
+          "recipient": "Wuhan-Hu-1|SARS-CoV-2|Wuhan|MN908947|2019-12",
+          "donor": "MT072865.1",
+          "u1": 21660,
+          "u2": 24753,
+          "in_tract_donor_matches": 617,
+          "in_tract_home_matches": 345,
+          "flank_donor_matches": 417,
+          "flank_home_matches": 5151,
+          "sscr_in": 0.6413721413721414,
+          "sscr_flank": 0.07489224137931035,
+          "delta_sscr": 0.566479899992831,
+          "p_fisher": 0.0
+        },
+        {
+          "event_id": 7,
+          "recipient": "Longquan_140|Bat-R_monoceros|China|KF294457|2012",
+          "donor": "PrC31|Bat-R_spp|Yunnan|EPI_ISL_1098866|2018-08",
+          "u1": 7,
+          "u2": 3436,
+          "in_tract_donor_matches": 383,
+          "in_tract_home_matches": 446,
+          "flank_donor_matches": 432,
+          "flank_home_matches": 4134,
+          "sscr_in": 0.4620024125452352,
+          "sscr_flank": 0.09461235216819974,
+          "delta_sscr": 0.3673900603770355,
+          "p_fisher": 1.7253127981637151e-127
+        },
+        {
+          "event_id": 8,
+          "recipient": "MG772933",
+          "donor": "HKU3-12|Bat-R_sinicus|Hong_Kong|GQ153547|2007-05-1",
+          "u1": 11999,
+          "u2": 20364,
+          "in_tract_donor_matches": 213,
+          "in_tract_home_matches": 238,
+          "flank_donor_matches": 170,
+          "flank_home_matches": 4567,
+          "sscr_in": 0.4722838137472284,
+          "sscr_flank": 0.035887692632467806,
+          "delta_sscr": 0.43639612111476056,
+          "p_fisher": 7.162219227016827e-142
+        },
+        {
+          "event_id": 9,
+          "recipient": "JTMC15|Bat-R_ferrumequinum|Jilin|KU182964|2013-10",
+          "donor": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "u1": 20605,
+          "u2": 23053,
+          "in_tract_donor_matches": 337,
+          "in_tract_home_matches": 140,
+          "flank_donor_matches": 1374,
+          "flank_home_matches": 2570,
+          "sscr_in": 0.7064989517819706,
+          "sscr_flank": 0.34837728194726164,
+          "delta_sscr": 0.358121669834709,
+          "p_fisher": 9.425436523297819e-51
+        },
+        {
+          "event_id": 10,
+          "recipient": "RShSTT200|Bat-R_shameli|Steung_Treng-Cambodia|EPI_",
+          "donor": "Longquan_140|Bat-R_monoceros|China|KF294457|2012",
+          "u1": 21116,
+          "u2": 24772,
+          "in_tract_donor_matches": 466,
+          "in_tract_home_matches": 333,
+          "flank_donor_matches": 671,
+          "flank_home_matches": 4150,
+          "sscr_in": 0.5832290362953693,
+          "sscr_flank": 0.13918274216967433,
+          "delta_sscr": 0.44404629412569496,
+          "p_fisher": 8.684426033332106e-151
+        },
+        {
+          "event_id": 13,
+          "recipient": "HKU3-12|Bat-R_sinicus|Hong_Kong|GQ153547|2007-05-1",
+          "donor": "MG772934",
+          "u1": 15559,
+          "u2": 20082,
+          "in_tract_donor_matches": 331,
+          "in_tract_home_matches": 111,
+          "flank_donor_matches": 1208,
+          "flank_home_matches": 3613,
+          "sscr_in": 0.748868778280543,
+          "sscr_flank": 0.25057042107446587,
+          "delta_sscr": 0.4982983572060771,
+          "p_fisher": 2.260668114648984e-96
+        },
+        {
+          "event_id": 14,
+          "recipient": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "donor": "KC881005",
+          "u1": 9219,
+          "u2": 21567,
+          "in_tract_donor_matches": 573,
+          "in_tract_home_matches": 191,
+          "flank_donor_matches": 489,
+          "flank_home_matches": 1135,
+          "sscr_in": 0.75,
+          "sscr_flank": 0.30110837438423643,
+          "delta_sscr": 0.44889162561576357,
+          "p_fisher": 1.9134132330903968e-96
+        },
+        {
+          "event_id": 15,
+          "recipient": "HI553383.1",
+          "donor": "JF292915",
+          "u1": 27641,
+          "u2": 30010,
+          "in_tract_donor_matches": 583,
+          "in_tract_home_matches": 9,
+          "flank_donor_matches": 3500,
+          "flank_home_matches": 2585,
+          "sscr_in": 0.9847972972972973,
+          "sscr_flank": 0.5751848808545604,
+          "delta_sscr": 0.4096124164427368,
+          "p_fisher": 7.976578762604995e-117
+        },
+        {
+          "event_id": 16,
+          "recipient": "KY417145",
+          "donor": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "u1": 21476,
+          "u2": 22391,
+          "in_tract_donor_matches": 224,
+          "in_tract_home_matches": 8,
+          "flank_donor_matches": 736,
+          "flank_home_matches": 1317,
+          "sscr_in": 0.9655172413793104,
+          "sscr_flank": 0.3584997564539698,
+          "delta_sscr": 0.6070174849253406,
+          "p_fisher": 9.755637487689586e-80
+        },
+        {
+          "event_id": 17,
+          "recipient": "SC2018|Bat-R_spp|Sichuan|MK211374|2016-10",
+          "donor": "Jiyuan-84|Bat-R_ferrumequinum|Henan-Jiyuan|KY77086",
+          "u1": 4011,
+          "u2": 9366,
+          "in_tract_donor_matches": 393,
+          "in_tract_home_matches": 233,
+          "flank_donor_matches": 589,
+          "flank_home_matches": 2785,
+          "sscr_in": 0.6277955271565495,
+          "sscr_flank": 0.17457024303497332,
+          "delta_sscr": 0.4532252841215762,
+          "p_fisher": 2.9135774684911157e-112
+        },
+        {
+          "event_id": 20,
+          "recipient": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "donor": "Anlong-103|Bat-R_sinicus|Guizhou-Anlong|KY770858|2",
+          "u1": 25514,
+          "u2": 29466,
+          "in_tract_donor_matches": 376,
+          "in_tract_home_matches": 46,
+          "flank_donor_matches": 1029,
+          "flank_home_matches": 1225,
+          "sscr_in": 0.8909952606635071,
+          "sscr_flank": 0.45652173913043476,
+          "delta_sscr": 0.43447352153307234,
+          "p_fisher": 5.256388097159076e-68
+        },
+        {
+          "event_id": 21,
+          "recipient": "JX993988",
+          "donor": "YN2018D|Bat-R_affinis|Yunnan|MK211378|2016-09",
+          "u1": 3510,
+          "u2": 8760,
+          "in_tract_donor_matches": 353,
+          "in_tract_home_matches": 83,
+          "flank_donor_matches": 916,
+          "flank_home_matches": 1264,
+          "sscr_in": 0.8096330275229358,
+          "sscr_flank": 0.42018348623853213,
+          "delta_sscr": 0.3894495412844036,
+          "p_fisher": 1.3232742741790277e-52
+        },
+        {
+          "event_id": 22,
+          "recipient": "RmYN02|EPI_ISL_412977|China|Yunnan|Xishuangbanna|2",
+          "donor": "PrC31|Bat-R_spp|Yunnan|EPI_ISL_1098866|2018-08",
+          "u1": 4255,
+          "u2": 5626,
+          "in_tract_donor_matches": 144,
+          "in_tract_home_matches": 7,
+          "flank_donor_matches": 1262,
+          "flank_home_matches": 1660,
+          "sscr_in": 0.9536423841059603,
+          "sscr_flank": 0.431895961670089,
+          "delta_sscr": 0.5217464224358712,
+          "p_fisher": 1.1863072706215306e-41
+        },
+        {
+          "event_id": 23,
+          "recipient": "RpYN06",
+          "donor": "MG772934",
+          "u1": 24006,
+          "u2": 25607,
+          "in_tract_donor_matches": 192,
+          "in_tract_home_matches": 83,
+          "flank_donor_matches": 1036,
+          "flank_home_matches": 3337,
+          "sscr_in": 0.6981818181818182,
+          "sscr_flank": 0.23690830093757145,
+          "delta_sscr": 0.4612735172442468,
+          "p_fisher": 1.504331050875878e-54
+        },
+        {
+          "event_id": 24,
+          "recipient": "MT084071.1",
+          "donor": "HI553383.1",
+          "u1": 20334,
+          "u2": 23621,
+          "in_tract_donor_matches": 310,
+          "in_tract_home_matches": 477,
+          "flank_donor_matches": 738,
+          "flank_home_matches": 4469,
+          "sscr_in": 0.39390088945362134,
+          "sscr_flank": 0.14173228346456693,
+          "delta_sscr": 0.25216860598905444,
+          "p_fisher": 1.4314534582544536e-56
+        },
+        {
+          "event_id": 25,
+          "recipient": "HKU3-12|Bat-R_sinicus|Hong_Kong|GQ153547|2007-05-1",
+          "donor": "JX993987",
+          "u1": 28960,
+          "u2": 29571,
+          "in_tract_donor_matches": 168,
+          "in_tract_home_matches": 6,
+          "flank_donor_matches": 1330,
+          "flank_home_matches": 1497,
+          "sscr_in": 0.9655172413793104,
+          "sscr_flank": 0.4704633887513265,
+          "delta_sscr": 0.4950538526279839,
+          "p_fisher": 1.1345289734761105e-44
+        },
+        {
+          "event_id": 26,
+          "recipient": "YN2018B|Bat-R_affinis|Yunnan|MK211376|2016-09",
+          "donor": "KJ473816",
+          "u1": 13982,
+          "u2": 18208,
+          "in_tract_donor_matches": 39,
+          "in_tract_home_matches": 5,
+          "flank_donor_matches": 193,
+          "flank_home_matches": 2052,
+          "sscr_in": 0.8863636363636364,
+          "sscr_flank": 0.08596881959910913,
+          "delta_sscr": 0.8003948167645272,
+          "p_fisher": 5.550487795096861e-35
+        },
+        {
+          "event_id": 27,
+          "recipient": "RacCS203|Bat-R_acuminatus|Thailand|MW251308.1|2020",
+          "donor": "MT084071.1",
+          "u1": 23924,
+          "u2": 30167,
+          "in_tract_donor_matches": 279,
+          "in_tract_home_matches": 937,
+          "flank_donor_matches": 507,
+          "flank_home_matches": 5316,
+          "sscr_in": 0.2294407894736842,
+          "sscr_flank": 0.08706852138073158,
+          "delta_sscr": 0.14237226809295261,
+          "p_fisher": 1.0968463586155792e-39
+        },
+        {
+          "event_id": 28,
+          "recipient": "KP886809",
+          "donor": "KF294456",
+          "u1": 2605,
+          "u2": 3074,
+          "in_tract_donor_matches": 41,
+          "in_tract_home_matches": 20,
+          "flank_donor_matches": 365,
+          "flank_home_matches": 8028,
+          "sscr_in": 0.6721311475409836,
+          "sscr_flank": 0.04348862147027285,
+          "delta_sscr": 0.6286425260707107,
+          "p_fisher": 3.1123116439082685e-40
+        },
+        {
+          "event_id": 29,
+          "recipient": "HKU3-3|Bat-R_sinicus|Hong_Kong|DQ084200|2005-03-17",
+          "donor": "KJ473815",
+          "u1": 21401,
+          "u2": 21666,
+          "in_tract_donor_matches": 18,
+          "in_tract_home_matches": 1,
+          "flank_donor_matches": 311,
+          "flank_home_matches": 3607,
+          "sscr_in": 0.9473684210526315,
+          "sscr_flank": 0.07937723328228688,
+          "delta_sscr": 0.8679911877703447,
+          "p_fisher": 4.493823481715694e-19
+        },
+        {
+          "event_id": 30,
+          "recipient": "JX993988",
+          "donor": "KF294456",
+          "u1": 8679,
+          "u2": 21852,
+          "in_tract_donor_matches": 403,
+          "in_tract_home_matches": 734,
+          "flank_donor_matches": 208,
+          "flank_home_matches": 7433,
+          "sscr_in": 0.3544415127528584,
+          "sscr_flank": 0.02722156785761026,
+          "delta_sscr": 0.32721994489524814,
+          "p_fisher": 1.8665535584061197e-229
+        },
+        {
+          "event_id": 31,
+          "recipient": "KJ473811",
+          "donor": "DQ412043",
+          "u1": 19614,
+          "u2": 19716,
+          "in_tract_donor_matches": 17,
+          "in_tract_home_matches": 0,
+          "flank_donor_matches": 6112,
+          "flank_home_matches": 1798,
+          "sscr_in": 1.0,
+          "sscr_flank": 0.772692793931732,
+          "delta_sscr": 0.22730720606826804,
+          "p_fisher": 0.012548264636846414
+        },
+        {
+          "event_id": 32,
+          "recipient": "RpYN06",
+          "donor": "RmYN02|EPI_ISL_412977|China|Yunnan|Xishuangbanna|2",
+          "u1": 14897,
+          "u2": 15737,
+          "in_tract_donor_matches": 133,
+          "in_tract_home_matches": 3,
+          "flank_donor_matches": 6111,
+          "flank_home_matches": 881,
+          "sscr_in": 0.9779411764705882,
+          "sscr_flank": 0.8739988558352403,
+          "delta_sscr": 0.10394232063534792,
+          "p_fisher": 1.821872180473542e-05
+        },
+        {
+          "event_id": 33,
+          "recipient": "LC556375.1",
+          "donor": "KY417152",
+          "u1": 13277,
+          "u2": 23952,
+          "in_tract_donor_matches": 632,
+          "in_tract_home_matches": 517,
+          "flank_donor_matches": 1405,
+          "flank_home_matches": 1839,
+          "sscr_in": 0.5500435161009574,
+          "sscr_flank": 0.43310727496917384,
+          "delta_sscr": 0.11693624113178352,
+          "p_fisher": 5.576648913342532e-12
+        },
+        {
+          "event_id": 34,
+          "recipient": "HKU3-7|Bat-R_sinicus|Guangdong|GQ153542|2006-02-15",
+          "donor": "DQ071615",
+          "u1": 29456,
+          "u2": 30167,
+          "in_tract_donor_matches": 22,
+          "in_tract_home_matches": 14,
+          "flank_donor_matches": 312,
+          "flank_home_matches": 3566,
+          "sscr_in": 0.6111111111111112,
+          "sscr_flank": 0.08045384218669417,
+          "delta_sscr": 0.530657268924417,
+          "p_fisher": 1.9835389796562094e-15
+        },
+        {
+          "event_id": 35,
+          "recipient": "HKU3-7|Bat-R_sinicus|Guangdong|GQ153542|2006-02-15",
+          "donor": "KJ473815",
+          "u1": 5600,
+          "u2": 6042,
+          "in_tract_donor_matches": 52,
+          "in_tract_home_matches": 6,
+          "flank_donor_matches": 1277,
+          "flank_home_matches": 2511,
+          "sscr_in": 0.896551724137931,
+          "sscr_flank": 0.33711721224920804,
+          "delta_sscr": 0.559434511888723,
+          "p_fisher": 1.8909799553605958e-18
+        },
+        {
+          "event_id": 36,
+          "recipient": "JX993987",
+          "donor": "KF294456",
+          "u1": 14216,
+          "u2": 21823,
+          "in_tract_donor_matches": 395,
+          "in_tract_home_matches": 228,
+          "flank_donor_matches": 623,
+          "flank_home_matches": 7449,
+          "sscr_in": 0.6340288924558587,
+          "sscr_flank": 0.07718037661050545,
+          "delta_sscr": 0.5568485158453532,
+          "p_fisher": 6.634821100466628e-235
+        },
+        {
+          "event_id": 37,
+          "recipient": "RaTG13|Bat-R_affinis|Yunnan|EPI_ISL_402131|2013-07",
+          "donor": "RmYN02|EPI_ISL_412977|China|Yunnan|Xishuangbanna|2",
+          "u1": 24783,
+          "u2": 26622,
+          "in_tract_donor_matches": 171,
+          "in_tract_home_matches": 39,
+          "flank_donor_matches": 1456,
+          "flank_home_matches": 898,
+          "sscr_in": 0.8142857142857143,
+          "sscr_flank": 0.6185216652506372,
+          "delta_sscr": 0.19576404903507705,
+          "p_fisher": 2.7496606363365744e-09
+        },
+        {
+          "event_id": 38,
+          "recipient": "SC2018|Bat-R_spp|Sichuan|MK211374|2016-10",
+          "donor": "KJ473812",
+          "u1": 1755,
+          "u2": 3004,
+          "in_tract_donor_matches": 94,
+          "in_tract_home_matches": 84,
+          "flank_donor_matches": 881,
+          "flank_home_matches": 3112,
+          "sscr_in": 0.5280898876404494,
+          "sscr_flank": 0.22063611319809667,
+          "delta_sscr": 0.3074537744423527,
+          "p_fisher": 3.0651680331201625e-18
+        },
+        {
+          "event_id": 39,
+          "recipient": "JX993988",
+          "donor": "F46|Bat-R_pusillus|Yunnan|KU973692|2012",
+          "u1": 8387,
+          "u2": 11072,
+          "in_tract_donor_matches": 95,
+          "in_tract_home_matches": 57,
+          "flank_donor_matches": 796,
+          "flank_home_matches": 1277,
+          "sscr_in": 0.625,
+          "sscr_flank": 0.3839845634346358,
+          "delta_sscr": 0.24101543656536423,
+          "p_fisher": 6.0014257112281135e-09
+        },
+        {
+          "event_id": 40,
+          "recipient": "JX993987",
+          "donor": "KF294456",
+          "u1": 4422,
+          "u2": 10558,
+          "in_tract_donor_matches": 377,
+          "in_tract_home_matches": 235,
+          "flank_donor_matches": 641,
+          "flank_home_matches": 7442,
+          "sscr_in": 0.6160130718954249,
+          "sscr_flank": 0.07930223926759866,
+          "delta_sscr": 0.5367108326278263,
+          "p_fisher": 6.282671448225499e-216
+        },
+        {
+          "event_id": 41,
+          "recipient": "KJ473811",
+          "donor": "KF294456",
+          "u1": 7,
+          "u2": 8085,
+          "in_tract_donor_matches": 589,
+          "in_tract_home_matches": 171,
+          "flank_donor_matches": 6,
+          "flank_home_matches": 7368,
+          "sscr_in": 0.775,
+          "sscr_flank": 0.0008136696501220504,
+          "delta_sscr": 0.7741863303498779,
+          "p_fisher": 0.0
+        }
+      ]
+    },
+    "evaluation_time_sec": 8.07
+  }
+]

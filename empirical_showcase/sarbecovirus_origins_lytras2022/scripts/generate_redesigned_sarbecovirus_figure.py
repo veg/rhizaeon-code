@@ -233,23 +233,24 @@ ax_a_ticks.set_xticklabels([f"{x:,}" for x in np.arange(0, 32000, 5000)])
 # PANEL B: Spike Reticulate Mosaic Architecture (Full Width)
 # =========================================================================
 taxa_tracks = [
-    ("SARS-CoV-2 (Wuhan-Hu-1) [Emergent Chimera]", [
-        ("NTD", 21000, 22764, "#0072B2", "RaTG13-like NTD Ancestral Module (94.4% ID)"),
-        ("RBD", 22764, 24500, "#D55E00", "BANAL-52 / Pangolin-like ACE2 Ridge Module"),
+    ("SARS-CoV-2 (Wuhan-Hu-1) [Ancestral RBD Trunk]", [
+        ("NTD", 21000, 22764, "#0072B2", "Ancestral nCoV NTD Module (94.4% ID to RaTG13)"),
+        ("RBD", 22764, 24500, "#0072B2", "Ancestral ACE2-Adapted Contact Ridge (Shared with BANAL-52)"),
         ("S2", 24500, 26000, "#009E73", "Conserved Sarbecovirus S2 Fusion Backbone")
     ]),
-    ("Bat RaTG13 (Yunnan)", [
+    ("Bat RaTG13 (Yunnan) [Recombinant RBD]", [
         ("NTD", 21000, 22764, "#0072B2", "Shared NTD Ancestral Module with SARS-CoV-2"),
-        ("RBD/S2", 22764, 26000, "#CC79A7", "Divergent Bat Lineage")
+        ("RBD", 22764, 24500, "#9333EA", "Divergent Recombinant Cassette from Unsampled Bat Reservoir (Z=20.9)"),
+        ("S2", 24500, 26000, "#0072B2", "Shared S2 Backbone with SARS-CoV-2")
     ]),
     ("Bat BANAL-52 (Laos)", [
         ("NTD", 21000, 22764, "#56B4E9", "Laos BANAL NTD"),
-        ("RBD", 22764, 24500, "#D55E00", "ACE2-Adapted Contact Ridge Homology"),
+        ("RBD", 22764, 24500, "#0072B2", "Ancestral ACE2-Adapted Contact Ridge (Shared with SARS-CoV-2)"),
         ("S2", 24500, 26000, "#56B4E9", "BANAL Backbone")
     ]),
     ("Pangolin-CoV (MP789)", [
         ("NTD", 21000, 22813, "#999999", "Pangolin NTD"),
-        ("RBM", 22813, 23490, "#D55E00", "Shared ACE2 Binding Motif with SARS-CoV-2"),
+        ("RBM", 22813, 23490, "#0072B2", "Shared ACE2 Binding Motif with SARS-CoV-2"),
         ("S2", 23490, 26000, "#999999", "Pangolin Backbone")
     ]),
     ("Bat BANAL-116 (Laos)", [
@@ -299,7 +300,7 @@ ax_b_mosaic.set_ylim(-0.8, len(taxa_tracks) + 0.6)
 ax_b_mosaic.set_yticks(y_pos)
 ax_b_mosaic.set_yticklabels([t[0] for t in taxa_tracks], fontsize=7.2, fontweight="bold")
 ax_b_mosaic.set_xlabel("Spike Glycoprotein Coordinate in Multiple Alignment (nt)", fontweight="bold")
-ax_b_mosaic.set_title("B   Spike Reticulate Mosaic Architecture Across Wildlife Progenitors and Emergent SARS-CoV-2",
+ax_b_mosaic.set_title("B   Spike Reticulate Mosaic Architecture Across Wildlife Progenitors and SARS-CoV-2",
                       loc="left", fontweight="bold", pad=28)
 
 ax_b_mosaic.text(22000, len(taxa_tracks) + 0.10, "NTD", ha="center", fontsize=7.5, fontweight="bold", color="#D55E00")
@@ -313,9 +314,16 @@ ax_b_mosaic.annotate("RacCS203 NTD\nmicro-conversions\n(Z=155.3, 113.1)",
                      fontsize=6.5, fontweight="bold", ha="right", va="center",
                      bbox=dict(boxstyle="round,pad=0.2", facecolor="#FFF9C4", edgecolor="#FBC02D", lw=0.6, alpha=0.95))
 
+# Callout on RaTG13 recombinant RBD
+ax_b_mosaic.annotate("RaTG13 divergent\nRBD introgression\n(Z=20.9, ghost donor)",
+                     xy=(23300, 1), xytext=(24000, 1.0),
+                     arrowprops=dict(facecolor="#222222", arrowstyle="->", lw=0.9),
+                     fontsize=6.5, fontweight="bold", ha="left", va="center",
+                     bbox=dict(boxstyle="round,pad=0.2", facecolor="#F3E8FF", edgecolor="#9333EA", lw=0.6, alpha=0.95))
+
 legend_elements_b = [
-    patches.Patch(facecolor="#0072B2", edgecolor="#222222", label="RaTG13-like NTD Ancestral Module"),
-    patches.Patch(facecolor="#D55E00", edgecolor="#222222", label="ACE2-Adapted Receptor Ridge Module"),
+    patches.Patch(facecolor="#0072B2", edgecolor="#222222", label="Ancestral nCoV / ACE2 Contact Ridge Module"),
+    patches.Patch(facecolor="#9333EA", edgecolor="#222222", label="RaTG13 Divergent Recombinant Cassette"),
     patches.Patch(facecolor="#56B4E9", edgecolor="#222222", label="Laos BANAL Lineage"),
     patches.Patch(facecolor="#E69F00", edgecolor="#222222", label="Thailand RacCS203 Clade"),
     patches.Patch(facecolor="#009E73", edgecolor="#222222", label="Conserved S2 Fusion Subunit")
@@ -438,10 +446,10 @@ labels_c = {
 
 render_tanglegram(ax_c_tree, t_ntd_c, t_rbd_c, color_c, labels_c,
                   ["SARS_CoV_2_Wuhan_Hu_1", "Bat_RaTG13", "Bat_BANAL_52", "Pangolin_MP789"],
-                  "C1  Spike NTD (Codons 1-313)\nRaTG13 Sister Clade",
-                  "C2  Spike RBD (Codons 314-540)\nBANAL-52 / Pangolin ACE2 Clade",
-                  "#0072B2", "#D55E00")
-ax_c_tree.set_title("C   SARS-CoV-2 Incongruence Across Codon 313 Hinge", loc="left", fontweight="bold", pad=8)
+                  "C1  Spike NTD (Codons 1-313)\nShared nCoV / RaTG13 Clade",
+                  "C2  Spike RBD (Codons 314-540)\nRaTG13 Shifts Basally; BANAL-52 / SC2 Sister Clade",
+                  "#0072B2", "#9333EA")
+ax_c_tree.set_title("C   SARS-CoV-2 / RaTG13 Incongruence Across Codon 313 Hinge", loc="left", fontweight="bold", pad=8)
 
 # =========================================================================
 # PANEL D: Ancestral Recombination Graph (ARG) & Macro-Evolutionary Validation
@@ -452,9 +460,9 @@ ax_d_tree.axis("off")
 ax_d_tree.set_title("D   Polarized Ancestral Recombination Graph (ARG) for Sarbecovirus Progenitors",
                     loc="left", fontweight="bold", pad=8)
 
-c_blue = "#0072B2"      # RaTG13 / NTD Chassis
-c_red = "#D55E00"       # Wuhan-Hu-1 / ACE2 Ridge
-c_cyan = "#56B4E9"      # BANAL-52 / Laos
+c_blue = "#0072B2"      # SARS-CoV-2 / Ancestral nCoV Backbone
+c_purple = "#9333EA"    # RaTG13 Recombinant RBD
+c_cyan = "#56B4E9"      # BANAL-52 / Laos Ancestral Trunk
 c_teal = "#009E73"      # BANAL-103 / 247
 c_gold = "#E69F00"      # RacCS203 (Thailand)
 c_pink = "#CC79A7"      # Pangolin MP789
@@ -463,10 +471,10 @@ col_tree = "#333333"
 
 # 9 Taxa spaced evenly from y=0.0 to 8.0, exactly matching Panel C
 taxa_info = [
-    ("SARS-CoV-2 (Wuhan-Hu-1)", c_red, 0.0, "(Emergent Chimera)", True),
-    ("Bat RaTG13", c_blue, 1.0, "(Yunnan NTD Chassis)", True),
-    ("Pangolin MP789", c_pink, 2.0, "(ACE2 Receptor Ridge)", True),
-    ("Bat BANAL-52", c_cyan, 3.0, "(Laos ACE2 Donor)", True),
+    ("SARS-CoV-2 (Wuhan-Hu-1)", c_blue, 0.0, "(Ancestral ACE2 Trunk)", True),
+    ("Bat RaTG13", c_purple, 1.0, "(Recombinant RBD Cassette)", True),
+    ("Pangolin MP789", c_pink, 2.0, "(Shared ACE2 Receptor Ridge)", True),
+    ("Bat BANAL-52", c_cyan, 3.0, "(Laos Ancestral Trunk)", True),
     ("Bat BANAL-103", c_teal, 4.0, "(Laos Reservoir)", True),
     ("Bat BANAL-247", c_teal, 5.0, "(Laos Mosaic NTD)", True),
     ("Bat RacCS203", c_gold, 6.0, "(Thailand Reservoir)", True),
@@ -535,26 +543,31 @@ for name, col, y, desc, is_focal in taxa_info:
     ax_d_tree.text(x_desc, y, desc, ha="left", va="center", fontsize=5.8, color="#555555", style="italic")
 
 # Tree scale bar matching Panel C
-ax_d_tree.plot([0.5, 1.0], [-0.5, -0.5], color="#222222", lw=1.1)
-ax_d_tree.text(0.75, -0.75, "0.05 subs/site", ha="center", fontsize=5.8, color="#222222")
+ax_d_tree.plot([0.5, 1.0], [-0.75, -0.75], color="#222222", lw=1.1)
+ax_d_tree.text(0.75, -1.0, "0.05 subs/site", ha="center", fontsize=5.8, color="#222222")
 
-# RETICULATION 1: ACE2 Receptor-Binding Ridge Introgression
-retic1_start = (4.6, 3.0)
-retic1_ctrl1 = (5.1, 2.2)
-retic1_ctrl2 = (5.2, 0.8)
-retic1_end = (4.9, 0.05)
+# RETICULATION 1: Divergent RBD Introgression into Bat RaTG13 from Ghost Donor
+retic1_start = (1.9, 2.7)  # Unsampled ancestral bat sarbecovirus reservoir
+retic1_ctrl1 = (3.0, 1.9)
+retic1_ctrl2 = (4.0, 1.3)
+retic1_end = (4.9, 1.05)   # Entering Bat RaTG13
 
 ts = np.linspace(0, 1, 50)
 x_arc1 = (1 - ts)**3 * retic1_start[0] + 3 * (1 - ts)**2 * ts * retic1_ctrl1[0] + 3 * (1 - ts) * ts**2 * retic1_ctrl2[0] + ts**3 * retic1_end[0]
 y_arc1 = (1 - ts)**3 * retic1_start[1] + 3 * (1 - ts)**2 * ts * retic1_ctrl1[1] + 3 * (1 - ts) * ts**2 * retic1_ctrl2[1] + ts**3 * retic1_end[1]
 
-ax_d_tree.plot(x_arc1, y_arc1, color=c_red, lw=1.8, linestyle="--", zorder=6)
+ax_d_tree.plot(x_arc1, y_arc1, color=c_purple, lw=1.8, linestyle="--", zorder=6)
 ax_d_tree.annotate("", xy=retic1_end, xytext=(x_arc1[-4], y_arc1[-4]),
-                   arrowprops=dict(arrowstyle="-|>", color=c_red, lw=1.8, mutation_scale=10), zorder=7)
+                   arrowprops=dict(arrowstyle="-|>", color=c_purple, lw=1.8, mutation_scale=10), zorder=7)
 
-ax_d_tree.text(1.8, -0.52,
-               "ACE2 Ridge Introgression (codons 314–540 / nt 940–1620)\nBANAL-52/Pangolin pool -> SARS-CoV-2 (P = 1.75e-23, Z = 8.23)",
-               ha="left", va="center", fontsize=5.8, color="#B91C1C", fontweight="semibold", linespacing=1.2)
+# Ghost donor node marker
+ax_d_tree.scatter(retic1_start[0], retic1_start[1], color="#9333EA", s=30, marker="o", facecolors="none", lw=1.2, zorder=7)
+ax_d_tree.text(retic1_start[0] - 0.15, retic1_start[1] + 0.15, "Ghost Donor\n(Unsampled Bat CoV)",
+               ha="right", va="bottom", fontsize=5.6, color="#7E22CE", style="italic", fontweight="semibold")
+
+ax_d_tree.text(2.0, -0.75,
+               "Divergent RBD Introgression (codons 314–540 / nt 940–1620)\nUnsampled Bat Reservoir -> Bat RaTG13 (P = 2.1e-9, Z = 20.9)\nAncestral ACE2 contact ridge preserved in SARS-CoV-2 / BANAL-52 trunk",
+               ha="left", va="center", fontsize=5.8, color="#7E22CE", fontweight="semibold", linespacing=1.2)
 
 # RETICULATION 2: RacCS203 NTD Micro-Conversions into BANAL-247
 retic2_start = (2.6, 6.0)
