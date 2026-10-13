@@ -6,48 +6,46 @@ Recombination has long challenged phylogenetic theory.
 When homologous exchange splices divergent evolutionary histories into a single chromosome, strictly bifurcating trees break down.
 Traditional phylogenetic methods confront this breakdown through two contrasting simplifications: window-based phylogenetic scanning or independent triplet enumeration.
 Both strategies incur severe trade-offs.
-Partition-searching algorithms like GARD navigate an astronomical search space of tree topologies, creating computational bottlenecks that force researchers to downsample genomic cohorts.
-Conversely, triplet scanning algorithms discard phylogenetic context, fracturing single ancestral recombination events into dozens of redundant alerts and misidentifying non-recombinant background lineages.
+Partition-searching algorithms such as GARD evaluate an astronomical search space of tree topologies, and the resulting computational bottleneck forces investigators to downsample genomic cohorts.
+Conversely, triplet scanning algorithms discard global phylogenetic context.
+They fracture single ancestral recombination events into dozens of redundant alerts and misclassify non-recombinant background lineages.
 
-\RhizAeon demonstrates that discrete tree search is unnecessary for identifying recombination.
-By embedding sequence alignments into continuous metric trajectory space, reticulation emerges as physical kinematic displacement.
-Instantaneous velocity shifts along chromosomes quantify local evolutionary discordance.
-Consolidating trajectories into ancestral rosters resolves reticulation without heuristic taxic downsampling.
-By embedding multi-sequence alignments into continuous metric trajectory space rather than searching discrete trees, the framework demonstrates that reticulation can be modeled as physical kinematic displacement along chromosomes without loss of taxonomic context.
-This formulation bridges the historical divide between fine-scale population-genetic ARG inference and macro-evolutionary phylogenetic networks.
-It establishes that whole-cohort continuous kinematics can resolve reticulate evolution in linear time.
+Continuous trajectory mechanics eliminates discrete tree search from recombination detection.
+By embedding multi-sequence alignments into continuous metric space, reticulation emerges as physical kinematic displacement along chromosomes without loss of taxonomic context.
+Instantaneous velocity shifts along the alignment quantify local genealogical discordance, while consolidating trajectories into ancestral rosters groups co-recombinant clades without taxic downsampling.
+Continuous trajectory tracking bridges the historical divide between fine-scale population-genetic ARG inference and macro-evolutionary phylogenetic networks.
+Whole-cohort continuous kinematics reconstructs reticulate evolution in linear time.
 
 \subsection{Resolving Real-World Evolutionary Complexities}
-Natural viral and bacterial populations violate the clean assumptions of neutral coalescent models.
-Pathogen outbreaks generate transmission swarms of near-identical descendants.
-Natural transformation frequently imports short micro-conversions from distant species.
-Introgressing donors are often absent from contemporary surveillance cohorts, residing in unsequenced wildlife reservoirs.
-
-Our simulation benchmarks and empirical applications show that \RhizAeon resolves each of these challenges.
-In epidemic transmission clusters, trajectory coherence collapses clonal swarms into single ancestral events, preventing the combinatorial event inflation that systematically cripples discrete triplet heuristics whenever recombinant lineages spread across multiple sampled hosts.
+Natural viral and bacterial populations violate the idealized assumptions of neutral coalescent models: pathogen outbreaks generate transmission swarms of near-identical descendants, natural transformation imports short micro-conversions from distant species, and introgressing donors frequently reside in unsampled wildlife reservoirs.
+Simulation benchmarks and empirical applications confirm that continuous trajectory deconvolution withstands each of these operational perturbations.
+In epidemic transmission clusters, trajectory coherence collapses clonal swarms into single ancestral events and prevents the combinatorial event inflation that cripples discrete triplet heuristics whenever recombinant lineages spread across multiple hosts.
 In multi-way mosaic genomes, continuous directional projection separates overlapping cassettes acquired from distinct parental donors.
-In ghost donor introgression, directional consistency constraints ensure that \RhizAeon abstains from reporting spurious transfers when the donor has no close sampled relative, preventing the false framing of innocent contemporary lineages that plagues closed-world triplet heuristics, while accurately capturing introgressions whenever a surrogate sister lineage is present.
-Across bacterial chromosomes, multi-scale matched filters detect micro-conversions down to 50 base pairs, capturing sparse signals that evade fixed-width windows.
-These capabilities demonstrate that continuous trajectory mechanics can withstand the messiness of real-world evolutionary dynamics.
+In ghost donor introgression, directional consistency constraints enforce principled abstention when an unsampled donor lacks close sampled relatives.
+Principled abstention prevents the false framing of unadmixed contemporary lineages that plagues closed-world triplet heuristics, while capturing introgressions whenever a surrogate sister lineage is present.
+Across bacterial chromosomes, multi-scale matched filters isolate micro-conversions down to 50 base pairs and recover sparse signals that evade fixed-width windows.
+Together, multi-scale filters and directional consistency constraints withstand the complexities of natural pathogen evolution.
 
 \subsection{Translational Surveillance and Vaccine Escape}
-The speed of \RhizAeon changes the practical economics of pathogen genomic surveillance.
-Historically, whole-genome recombination screens required cluster-scale supercomputing or days of MCMC sampling.
+Sub-second and multi-second execution runtimes change the practical economics of pathogen genomic surveillance.
+Historically, whole-genome recombination screens required cluster-scale supercomputing or days of Markov chain Monte Carlo sampling.
 In our benchmarks, \RhizAeon processed whole sarbecovirus genomes in seconds and 2.2~Mb pneumococcal chromosomes in fractions of a second.
-Compiling the core engine to WebAssembly enables interactive, client-side deconvolution directly within standard web browsers.
-Public health laboratories can screen pathogen cohorts locally without transmitting sensitive sequence data to external servers or installing complex software dependencies.
+Compiling the core engine to WebAssembly enables interactive client-side deconvolution within standard web browsers.
+Public health laboratories can screen pathogen cohorts locally without transmitting sensitive sequence data to external servers or installing software dependencies.
 
-This operational efficiency directly informs vaccine design and outbreak preparedness.
-In our whole-genome analysis of sarbecovirus evolution, \RhizAeon resolved the longstanding reciprocal attribution debate in the Spike glycoprotein at codon 313, demonstrating that the human-compatible ACE2 contact ridge was ancestral to the SARS-CoV-2 and Laotian BANAL bat lineages, whereas close bat relatives such as RaTG13 acquired divergent RBD cassettes via reticulation with unsampled bat reservoirs.
-In \textit{Streptococcus pneumoniae}, the algorithm mapped the capsular serotype switch from 23F to 19A driving clinical escape from the PCV7 conjugate vaccine alongside penicillin-binding protein replacements.
-Rapid detection of such modular transfers allows epidemiologists to track adaptive antigenic shifts in real time.
+Rapid trajectory deconvolution informs vaccine design and outbreak preparedness.
+In our whole-genome analysis of sarbecovirus evolution, continuous trajectory tracking clarified the longstanding reciprocal attribution debate in the Spike glycoprotein at codon 313.
+Trajectory colinearity confirmed that the human-compatible ACE2 contact ridge was ancestral to the SARS-CoV-2 and Laotian BANAL bat lineages, whereas close bat relatives such as RaTG13 acquired divergent RBD cassettes via reticulation with unsampled bat reservoirs.
+In \textit{Streptococcus pneumoniae}, whole-chromosome deconvolution pinpointed the capsular serotype switch from 23F to 19A driving clinical escape from the PCV7 conjugate vaccine alongside penicillin-binding protein replacements.
+Rapid detection of such modular transfers equips epidemiologists to track adaptive antigenic shifts in real time.
 
 \subsection{Limitations, Boundary Conditions, and Outlook}
 Several biological boundary conditions warrant careful consideration.
-First, continuous trajectory deconvolution requires sufficient mutational density to distinguish evolutionary displacement from stochastic substitution noise.
-In extremely low-divergence cohorts ($d < 0.005$), distinguishing mutations become sparse, defining an intrinsic physical limit for all sequence-based recombination detection.
-Second, while \RhizAeon accurately localizes breakpoints and attributes parental clades, fine-scale branch-length estimation within individual partitions still benefits from dedicated maximum-likelihood or Bayesian refinement.
+Continuous trajectory deconvolution requires sufficient mutational density to distinguish evolutionary displacement from stochastic substitution noise.
+In extremely low-divergence cohorts ($d < 0.005$), distinguishing mutations become sparse and define an intrinsic physical limit for all sequence-based recombination detection.
+Furthermore, although trajectory mechanics localizes breakpoints and attributes parental clades with high precision, fine-scale branch-length estimation within individual partitions still benefits from downstream maximum-likelihood or Bayesian refinement.
 
 Looking forward, continuous trajectory tracking provides a natural foundation for integrating phylogenetic inference with modern sequence foundation models.
-Attention matrices extracted from pre-trained protein language models encode deep biophysical and evolutionary constraints, providing an unexploited substrate that could be coupled with continuous metric mechanics to annotate reticulate events both structurally and functionally as they emerge.
-By replacing discrete tree search with continuous sequence kinematics, \RhizAeon offers a scalable mathematical foundation for reticulate genomics.
+Attention matrices extracted from pre-trained protein language models encode deep biophysical and evolutionary constraints.
+Coupling these learned representations with continuous metric mechanics will annotate reticulate transfers both structurally and functionally as they emerge.
+Replacing discrete tree search with continuous sequence kinematics establishes a scalable mathematical foundation for reticulate genomics.
