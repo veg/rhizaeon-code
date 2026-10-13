@@ -26,10 +26,13 @@ Both methods followed identical curves and peaked near 26\% at $\rho = 16$ befor
 At realistic diversity ($\theta \ge 50$), sensitivity climbed rapidly to reach 88\% at $\rho = 16$ and 98\% at $\rho = 64$ ($\theta = 200$).
 Trajectory deconvolution matched 3SEQ power while scanning each alignment in 15--26 milliseconds without testing triplets individually.
 
-The fundamental difference between the two approaches lies in event counting (Figure~\ref{fig:posada_benchmark}B).
+The fundamental difference between the two approaches lies in event counting and bipartite event precision (Figure~\ref{fig:posada_benchmark}B and Supplementary Table~\ref{tab:supp_posada_summary}).
 In coalescent trees, an ancestral recombination event is often inherited by multiple descendants.
 Evaluating triplets independently flags every combination of descendant lineages as a separate event and inflates counts three- to ten-fold above Hudson's theoretical expectation ($\mathbb{E}[R]$, dashed line) to 16.3 reported events per alignment at $\theta = 200, \rho = 64$.
-\RhizAeon analyzes all sequences together and groups shared segments into a single historical event ($\hat{K} \approx 2.1\text{--}4.6$).
+\RhizAeon analyzes all sequences together and groups shared segments into calibrated historical events ($\hat{K} \approx 2.1\text{--}4.6$).
+Whereas alignment-level power scores binary locus detection, event-level precision ($\text{PPV}$) penalizes every ungrounded or split sub-event call under strict one-to-one bipartite matching and weights each matched pair by parental triad attribution ($S_{\mathrm{triad}}$) and SNP overlap ($J_{\mathrm{SNP}}$, Equation~\ref{eq:methods_event_affinity}).
+At high coalescent recombination rates ($\rho \ge 16$), nested crossovers fragment ancestral tracts into short segments containing few informative mutations, which lowers continuous per-event $\text{PPV}$ ($38\%\text{--}45\%$ for \RhizAeon vs.\ $9\%\text{--}16\%$ for 3SEQ at $\theta = 200$) even when alignment-level detection power reaches $96\%\text{--}98\%$.
+% [DARIA adjudicated: Added explicit explanation in Section 3.1 of why continuous bipartite event-level PPV is lower than binary alignment-level detection power in coalescent ARG benchmarks, and why RhizAeon's cohort consolidation yields 2.5- to 4-fold higher PPV than 3SEQ.]
 Combinatorial overcounting in simple 10-taxon trees foreshadows major breakdowns in genomic surveillance, where recombinants form transmission swarms, carry multiple mosaic tracts, or acquire sequence from unsampled lineages.
 
 \begin{figure*}[p]

@@ -1,4 +1,4 @@
-\begin{thebibliography}{35}
+\begin{thebibliography}{36}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -292,5 +292,21 @@ Koichiro Tamura and Masatoshi Nei.
 \newblock \emph{Molecular Biology and Evolution}, 10\penalty0 (3):\penalty0
   512--526, 1993.
 \newblock \doi{10.1093/oxfordjournals.molbev.a040023}.
+
+\bibitem[Temmam et~al.(2022)Temmam, Vongphrachanh, Baquero, Munier, Bonomi,
+  Regnault, Douangboubpha, Karami, Chr{\'e}tien, Sanamxay, Xayaphet,
+  Paphaphanh, Lacoste, Somlor, Lakeomany, Phommavanh, P{\'e}rot, Dehan, Amara,
+  Donati, Bigot, Nilges, Rey, van~der Werf, Brey, and Eloit]{temmam2022bat}
+Sarah Temmam, Khamsing Vongphrachanh, Eduard Baquero, Sandrine Munier,
+  Massimiliano Bonomi, B{\'e}atrice Regnault, Bounsavane Douangboubpha, Yasaman
+  Karami, Delphine Chr{\'e}tien, Daosavanh Sanamxay, Vilakhan Xayaphet,
+  Phetphoumin Paphaphanh, Vincent Lacoste, Somphavanh Somlor, Khaithong
+  Lakeomany, Nothasin Phommavanh, Philippe P{\'e}rot, Oc{\'e}ane Dehan,
+  Faustine Amara, Flora Donati, Thomas Bigot, Michael Nilges, F{\'e}lix~A. Rey,
+  Sylvie van~der Werf, Paul~T. Brey, and Marc Eloit.
+\newblock Bat coronaviruses related to {SARS-CoV-2} and capable of using human
+  {ACE2} to enter cells.
+\newblock \emph{Nature}, 604\penalty0 (7905):\penalty0 330--336, 2022.
+\newblock \doi{10.1038/s41586-022-04532-4}.
 
 \end{thebibliography}

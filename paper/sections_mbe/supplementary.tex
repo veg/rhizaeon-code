@@ -416,7 +416,9 @@ GARD BP 21 (ORF7b / ORF8) & 27,685 & 28,571 & 28,580 & 28,670 & 27,775 & 90 / 90
 \small
 \caption{Quantitative comparison of \RhizAeon and 3SEQ across the 3,200-trial Posada \& Crandall (2001) benchmark suite.
 Results are grouped by evolutionary regime: false positive evaluation under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$, $\rho = 0$, 1,200 trials), clock-like null controls ($\rho = 0$, 400 trials), and recombinant coalescent trials ($\rho \in \{1, 4, 16, 64\}$, 1,600 trials).
-Columns report the population mutation parameter ($\theta$), population recombination parameter ($\rho$), alignment-level power or FPR (\%), mean inferred event count ($\hat{K}$), precision ($\text{PPV}$), triad lineage attribution accuracy ($S_{\mathrm{triad}}$), and execution runtime per alignment (ms).}
+Columns report the population mutation parameter ($\theta$), population recombination parameter ($\rho$), binary alignment-level power or FPR (\%), mean inferred event count ($\hat{K}$), continuous bipartite event precision ($\text{PPV}$), triad lineage attribution accuracy ($S_{\mathrm{triad}}$), and execution runtime per alignment (ms).
+Whereas alignment-level power scores binary locus detection, $\text{PPV}$ weights one-to-one Hungarian-matched events by $S_{\mathrm{triad}} \times J_{\mathrm{SNP}}$ and penalizes ungrounded or over-split calls (Section~\ref{subsec:posada_benchmark}).}
+% [DARIA adjudicated: (1) Added explicit explanation of why continuous bipartite event-level PPV is lower than binary alignment-level power in both the Table S3 caption and main text Section 3.1; (2) Noted suggestion regarding additional domain-specific simulators/tools (GARD, RDP5, ClonalFrameML, fastGEAR, RIPPLES), which are benchmarked on their native empirical cohorts in Section 4 and Table 1 while 3SEQ serves as the fast CLI-automatable exact triplet baseline across the 5,480-alignment simulation suites.]
 \label{tab:supp_posada_summary}
 {\setlength{\tabcolsep}{4.5pt}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l c rrrrr rrrrr@{}}
