@@ -4,66 +4,67 @@
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{figures/fig_sarbecovirus_recombination_landscape.pdf}
-\caption{\textbf{Sarbecovirus whole-genome recombination landscapes, Spike mosaicism, and ancestral recombination graphs.}
-\textbf{A.} Genome-wide breakpoint flux $\Phi_{\mathrm{bp}}(u)$ across 83 sarbecoviruses ($30.9$~kb) aligned to gene annotations. Recombination hotspots concentrate at the Spike $5'$ NTD junction (21,825~bp), codon 313 hinge (22,764~bp), S1/S2 furin site (23,618~bp), and ORF8/N cluster (28,810~bp). Coldspots protect the RdRp catalytic core (nt 13,400--16,200) and Spike S2 fusion machinery. Beneath the genes, \RhizAeon changepoints (orange) match 21 published GARD breakpoints (blue) with 99.0~nt median deviation.
-\textbf{B.} Reticulate Spike glycoprotein mosaicism (nt 21,000--26,000). Rather than SARS-CoV-2 emerging as a terminal recombinant chimera, Wuhan-Hu-1 and Laotian bat isolate BANAL-52 exhibit continuous collinearity across the entire Spike glycoprotein (blue, $\sim 5\%$ divergence). In contrast, Yunnan bat isolate RaTG13 harbors a divergent recombinant cassette specifically within the receptor-binding domain (RBD, codons 314--540; purple, divergence spiking to $13.8\%$), acquired from an unsampled bat reservoir.
-\textbf{C.} Segmental incongruence across codon 313 in a two-partition tanglegram. Wuhan-Hu-1, BANAL-52, and RaTG13 cluster sister in the NTD (C1). In the RBD (C2), Wuhan-Hu-1 and BANAL-52 remain tightly clustered, while RaTG13 diverges basally into an outgroup position.
-\textbf{D.} Polarized Ancestral Recombination Graph (ARG). Reticulation arcs trace the introgression of the divergent RBD cassette into RaTG13 from an unsampled bat reservoir ($Z = 20.9, P = 2.1 \times 10^{-9}$), while the ancestral SARS-CoV-2 / BANAL-52 trunk preserved the human-compatible ACE2 contact ridge, alongside NTD micro-conversions from Thai RacCS203 into BANAL-247. The tripartite ARG reduces residual strain by $74.0\%$ ($\Delta\mathrm{BIC} = 0.0$).
+\caption{Sarbecovirus whole-genome recombination profiles, Spike mosaicism, and ancestral recombination graphs.
+(A) Genome-wide breakpoint flux $\Phi_{\mathrm{bp}}(u)$ across 83 sarbecoviruses ($30.9$~kb) aligned to gene annotations. Recombination hotspots concentrate at the Spike $5'$ NTD junction (21,825~bp), codon 313 hinge (22,764~bp), S1/S2 furin site (23,618~bp), and ORF8/N cluster (28,810~bp). Coldspots protect the RdRp catalytic core (nt 13,400--16,200) and Spike S2 fusion machinery. Beneath the genes, \RhizAeon changepoints (orange) match 21 published GARD breakpoints (blue) with 99.0~nt median deviation.
+(B) Reticulate Spike glycoprotein mosaicism (nt 21,000--26,000). Rather than SARS-CoV-2 emerging as a terminal recombinant chimera, Wuhan-Hu-1 and Laotian bat isolate BANAL-52 exhibit continuous collinearity across the entire Spike glycoprotein (blue, $\sim 5\%$ divergence). In contrast, Yunnan bat isolate RaTG13 harbors a divergent recombinant cassette specifically within the receptor-binding domain (RBD, codons 314--540, purple, divergence spiking to $13.8\%$), acquired from an unsampled bat reservoir.
+(C) Segmental incongruence across codon 313 in a two-partition tanglegram. Wuhan-Hu-1, BANAL-52, and RaTG13 cluster sister in the NTD (C1). In the RBD (C2), Wuhan-Hu-1 and BANAL-52 remain tightly clustered, while RaTG13 diverges basally into an outgroup position.
+(D) Polarized Ancestral Recombination Graph (ARG). Reticulation arcs trace the introgression of the divergent RBD cassette into RaTG13 from an unsampled bat reservoir ($Z = 20.9, P = 2.1 \times 10^{-9}$), while the ancestral SARS-CoV-2 / BANAL-52 trunk preserved the human-compatible ACE2 contact ridge, alongside NTD micro-conversions from Thai RacCS203 into BANAL-247. The tripartite ARG reduces residual strain by $74.0\%$ ($\Delta\mathrm{BIC} = 0.0$).
 }
 \label{fig:sarbecovirus_recombination_landscape}
 \end{figure*}
 
-\subsection{Deconvolving Recombination Landscapes and Mosaic Genomes in Sarbecoviruses}
+\subsection{Deconvolving Recombination Profiles and Mosaic Genomes in Sarbecoviruses}
 \label{subsec:sarbecoviruses}
 
 Sarbecoviruses, the subgenus of coronaviruses that includes SARS-CoV and SARS-CoV-2, evolve under frequent homologous recombination within bat and mammalian reservoirs.
-When investigating recombination across these viral cohorts, genomic screens serve two distinct goals: mapping chromosome-wide landscapes to identify hotspots and coldspots, and resolving the mosaic anatomy of individual recombinant genomes.
+When investigating recombination across these viral cohorts, genomic screens serve two distinct goals: mapping chromosome-wide profiles to identify hotspots and coldspots, and reconstructing the mosaic anatomy of individual recombinant genomes.
 Phylogenetic partition search, implemented in tools such as GARD, explores discrete tree space to detect topological discordance.
-This combinatorial search creates a severe computational bottleneck.
-In their landmark screen of sarbecovirus origins, \citet{lytras2022exploring} were forced to downsample their 78-genome cohort to a representative subset of 22 taxa to make phylogenetic breakpoint screening computationally tractable.
+Combinatorial tree search creates a severe computational bottleneck.
+In their foundational screen of sarbecovirus origins, \citet{lytras2022exploring} downsampled their 78-genome cohort to a representative subset of 22 taxa to make phylogenetic breakpoint screening computationally tractable.
 For a complete 78-taxon alignment spanning over 30~kb, exhaustive phylogenetic model selection under GARD requires multiple days of high-performance cluster compute.
-\RhizAeon eliminates this bottleneck.
-By projecting alignments into continuous metric space, it quantifies spatial velocity changes as a continuous breakpoint flux $\Phi_{\mathrm{bp}}(u)$ in $\mathcal{O}(N K L)$ time.
-\RhizAeon scanned the full 78-taxon alignment (30,956~bp, 13,160 informative sites) in 1.48~seconds (18.2~seconds for the complete pipeline, including local tree reconstruction and interactive dashboard rendering) and an expanded 83-taxon cohort (30,965~bp, 13,260 segregating sites) in 25.0~seconds.
-This enables exhaustive, whole-cohort reticulation deconvolution without taxon subsampling.
+Continuous trajectory tracking eliminates this bottleneck.
+By projecting alignments into continuous metric space, \RhizAeon quantifies spatial velocity changes as a continuous breakpoint flux $\Phi_{\mathrm{bp}}(u)$ in $\mathcal{O}(N K L)$ time.
+The engine scanned the full 78-taxon alignment (30,956~bp, 13,160 informative sites) in 1.48~seconds (18.2~seconds for the complete pipeline, including local tree reconstruction and interactive dashboard rendering) and an expanded 83-taxon cohort (30,965~bp, 13,260 segregating sites) in 25.0~seconds.
+Linear-time trajectory mechanics permits exhaustive whole-cohort reticulation deconvolution without taxon subsampling.
 
-The genomic flux reveals sharp evolutionary regionalization: pronounced coldspots protect the catalytic core of RNA-dependent RNA polymerase (RdRp, nt 13,400--16,200; annotated Wuhan-Hu-1 catalytic core nt 13,468--16,236) and the heptad-repeat fusion machinery of Spike S2 (nt 24,600--25,600).
+The genomic flux reveals sharp evolutionary regionalization: pronounced coldspots protect the catalytic core of RNA-dependent RNA polymerase (RdRp, nt 13,400--16,200, annotated Wuhan-Hu-1 catalytic core nt 13,468--16,236) and the heptad-repeat fusion machinery of Spike S2 (nt 24,600--25,600).
 Structural constraints in these regions preclude modular exchange (Figure~\ref{fig:sarbecovirus_recombination_landscape}A).
 Recombination hotspots concentrate at the Spike $5'$ NTD junction (21,825~bp), the codon 313 hinge between the NTD and receptor-binding domain (RBD, 22,764~bp), the S1/S2 furin cleavage site (23,618~bp), and the ORF8/Nucleocapsid boundary (28,810~bp).
-Continuous changepoints show close spatial concordance with the 21 published GARD breakpoints of \citet{lytras2022exploring} (median deviation 99.0~nt; Figure~\ref{fig:sarbecovirus_recombination_landscape}A).
+Continuous changepoints show close spatial concordance with the 21 published GARD breakpoints of \citet{lytras2022exploring} (median deviation 99.0~nt, Figure~\ref{fig:sarbecovirus_recombination_landscape}A).
 \RhizAeon localized the critical S1/S2 junction within 9~nt (24,461 vs.\ 24,452~bp) and the RdRp exit within 12~nt.
-Analyzing the exhaustive 83-sequence cohort reveals fine-grained dynamics invisible under downsampling: incorporating Laotian bat BANAL isolates causes peak breakpoint flux in the Spike NTD to surge four-fold (from 0.41 to 1.51~$Z$/nt), identifying a recurrent micro-conversion hub.
+Analyzing the exhaustive 83-sequence cohort uncovers fine-grained dynamics invisible under downsampling: incorporating Laotian bat BANAL isolates causes peak breakpoint flux in the Spike NTD to surge four-fold (from 0.41 to 1.51~$Z$/nt) and reveals a recurrent micro-conversion hub.
 
-Simultaneously, \RhizAeon resolves the mosaic anatomy of individual recombinant lineages at single-nucleotide precision (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,C).
-In the Spike glycoprotein (3,843~nt, 1,153 variable sites; scanned in 18.7~ms), \RhizAeon pinpointed the historic crossover boundary at codon 313 ($Z = 8.23, P = 4.07 \times 10^{-22}$).
-Importantly, multi-genome sequence manifold tracking resolves the longstanding reciprocal attribution ambiguity surrounding SARS-CoV-2 and RaTG13 \citep{boni2020evolutionary}.
+Simultaneously, continuous trajectory tracking reconstructs the mosaic anatomy of individual recombinant lineages at single-nucleotide precision (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,C).
+In the Spike glycoprotein (3,843~nt, 1,153 variable sites, scanned in 18.7~ms), \RhizAeon pinpointed the historic crossover boundary at codon 313 ($Z = 8.23, P = 4.07 \times 10^{-22}$).
+Multi-genome sequence manifold tracking clarifies the longstanding reciprocal attribution ambiguity surrounding SARS-CoV-2 and RaTG13 \citep{boni2020evolutionary}.
 In early three-way comparisons lacking intermediate wildlife isolates, the discordance between an RaTG13-like NTD and a pangolin-like ACE2-binding motif led to speculation that SARS-CoV-2 arose through a terminal chimeric recombination event.
-However, \RhizAeon's continuous trajectory tracking demonstrates that Wuhan-Hu-1 and Laotian bat isolate BANAL-52 exhibit unbroken collinearity across the entirety of Spike ($d = 0.0556$ in NTD, $d = 0.0617$ in RBD, and $d = 0.0457$ in S2; Figure~\ref{fig:sarbecovirus_recombination_landscape}B).
-This confirms that the human-transmissible ACE2 contact ridge represents an ancestral bat trait circulating naturally in \textit{Rhinolophus} reservoirs across Southeast Asia.
-In contrast, it is RaTG13 that underwent recombination: while sharing the ancestral NTD and S2 backbone ($d \approx 0.05$), its divergence spikes more than 2.5-fold specifically within the RBD ($d = 0.1380$; Figure~\ref{fig:sarbecovirus_recombination_landscape}C), reflecting the acquisition of a divergent cassette from an unsampled bat lineage.
+However, continuous trajectory tracking demonstrates that Wuhan-Hu-1 and Laotian bat isolate BANAL-52 exhibit unbroken collinearity across the entirety of Spike ($d = 0.0556$ in NTD, $d = 0.0617$ in RBD, and $d = 0.0457$ in S2, Figure~\ref{fig:sarbecovirus_recombination_landscape}B).
+Unbroken collinearity across Spike confirms that the human-transmissible ACE2 contact ridge represents an ancestral bat trait circulating naturally in \textit{Rhinolophus} reservoirs across Southeast Asia.
+In contrast, RaTG13 underwent recombination: while sharing the ancestral NTD and S2 backbone ($d \approx 0.05$), its divergence spikes more than 2.5-fold specifically within the RBD ($d = 0.1380$, Figure~\ref{fig:sarbecovirus_recombination_landscape}C), which reflects the acquisition of a divergent cassette from an unsampled bat lineage.
 % [DARREN adjudicated: Clarified reciprocal interpretations (RaTG13 vs Wuhan-Hu-1 recombinant RBD) following Boni et al. (2020) and how full-genome ARG polarization resolves the polarity.]
 
-Multi-scale scanning also resolves mosaic architectures in wildlife reservoirs.
+Multi-scale scanning also reconstructs mosaic architectures in wildlife reservoirs.
 In Laotian bat isolate BANAL-247, \RhizAeon identified a tripartite mosaic (Figure~\ref{fig:sarbecovirus_recombination_landscape}B).
-While its backbone and S2 subunit belong to northern Laos \textit{Rhinolophus malayanus} viruses ($>98.5\%$ identity to BANAL-236/103), its Spike NTD harbors three nested micro-conversions (nt 21,909--22,011, $Z = 155.3$; nt 22,054--22,251, $Z = 113.1$; nt 22,318--22,592, $Z = 81.2$).
-These were donated by a Thai \textit{Rhinolophus shameli} reservoir related to RacCS203 (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,D).
-Cross-clade exchange demonstrates that Southeast Asian sarbecoviruses undergo modular gene transfer across divergent host species and regions.
+While its backbone and S2 subunit belong to northern Laos \textit{Rhinolophus malayanus} viruses ($>98.5\%$ identity to BANAL-236/103), its Spike NTD harbors three nested micro-conversions (nt 21,909--22,011, $Z = 155.3$, nt 22,054--22,251, $Z = 113.1$, and nt 22,318--22,592, $Z = 81.2$).
+A Thai \textit{Rhinolophus shameli} reservoir related to RacCS203 donated all three NTD micro-conversions (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,D).
+Cross-clade exchange confirms that Southeast Asian sarbecoviruses undergo modular gene transfer across divergent host species and geographic regions.
 
-\RhizAeon synthesizes these events into a parameterized Ancestral Recombination Graph (ARG; Figure~\ref{fig:sarbecovirus_recombination_landscape}D).
-In the Spike glycoprotein, statistical model comparison across 9 sarbecoviruses decisively favors a tripartite modular ARG ($H_3$: NTD chassis, divergent RBD cassette, and S2 backbone; $\Delta\mathrm{BIC} = 0.0$) over unpolarized trees ($\Delta\mathrm{BIC} = +170.9$) and a clonal null ($\Delta\mathrm{BIC} = +1654.8$).
-Polarizing the reticulation demonstrates that the divergent RBD cassette was introgressed into the RaTG13 lineage from an unsampled bat reservoir ($Z = 20.9, P = 2.1 \times 10^{-9}$), while the ancestral SARS-CoV-2 / BANAL-52 trunk preserved the human-compatible ACE2 contact ridge ($94.2\%$ synapomorphic concordance, $P = 1.75 \times 10^{-23}$), reducing residual metric strain by $74.0\%$ ($3.34\% \to 0.87\%$).
+\RhizAeon synthesizes these events into a parameterized Ancestral Recombination Graph (ARG, Figure~\ref{fig:sarbecovirus_recombination_landscape}D).
+In the Spike glycoprotein, statistical model comparison across 9 sarbecoviruses favors a tripartite modular ARG ($H_3$: NTD chassis, divergent RBD cassette, and S2 backbone, $\Delta\mathrm{BIC} = 0.0$) over unpolarized trees ($\Delta\mathrm{BIC} = +170.9$) and a clonal null ($\Delta\mathrm{BIC} = +1654.8$).
+Polarizing the reticulation confirms that the divergent RBD cassette introgressed into the RaTG13 lineage from an unsampled bat reservoir ($Z = 20.9, P = 2.1 \times 10^{-9}$).
+Meanwhile, the ancestral SARS-CoV-2 / BANAL-52 trunk preserved the human-compatible ACE2 contact ridge ($94.2\%$ synapomorphic concordance, $P = 1.75 \times 10^{-23}$) and reduced residual metric strain by $74.0\%$ ($3.34\% \to 0.87\%$).
 Across the 30.9~kb genome of 83 sarbecoviruses, consolidating 45 detected tracts yields an ARG of 44 unique reticulations.
 The consolidated network explains $98.82\%$ of total metric strain, matching the $98.85\%$ explained by GARD's 22 unconstrained trees while cutting parameter complexity by $58\%$ (1,559 vs.\ 3,674 parameters).
-It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract concordance under the Synapomorphic Site Concordance Ratio, SSCR; $P < 10^{-15}$).
+It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract concordance under the Synapomorphic Site Concordance Ratio, SSCR, $P < 10^{-15}$).
 
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{figures/fig_spneumoniae_chromosome_landscape.pdf}
-\caption{\textbf{Whole-chromosome recombination deconvolution, antimicrobial resistance mosaicism, and ancestral recombination graphs in \textit{Streptococcus pneumoniae} PMEN1.}
-\textbf{A.} Chromosomal breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (vermillion) and cumulative strain $\rho(u)$ (dashed blue) across 11 global clinical isolates ($2.22$~Mb, Spain23F-1 / PMEN1). Six hotspots emerge: $pbp2x/cps$ (285--352~kb), 732~kb, 1.15~Mb, \textit{folA} (1,620--1,649~kb), 1.72~Mb, and \textit{pspC/cbpA} (2,105--2,138~kb). Tickmarks benchmark \RhizAeon changepoints (orange) against 52 published Gubbins boundaries (blue; $96.2\%$ concordance $\le 2$~kb, median deviation 92.5~nt).
-\textbf{B.} AMR and capsular switch mosaicism (nt 270,000--370,000). Ancestral isolate 2097 carries the core backbone (dark blue); 1731 displays the 1,121~bp active-site \textit{pbp2x} transpeptidase replacement ($P = 9.85 \times 10^{-35}$); 2682 captures a 73.9~kb \textit{pbp2x-cps} co-transfer mega-cassette; and 3355 reveals serotype 23F $\to$ 19A capsule replacement enabling PCV7 vaccine escape.
-\textbf{C.} Segmental incongruence across the \textit{pbp2x} catalytic domain. In the core chromosome, all isolates form a monophyletic complex; in \textit{pbp2x}, isolates 1731 and 2682 diverge into commensal viridans streptococci (\textit{S.~mitis} / \textit{S.~oralis}, $\Delta d > 6\%$).
-\textbf{D.} Polarized ARG for PMEN1 clinical adaptation. Arcs reconcile \textit{pbp2x} active-site import, 73.9~kb co-transfer, and 19A capsular replacement onto the Spain23F-1 backbone.
+\caption{Whole-chromosome recombination deconvolution, antimicrobial resistance mosaicism, and ancestral recombination graphs in \textit{Streptococcus pneumoniae} PMEN1.
+(A) Chromosomal breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (vermillion) and cumulative strain $\rho(u)$ (dashed blue) across 11 global clinical isolates ($2.22$~Mb, Spain23F-1 / PMEN1). Six hotspots emerge: $pbp2x/cps$ (285--352~kb), 732~kb, 1.15~Mb, \textit{folA} (1,620--1,649~kb), 1.72~Mb, and \textit{pspC/cbpA} (2,105--2,138~kb). Tickmarks benchmark \RhizAeon changepoints (orange) against 52 published Gubbins boundaries (blue, $96.2\%$ concordance $\le 2$~kb, median deviation 92.5~nt).
+(B) AMR and capsular switch mosaicism (nt 270,000--370,000). Ancestral isolate 2097 carries the core backbone (dark blue). Isolate 1731 displays the 1,121~bp active-site \textit{pbp2x} transpeptidase replacement ($P = 9.85 \times 10^{-35}$), isolate 2682 captures a 73.9~kb \textit{pbp2x-cps} co-transfer mega-cassette, and isolate 3355 reveals serotype 23F $\to$ 19A capsule replacement driving PCV7 vaccine escape.
+(C) Segmental incongruence across the \textit{pbp2x} catalytic domain. In the core chromosome, all isolates form a monophyletic complex, whereas in \textit{pbp2x}, isolates 1731 and 2682 diverge into commensal viridans streptococci (\textit{S.~mitis} / \textit{S.~oralis}, $\Delta d > 6\%$).
+(D) Polarized ARG for PMEN1 clinical adaptation. Arcs reconcile \textit{pbp2x} active-site import, 73.9~kb co-transfer, and 19A capsular replacement onto the Spain23F-1 backbone.
 }
 \label{fig:spneumoniae_chromosome_landscape}
 \end{figure*}
@@ -71,48 +72,48 @@ It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract conc
 \subsection{Bacterial AMR Mosaicism and Vaccine Escape in \textit{Streptococcus pneumoniae}}
 \label{subsec:bacterial_amr}
 
-Bacterial evolution is accelerated by natural transformation and homologous recombination, driving rapid antimicrobial resistance (AMR), capsular serotype switching, and antigenic diversification from commensal reservoirs \citep{didelot2010impact,croucher2011rapid}.
+Bacterial evolution is accelerated by natural transformation and homologous recombination, which drives rapid antimicrobial resistance (AMR), capsular serotype switching, and antigenic diversification from commensal reservoirs \citep{didelot2010impact,croucher2011rapid}.
 In naturally competent pathogens such as \textit{Streptococcus pneumoniae}, horizontal gene transfer imports replacement tracts ranging from tens of base pairs to over 70~kilobases across species boundaries (e.g., from viridans streptococci \textit{Streptococcus mitis} and \textit{Streptococcus oralis}).
-Resolving these events across bacterial cohorts has historically required heavy computation: ancestral inference tools like ClonalFrame \citep{didelot2007inference}, ClonalFrameML \citep{didelot2015clonalframeml}, and Gubbins \citep{croucher2015rapid} rely on iterative phylogenetic reconstruction and tree peeling via maximum likelihood, demanding hours to weeks of compute.
+Resolving these events across bacterial cohorts has historically required heavy computation: ancestral inference tools like ClonalFrame \citep{didelot2007inference}, ClonalFrameML \citep{didelot2015clonalframeml}, and Gubbins \citep{croucher2015rapid} rely on iterative phylogenetic reconstruction and tree peeling via maximum likelihood, which demands hours to weeks of compute.
 
-\RhizAeon bypasses iterative tree reconstruction by tracking whole-chromosome sequence trajectories in continuous metric space, quantifying spatial turbulence as breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
-We evaluated \RhizAeon on the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 lineage of \textit{S.~pneumoniae} (PMEN1, ATCC 700669; 11 representative global isolates spanning 1984--2008; \citealt{croucher2011rapid}).
+\RhizAeon bypasses iterative tree reconstruction by tracking whole-chromosome sequence trajectories in continuous metric space and quantifies spatial turbulence as breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
+We evaluated \RhizAeon on the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 lineage of \textit{S.~pneumoniae} (PMEN1, ATCC 700669, 11 representative global isolates spanning 1984--2008, \citealt{croucher2011rapid}).
 Because closely related bacterial genomes are predominantly monomorphic along clonal backbones, over 99.9\% of alignment columns carry zero phylogenetic information.
 \RhizAeon exploits this sparsity through lossless SNP compression.
 Indexing out invariant positions reduces the 2.22~Mb chromosome to 1,516 segregating sites---a $1{,}465$-fold dimensional reduction.
 Trajectories are evaluated within this compact space to perform $O(1)$ sub-interval distance queries.
-Identified changepoints map bijectively back to physical base-pair coordinates, projecting continuous flux $\Phi_{\mathrm{bp}}(u)$ and cumulative strain $\rho(u)$ onto the reference genome.
+Identified changepoints map bijectively back to physical base-pair coordinates to project continuous flux $\Phi_{\mathrm{bp}}(u)$ and cumulative strain $\rho(u)$ onto the reference genome.
 Six prominent recombination hotspots emerge (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
 The identified hotspots correspond to key clinical determinants: the penicillin-binding protein and capsule island ($pbp2x/cps$, 285--352~kb), the trimethoprim resistance island (\textit{folA}, 1,620--1,649~kb), and the surface adhesin cluster (\textit{pspC/cbpA}, 2,105--2,138~kb).
 
 Without constructing discrete trees, continuous changepoints show tight spatial concordance with Gubbins boundaries inferred through iterative RAxML optimization \citep{croucher2011rapid,croucher2015rapid} (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
 Across all 52 published whole-chromosome recombination boundaries, \RhizAeon achieves 96.2\% concordance within 2~kb (50/52) and 80.8\% within 1~kb, with a median spatial deviation of only 92.5~nt.
 On primary clinical resistance loci, changepoints match reference boundaries at single-nucleotide precision: the $5'$ boundary of \textit{pbp2x} and the \textit{pspC} locus were both localized within 1~nt of Gubbins, while \textit{folA} was identified within 19~nt.
-Metric trajectory tracking faithfully recovers the genomic footprint of bacterial transformation without iterative tree search.
+Metric trajectory tracking recovers the genomic footprint of bacterial transformation without iterative tree search.
 
-Simultaneously, multi-scale scanning resolves the layered mosaic anatomy of resistance and vaccine escape across individual isolates within the 270--370~kb hotspot (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
-In isolate 1731, \RhizAeon resolves a focal 20.7~kb introgression across \textit{pbp2x} ($Z = 5.35$).
+Simultaneously, multi-scale scanning reconstructs the layered mosaic anatomy of resistance and vaccine escape across individual isolates within the 270--370~kb hotspot (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
+In isolate 1731, trajectory deconvolution identifies a focal 20.7~kb introgression across \textit{pbp2x} ($Z = 5.35$).
 Fine-scale scanning pinpoints the exact 1,121~bp active-site transpeptidase domain replacement ($P = 9.85 \times 10^{-35}, Z = 14.40$) imported from commensal viridans streptococci to abolish $\beta$-lactam binding.
-In isolate 2682, a massive 73.9~kb mega-cassette ($Z = 6.42$) co-transferred \textit{pbp2x} resistance and the capsular locus in a single transformation event (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
+In isolate 2682, a 73.9~kb mega-cassette ($Z = 6.42$) co-transferred \textit{pbp2x} resistance and the capsular locus in a single transformation event (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
 In isolate 3355, \RhizAeon deconvolves the capsular serotype switch from 23F to 19A (15.5~kb, $Z = 3.19$) that enabled escape from the 7-valent pneumococcal conjugate vaccine (PCV7), accompanied by a linked low-affinity \textit{pbp1a} allele.
 A two-partition tanglegram corroborates this incongruence (Figure~\ref{fig:spneumoniae_chromosome_landscape}C): whereas all 11 isolates form a monophyletic complex across the core chromosome, isolates 1731 and 2682 translocate into the divergent commensal viridans cluster (\textit{S.~mitis} / \textit{S.~oralis}, $\Delta d > 6\%$) within the \textit{pbp2x} catalytic domain.
 
 \RhizAeon synthesizes these transfers into a polarized ARG for PMEN1 clinical adaptation (Figure~\ref{fig:spneumoniae_chromosome_landscape}D).
-Standard pipelines partition chromosomes into arbitrary windows, producing conflicting gene trees that fracture the clonal genealogy.
+Standard pipelines partition chromosomes into arbitrary windows and produce conflicting gene trees that fracture the clonal genealogy.
 The polarized ARG anchors all horizontal transfers onto the vertical Spain23F-1 backbone.
 It parameterizes the focal \textit{pbp2x} catalytic replacement in 1731, the 73.9~kb mega-cassette in 2682, and the 19A capsular replacement in 3355.
 On the 2.22~Mb PMEN1 cohort, full-chromosome deconvolution under iterative phylogenetic tools such as Gubbins required $\sim 14.5$~hours of multicore compute to infer reticulation boundaries across successive tree iterations.
 In contrast, \RhizAeon completes whole-chromosome metric projection, trajectory tracking, and changepoint detection in 114~ms of core scan time (161~ms in native Rust), and finishes the complete end-to-end deconvolution pipeline across the 2.22~Mb chromosome in 42.6~seconds.
-This represents an over 1,200-fold end-to-end wall-time acceleration over iterative tree peeling, enabling real-time genomic surveillance of multidrug resistance and vaccine escape across bacterial pathogens.
+Sub-minute chromosome deconvolution achieves an over 1,200-fold end-to-end wall-time acceleration over iterative tree peeling and enables real-time genomic surveillance of multidrug resistance and vaccine escape across bacterial pathogens.
 
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{figures/fig_hominoidea_mhc_landscape.pdf}
-\caption{\textbf{Whole-gene recombination deconvolution, ectopic micro-conversion, and ancestral recombination graphs in Hominoidea MHC Class~I.}
-\textbf{A.} Breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (vermillion) and cumulative strain $\rho(u)$ (dashed blue) across $N = 379$ primate alleles ($1{,}128$~bp, Exons 1--7). Reticulations concentrate in the antigen recognition site (ARS; Exons 2--3, nt 72--618) and transmembrane anchor (Exon 5), while Exon 4 ($\alpha_3$ stalk) remains a conserved coldspot ($93.7\%$ of strain in ARS and TM). The unsupervised boundary inflection at nt 608--615 matches the 618~bp Exon 3/4 junction.
-\textbf{B.} Reticulate mosaic architecture in primate MHC Class~I chimeras. \textit{HLA-B*46:01} is deconvolved as an inter-locus chimera carrying an exact 73~bp micro-conversion (nt 220--293, codons 66--76; green) from \textit{HLA-C*01:02} within an \textit{HLA-B*15:01} backbone (dark blue), transferring the C1 functional epitope that binds NK cell receptors KIR2DL2/3.
-\textbf{C.} Segmental incongruence across the $\alpha_3$ boundary. In Exon 4, \textit{HLA-A}, \textit{B}, and \textit{C} form monophyletic clades (\textit{B*46:01} sister to \textit{B*15:01}). In the Exon 2 C1 cassette, \textit{B*46:01} translocates into the \textit{HLA-C} clade sister to \textit{C*01:02}.
-\textbf{D.} Polarized ARG for primate MHC. Reticulation arcs anchor the 73~bp C1 micro-conversion and ancient chimpanzee \textit{Patr-AL*01} transfers onto the tandem gene duplication backbone.
+\caption{Whole-gene recombination deconvolution, ectopic micro-conversion, and ancestral recombination graphs in Hominoidea MHC Class~I.
+(A) Breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (vermillion) and cumulative strain $\rho(u)$ (dashed blue) across $N = 379$ primate alleles ($1{,}128$~bp, Exons 1--7). Reticulations concentrate in the antigen recognition site (ARS, Exons 2--3, nt 72--618) and transmembrane anchor (Exon 5), while Exon 4 ($\alpha_3$ stalk) remains a conserved coldspot ($93.7\%$ of strain in ARS and TM). The unsupervised boundary inflection at nt 608--615 matches the 618~bp Exon 3/4 junction.
+(B) Reticulate mosaic architecture in primate MHC Class~I chimeras. \textit{HLA-B*46:01} is deconvolved as an inter-locus chimera carrying an exact 73~bp micro-conversion (nt 220--293, codons 66--76, green) from \textit{HLA-C*01:02} within an \textit{HLA-B*15:01} backbone (dark blue), transferring the C1 functional epitope that binds NK cell receptors KIR2DL2/3.
+(C) Segmental incongruence across the $\alpha_3$ boundary. In Exon 4, \textit{HLA-A}, \textit{B}, and \textit{C} form monophyletic clades (\textit{B*46:01} sister to \textit{B*15:01}). In the Exon 2 C1 cassette, \textit{B*46:01} translocates into the \textit{HLA-C} clade sister to \textit{C*01:02}.
+(D) Polarized ARG for primate MHC. Reticulation arcs anchor the 73~bp C1 micro-conversion and ancient chimpanzee \textit{Patr-AL*01} transfers onto the tandem gene duplication backbone.
 }
 \label{fig:hominoidea_mhc_landscape}
 \end{figure*}
@@ -122,25 +123,25 @@ This represents an over 1,200-fold end-to-end wall-time acceleration over iterat
 
 Primate major histocompatibility complex (MHC) Class~I genes (\textit{HLA-A}, \textit{HLA-B}, \textit{HLA-C}) exemplify pathogen-driven balancing selection in vertebrate genomes \citep{parham1995origins,adams2001species}.
 Immunogenetic studies reveal a striking structural contrast.
-The antigen recognition site (ARS; Exons 2--3, encoding the $\alpha_1$ and $\alpha_2$ peptide groove) undergoes rapid diversification through balancing selection and ectopic gene conversion between paralogs.
+The antigen recognition site (ARS, Exons 2--3, encoding the $\alpha_1$ and $\alpha_2$ peptide groove) undergoes rapid diversification through balancing selection and ectopic gene conversion between paralogs.
 In contrast, the adjacent $\alpha_3$ structural stalk (Exon 4) remains conserved to preserve invariant contacts with $\beta_2$-microglobulin ($\beta_2$m) and the CD8 co-receptor.
-Phylogenetic methods struggle with this modular architecture: full-length alignments generate topological conflicts that collapse locus monophyly, whereas sliding windows require arbitrary boundaries and risk missing short micro-conversions.
+Standard phylogenetic methods falter on this modular architecture: full-length alignments generate topological conflicts that collapse locus monophyly, whereas sliding windows require arbitrary boundaries and risk missing short micro-conversions.
 
-\RhizAeon resolves this structural compartmentalization by tracking continuous trajectories across the full coding sequence without window slicing (Figure~\ref{fig:hominoidea_mhc_landscape}A).
-We evaluated \RhizAeon on an exhaustive cohort of $N = 379$ Hominoidea classical MHC Class~I alleles ($L = 1{,}128$~bp, 526 segregating polymorphic sites across human, chimpanzee, gorilla, and orangutan; \citealt{maccari2017ipd}).
+Continuous trajectory tracking captures this structural compartmentalization across the full coding sequence without window slicing (Figure~\ref{fig:hominoidea_mhc_landscape}A).
+We evaluated \RhizAeon on an exhaustive cohort of $N = 379$ Hominoidea classical MHC Class~I alleles ($L = 1{,}128$~bp, 526 segregating polymorphic sites across human, chimpanzee, gorilla, and orangutan, \citealt{maccari2017ipd}).
 In 16.34~seconds across all 379 alleles (and 3.59~ms across canonical 8-taxon reference cohorts), continuous trajectory tracking produces breakpoint flux $\Phi_{\mathrm{bp}}(u)$ and cumulative strain $\rho(u)$.
-Without structural annotations, the breakpoint flux pinpoints the physical boundary between the $\alpha_2$ ARS groove and the $\alpha_3$ structural stalk at nt 608--615 (canonical exon junction 618~bp; Figure~\ref{fig:hominoidea_mhc_landscape}A).
+Without structural annotations, the breakpoint flux pinpoints the physical boundary between the $\alpha_2$ ARS groove and the $\alpha_3$ structural stalk at nt 608--615 (canonical exon junction 618~bp, Figure~\ref{fig:hominoidea_mhc_landscape}A).
 Quantitative profiling confirms marked domain segregation: $93.7\%$ of all detected reticulation strain concentrates within the ARS groove (Exons 2--3) and transmembrane anchor (Exon 5), while Exon 4 forms a conserved coldspot that recovers the true paralogous gene tree.
 
-Multi-scale scanning resolves the fine mosaic anatomy of hominoid chimeras at single-nucleotide precision (Figure~\ref{fig:hominoidea_mhc_landscape}B).
+Multi-scale scanning reconstructs the fine mosaic anatomy of hominoid chimeras at single-nucleotide precision (Figure~\ref{fig:hominoidea_mhc_landscape}B).
 A clinically prominent recombinant is \textit{HLA-B*46:01}, an allele common in Southeast Asia ($>20\%$) associated with nasopharyngeal carcinoma, myasthenia gravis, and severe SARS-CoV-1 infection.
-\RhizAeon deconvolves \textit{HLA-B*46:01} as an ectopic chimera created by an exact 73~bp micro-conversion (nt 220--293, codons 66--76; $Z = 2.69, P = 1.15 \times 10^{-7}$) donated by \textit{HLA-C*01:02} into an ancestral \textit{HLA-B*15:01} backbone (Figure~\ref{fig:hominoidea_mhc_landscape}B).
-The 73~bp tract transfers the C1 functional epitope (Val76-Arg79-Leu80-Arg81), conferring recognition by natural killer (NK) cell inhibitory receptors KIR2DL2/3 absent in all other classical \textit{HLA-B} alleles \citep{barber1996inter}.
-In non-human hominoids, \RhizAeon resolves multi-way chimerism: in chimpanzee \textit{Patr-AL*01:01}, it identifies a multi-segment recombinant combining \textit{Patr-A} with an ancient \textit{Patr-C} cassette ($Z = 4.03$), while in gorilla \textit{Gogo-C*02:01}, it localizes an ectopic transmembrane exchange at nt 971--1,128.
+\RhizAeon deconvolves \textit{HLA-B*46:01} as an ectopic chimera created by an exact 73~bp micro-conversion (nt 220--293, codons 66--76, $Z = 2.69, P = 1.15 \times 10^{-7}$) donated by \textit{HLA-C*01:02} into an ancestral \textit{HLA-B*15:01} backbone (Figure~\ref{fig:hominoidea_mhc_landscape}B).
+The 73~bp tract transfers the C1 functional epitope (Val76-Arg79-Leu80-Arg81) and confers recognition by natural killer (NK) cell inhibitory receptors KIR2DL2/3 absent in all other classical \textit{HLA-B} alleles \citep{barber1996inter}.
+In non-human hominoids, trajectory deconvolution characterizes multi-way chimerism: in chimpanzee \textit{Patr-AL*01:01}, it identifies a multi-segment recombinant combining \textit{Patr-A} with an ancient \textit{Patr-C} cassette ($Z = 4.03$), while in gorilla \textit{Gogo-C*02:01}, it localizes an ectopic transmembrane exchange at nt 971--1,128.
 
 Segmental phylogenies and a two-partition tanglegram confirm this discordance across the structural boundary (Figure~\ref{fig:hominoidea_mhc_landscape}C).
-In the Exon 4 $\alpha_3$ stalk (nt 618--894; Figure~\ref{fig:hominoidea_mhc_landscape}C1), the neighbor-joining tree cleanly reconstructs the ancient locus duplication: \textit{HLA-A}, \textit{HLA-B}, and \textit{HLA-C} form monophyletic clades, with \textit{HLA-B*46:01} clustering sister to \textit{HLA-B*15:01} with zero divergence ($d = 0.000$).
-Within the Exon 2 C1 cassette (nt 210--310; Figure~\ref{fig:hominoidea_mhc_landscape}C2), \textit{HLA-B*46:01} crosses the locus divide to cluster inside the \textit{HLA-C} clade sister to donor \textit{HLA-C*01:02} ($d = 0.000$).
+In the Exon 4 $\alpha_3$ stalk (nt 618--894, Figure~\ref{fig:hominoidea_mhc_landscape}C1), the neighbor-joining tree reconstructs the ancient locus duplication: \textit{HLA-A}, \textit{HLA-B}, and \textit{HLA-C} form monophyletic clades, with \textit{HLA-B*46:01} clustering sister to \textit{HLA-B*15:01} with zero divergence ($d = 0.000$).
+Within the Exon 2 C1 cassette (nt 210--310, Figure~\ref{fig:hominoidea_mhc_landscape}C2), \textit{HLA-B*46:01} crosses the locus divide to cluster inside the \textit{HLA-C} clade sister to donor \textit{HLA-C*01:02} ($d = 0.000$).
 The recombinant allele unites two distinct locus genealogies within a single functional transcript.
 
 Finally, \RhizAeon integrates these transfers into a polarized ARG for primate MHC evolution (Figure~\ref{fig:hominoidea_mhc_landscape}D).
