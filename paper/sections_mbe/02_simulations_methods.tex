@@ -84,12 +84,16 @@ Recombination reverses trajectory derivative within the converted donor tract, d
 To test the clonal null hypothesis, we construct the centered Brownian bridge $B(u) = Y(u) - \frac{u}{L} Y(L)$ by subtracting linear chromosome drift.
 By Donsker's functional central limit theorem \citep{donsker1951invariance}, standardized process $W_L^0(t) = B(\lfloor t L \rfloor) / (\sigma \sqrt{L})$ converges weakly to a standard Brownian bridge.
 Its trajectory supremum follows the two-sided Kolmogorov distribution \citep{kolmogorov1933sulla}.
-To control the family-wise error rate across all $M_{\text{topo}} = \binom{N}{2} \max(1, N - 2)$ testable topologies at significance $\alpha = 0.05$, we apply the Dunn-\v{S}id\'{a}k boundary \citep{sidak1967rectangular}:
+To maintain rigorous family-wise error rate (FWER) control across the hierarchical pipeline without incurring the statistical dilution of an unconstrained $\mathcal{O}(N^3)$ hypothesis penalty, \RhizAeon calibrates the boundary-crossing quantile $K_{\text{crit}}$ at each distinct operational stage:
 \begin{equation}
-K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( 1 - (1 - \alpha)^{1 / M_{\text{topo}}} \right)} \approx \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{2 M_{\text{topo}}} \right)}.
+K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{M} \right)},
 \label{eq:methods_k_crit}
 \end{equation}
-Significant trajectories ($\sup |B(u)| / (\sigma \sqrt{L}) \ge K_{\text{crit}}$) reject the unreticulated null hypothesis.
+derived from the asymptotic two-sided Kolmogorov extreme-value distribution \citep{kolmogorov1933sulla,donsker1951invariance}.
+In the primary whole-chromosome screening pass (\texttt{screener.rs}), $M = 2N$ controls for positive and negative excursions across all $N$ evaluated sequences.
+In candidate donor channel attribution (\texttt{attribution.rs}), $M = 2(K + 1)$ corrects for comparisons across the $K$ landmark reference channels and the root sink.
+In post-polishing changepoint certification (\texttt{polishing.rs}), $M = 4N$ bounds the two-sided trajectory verification across polished segment boundaries.
+Trajectories satisfying $\sup |B(u)| / (\sigma \sqrt{L}) \ge K_{\text{crit}}$ reject the unreticulated clonal null.
 
 For short conversion tracts ($< 200$~nt), global Brownian bridge tests can suffer signal dilution across megabase chromosomes.
 \RhizAeon convolves trajectory flux $\Delta Y(u)$ with a bank of zero-mean bipolar dyadic matched filters $h_\tau(s)$ across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt, isolating step transitions in scale space.
@@ -103,30 +107,27 @@ Across invariant sites, the likelihood forms a flat plateau.
 \RhizAeon reports the exact 95\% confidence interval $[c_{\text{left}}, c_{\text{right}}] = \{c : \ln \mathcal{L}(c) \ge \max \ln \mathcal{L} - 1.92\}$, bounding genetic exchange by physical informative mutations.
 Continuous gap bridging iteratively coalesces adjacent donor fragments separated by non-informative intervals ($\le 150$~bp) whenever net flux across the merged span remains positive.
 
-\subsection{Physical Force Field Deconvolution and Random Matrix Halting}
+\subsection{Attention Force Field Deconvolution and Multi-Channel Trajectory Resolution}
 \label{subsec:methods_force_field}
-To resolve multi-way mosaics without combinatorial heuristics, \RhizAeon models trajectory excursions as displacements within a physical force field.
-The home lineage exerts a Hookean restoring force $\mathbf{f}(u) = -\lambda (\mathbf{z}(u) - \mathbf{z}_{\text{home}}) \in \mathbb{R}^d$.
-Across candidate breakpoint boundaries, flanking force vectors $\mathbf{f}_{\text{left}}$ and $\mathbf{f}_{\text{right}}$ define step velocity $v_{\text{step}} = \|\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}\|$ and deflection angle $\cos \theta = \langle \mathbf{f}_{\text{left}}, \mathbf{f}_{\text{right}} \rangle / (\|\mathbf{f}_{\text{left}}\| \|\mathbf{f}_{\text{right}}\|)$.
-Dynamic velocity reversal $R = v_{\text{step}} (1 - \cos \theta)$ captures abrupt momentum changes.
-Projecting flanking force increments onto unit parental dipole axis $\mathbf{d}_{\text{hat}} = (\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}) / \|\mathbf{z}_{\text{donor}} - \mathbf{z}_{\text{home}}\|$ yields the scale-invariant test statistic:
+To resolve multi-way mosaics without combinatorial heuristics, \RhizAeon formalizes cross-attention dynamics as an empirical force field.
+At each position $u$, the directed attention weight $A_u(i \to j)$ defines the instantaneous attraction pulling query sequence $i$ toward reference taxon $j$.
+Subtracting the sequence's genome-wide mean baseline affinity $\bar{A}(i \to j) = \frac{1}{L}\sum_{v=1}^L A_v(i \to j)$ produces the zero-drift attention force field:
 \begin{equation}
-Z_{\text{flip}} = \frac{\left| (\mathbf{f}_{\text{right}} - \mathbf{f}_{\text{left}}) \cdot \mathbf{d}_{\text{hat}} \right|}{\sqrt{\frac{\sigma_{\text{left}}^2}{L_{\text{left}}} + \frac{\sigma_{\text{right}}^2}{L_{\text{right}}}}}.
-\label{eq:methods_z_flip}
+F_u(i \to j) = A_u(i \to j) - \bar{A}(i \to j), \quad \text{where} \quad \sum_{u=1}^L F_u(i \to j) = 0.
+\label{eq:methods_force_field}
 \end{equation}
+Integrating this directed force across chromosome coordinates yields the cumulative momentum trajectory $C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} F_v(i \to j)$ for each reference clade $\mathcal{B}_m$.
+Under clonal evolution, instantaneous forces fluctuate around zero as balanced thermal noise, and the cumulative momentum behaves as a centered random walk bounded within Kolmogorov confidence intervals.
+When a recombination event incorporates an introgressed segment, persistent directional affinity toward the donor exerts a continuous force that imparts positive momentum to $C_{i, \text{donor}}(u)$ while depressing home momentum.
 
-For chromosomes bearing multiple reticulations, spatio-temporal force vectors form matrix $\mathbf{F} \in \mathbb{R}^{N \times L}$.
-Singular value decomposition $\mathbf{F} = \sum_{m=1}^r s_m \mathbf{u}_m \mathbf{v}_m^T$ isolates distinct reticulation modes.
-Iterative mode peeling subtracts each verified component $s_m \mathbf{u}_m \mathbf{v}_m^T$ from residual forces.
-Peeling must halt when residual variance reflects neutral coalescent drift.
-By random matrix theory, singular values of an $N \times L$ noise matrix follow the Marchenko-Pastur distribution \citep{marchenko1967distribution}.
-The upper edge of the bulk spectral noise edge is:
+To deconvolve complex genomes bearing multiple mosaic tracts or divergent parental donors, \RhizAeon evaluates differential momentum curves across all candidate donor channels $k \in \{1, \dots, K\}$:
 \begin{equation}
-s_{\text{bulk}} = \frac{L}{\pi} \sigma_{\text{noise}} \left( 1 + \sqrt{\frac{P}{L}} \right),
-\label{eq:methods_marchenko_pastur}
+Y_{i, k}(u) = C_{i, k}(u) - C_{i, \text{home}}(u).
+\label{eq:methods_channel_momentum}
 \end{equation}
-where $P = \min(N, d)$ and $\sigma_{\text{noise}}$ is the empirical force increment standard deviation.
-Peeling terminates when leading residual singular values satisfy $s_m \le s_{\text{bulk}}$, halting iteration without arbitrary threshold tuning.
+Candidate events are extracted across channels using dyadic wavelet matched filters and running drawdown $\text{DD}_k(u) = \max_{v \le u} Y_{i, k}(v) - Y_{i, k}(u)$, detecting crossover and cassette changepoints whose excursion exceeds $K_{\text{crit}}$.
+To resolve overlapping candidate alerts without arbitrary threshold tuning, \RhizAeon evaluates channel contrast: for any candidate tract $[u_1, u_2]$, the authentic donor channel maximizes the mean in-tract attention flux while maintaining negative or baseline flux in flanking regions.
+Candidate events across channels are deduplicated and consolidated by merging concordant intervals, producing a unified non-redundant inventory of reticulations across the chromosome.
 
 \subsection{Reticulation Graph Adjudication and Ancestral Event Grouping}
 \label{subsec:methods_adjudication}
@@ -153,7 +154,7 @@ Each unique event receives a persistent sequential identifier ($1, 2, \dots$), r
 \subsection{Coalescent Simulation Suites and Bipartite Hungarian Evaluation}
 \label{subsec:methods_benchmarks}
 Synthetic alignments were generated under Hudson's neutral coalescent model with recombination \citep{hudson1983properties,posada2001evaluation} across 3,200 alignments spanning 16 parameter regimes.
-Simulations crossed sequence divergence $\theta \in \{2, 10, 50\}$, recombination rate $\rho \in \{0, 4, 16, 64\}$, and rate heterogeneity $\alpha \in \{0.5, \infty\}$.
+Simulations crossed sequence divergence $\theta \in \{10, 50, 100, 200\}$, recombination rate $\rho \in \{0, 1, 4, 16, 64\}$, and rate heterogeneity $\alpha \in \{2.0, 0.5, 0.05\}$ (comprising 1,200 null alignments and 2,000 recombinant alignments, 100 replicates each; Supplementary Table~\ref{tab:supp_posada_summary}).
 To evaluate operational challenges, four specialized scenario suites were simulated under HKY85 substitution dynamics ($\kappa = 2.5, \pi = [0.3, 0.2, 0.2, 0.3]$) across 2,280 alignments:
 \begin{enumerate}
 \item \textbf{Epidemic Clonal Expansion}: Recombinant ancestors sprouting $K \in \{2, 5, 8, 10, 15\}$ descendants with transmission drift ($\delta = 0.002$) alongside 40 parental background isolates ($N = 42\text{--}55$, $L = 5,000$~nt; 300 alignments).
@@ -161,7 +162,7 @@ To evaluate operational challenges, four specialized scenario suites were simula
 \item \textbf{Ghost Donor Introgression}: Pure unsampled donor, surrogate sister clade, and deep reservoir donor regimes across swarm sizes $K \in \{2, 5, 10\}$ ($N = 32\text{--}40$, $L = 5,000$~nt; 540 alignments).
 \item \textbf{Micro-Conversion Resolution}: Conversion tracts spanning $L_{\text{tract}} \in \{50, 100, 200, 400, 800\}$~nt across three divergence tiers ($N = 32\text{--}40$, $L = 5,000$~nt; 900 alignments).
 \end{enumerate}
-In addition, a grand continuous parameter sweep of 1,000,000 whole genomes was evaluated across continuous distributions: $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d \in [0.005, 0.25]$~subs/site, Gamma rate shape $\alpha \in [0.05, 5.0]$, single and multi-event mosaic topologies ($K_{\mathrm{true}} \in \{0, 1, 2, 3, 4\}$), and multi-donor introgressions ($P_1 \leftarrow P_2 + P_3$).
+In addition, a grand continuous parameter sweep of 1,000,000 whole genomes was evaluated across continuous distributions: $L \in [300, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d \in [0.005, 0.35]$~subs/site, Gamma rate shape $\alpha \in [0.2, 5.0]$ alongside strict molecular clock controls ($\alpha \ge 50$), single and multi-event mosaic topologies ($K_{\mathrm{true}} \in \{0, 1, 2, 3, 4\}$), and multi-donor introgressions ($P_1 \leftarrow P_2 + P_3$; Table~\ref{tab:grand_sweep_1m_envelope}).
 
 Ground truth was evaluated via maximum-weight bijective bipartite matching using the Hungarian algorithm \citep{kuhn1955hungarian}.
 For true event $E = (C, H, D, \mathcal{I})$ and inferred event $\hat{E} = (\hat{C}, \hat{H}, \hat{D}, \hat{\mathcal{I}})$, event affinity combines genealogical triad affinity and informative SNP Jaccard similarity:
@@ -174,13 +175,13 @@ Across the optimal matching $\mathcal{M}$, reticulation precision and recall are
 The composite Reticulation Fidelity Index is their harmonic mean $\mathcal{R}_{F_1} = 2 \cdot \text{PPV}_{\mathcal{R}} \cdot \text{TPR}_{\mathcal{R}} / (\text{PPV}_{\mathcal{R}} + \text{TPR}_{\mathcal{R}})$.
 Every unmatched true event penalizes recall; every ungrounded prediction penalizes precision.
 
-\subsection{Empirical Genomic Datasets and Implementation}
+\subsection{Empirical Genomic Datasets, Software Availability, and Data Distribution}
 \label{subsec:methods_empirical}
 Empirical evaluations analyzed three natural evolutionary cohorts:
 \begin{enumerate}
-\item \textbf{Sarbecovirus Genomes}: 83 whole genomes of bat, pangolin, and human sarbecoviruses (30,950~nt; \citealt{lytras2022exploring}), including SARS-CoV-2 reference NC\_045512.2 and close relatives RaTG13, BANAL-20-52, and RmYN02.
+\item \textbf{Sarbecovirus Genomes}: 83 whole genomes of bat, pangolin, and human sarbecoviruses (30,965~bp multiple sequence alignment, 13,260 segregating sites; \citealt{lytras2022exploring}), alongside the primary 78-taxon sub-cohort (30,956~bp, 13,160 informative sites), including SARS-CoV-2 reference NC\_045512.2 and close relatives RaTG13, BANAL-20-52, and RmYN02.
 \item \textbf{Bacterial Chromosomes}: 11 clinical isolates of multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 (2,221,315~nt; \citealt{croucher2011rapid}) spanning global penicillin-resistant outbreaks.
-\item \textbf{Primate Immunogenomics}: 379 classical primate MHC Class~I alleles (\textit{HLA-A}, \textit{HLA-B}, \textit{HLA-C}, and non-human hominoid orthologs; 1,130~nt; \citealt{maccari2017ipd}).
+\item \textbf{Primate Immunogenomics}: 379 classical primate MHC Class~I alleles (\textit{HLA-A}, \textit{HLA-B}, \textit{HLA-C}, and non-human hominoid orthologs; 1,128~nt; \citealt{maccari2017ipd}).
 \end{enumerate}
 
 \RhizAeon is implemented in native Rust with Rayon multicore parallelization and PyO3 Python bindings.
@@ -188,4 +189,5 @@ The algorithmic core compiles to WebAssembly (WASM).
 Surveillance pipelines execute client-side within standard web browsers without remote server transmission.
 All computation executes locally on client hardware without transmitting sequence data across external networks.
 Interactive dashboards render synchronized signal inspectors, 2D metric subspace projections, and midpoint-rooted phylogenetic trees within browser canvas.
+All raw multiple sequence FASTA alignments, empirical cohort datasets, and simulation benchmark suites are distributed directly within the project repository under \texttt{empirical\_datasets/} and \texttt{benchmarks/}.
 Source code, documentation, and benchmark workflows are freely available under the MIT license at \url{https://github.com/veg/rhizaeon-code}.

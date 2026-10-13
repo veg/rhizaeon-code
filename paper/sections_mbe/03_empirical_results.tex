@@ -20,13 +20,14 @@ Sarbecoviruses, the subgenus of coronaviruses that includes SARS-CoV and SARS-Co
 When investigating recombination across these viral cohorts, genomic screens serve two distinct goals: mapping chromosome-wide landscapes to identify hotspots and coldspots, and resolving the mosaic anatomy of individual recombinant genomes.
 Phylogenetic partition search, implemented in tools such as GARD, explores discrete tree space to detect topological discordance.
 This combinatorial search creates a severe computational bottleneck.
-In their screen of sarbecovirus origins, \citet{lytras2022exploring} downsampled a 78-genome cohort to 18 taxa, requiring 4.5~days on a compute cluster to identify 21 breakpoints.
-\RhizAeon removes this bottleneck.
-By projecting alignments into continuous metric space, it quantifies spatial velocity changes as a continuous breakpoint flux $\Phi_{\mathrm{bp}}(u)$ in $O(N \cdot L)$ time.
-\RhizAeon scanned the full 78-taxon alignment (30,956~bp, 13,160 informative sites) in 18.2~seconds and an expanded 83-taxon cohort in 25.0~seconds.
-The analysis represents a 20,000-fold speedup over cluster-based phylogenetic inference without taxon subsampling.
+In their landmark screen of sarbecovirus origins, \citet{lytras2022exploring} were forced to downsample their 78-genome cohort to a representative subset of 22 taxa to make phylogenetic breakpoint screening computationally tractable.
+For a complete 78-taxon alignment spanning over 30~kb, exhaustive phylogenetic model selection under GARD requires multiple days of high-performance cluster compute.
+\RhizAeon eliminates this bottleneck.
+By projecting alignments into continuous metric space, it quantifies spatial velocity changes as a continuous breakpoint flux $\Phi_{\mathrm{bp}}(u)$ in $\mathcal{O}(N K L)$ time.
+\RhizAeon scanned the full 78-taxon alignment (30,956~bp, 13,160 informative sites) in 1.48~seconds (18.2~seconds for the complete pipeline, including local tree reconstruction and interactive dashboard rendering) and an expanded 83-taxon cohort (30,965~bp, 13,260 segregating sites) in 25.0~seconds.
+This enables exhaustive, whole-cohort reticulation deconvolution without taxon subsampling.
 
-The genomic flux reveals sharp evolutionary regionalization: pronounced coldspots protect the catalytic core of RNA-dependent RNA polymerase (RdRp, nt 13,400--16,200) and the heptad-repeat fusion machinery of Spike S2 (nt 24,600--25,600).
+The genomic flux reveals sharp evolutionary regionalization: pronounced coldspots protect the catalytic core of RNA-dependent RNA polymerase (RdRp, nt 13,400--16,200; annotated Wuhan-Hu-1 catalytic core nt 13,468--16,236) and the heptad-repeat fusion machinery of Spike S2 (nt 24,600--25,600).
 Structural constraints in these regions preclude modular exchange (Figure~\ref{fig:sarbecovirus_recombination_landscape}A).
 Recombination hotspots concentrate at the Spike $5'$ NTD junction (21,825~bp), the codon 313 hinge between the NTD and receptor-binding domain (RBD, 22,764~bp), the S1/S2 furin cleavage site (23,618~bp), and the ORF8/Nucleocapsid boundary (28,810~bp).
 Continuous changepoints show close spatial concordance with the 21 published GARD breakpoints of \citet{lytras2022exploring} (median deviation 99.0~nt; Figure~\ref{fig:sarbecovirus_recombination_landscape}A).
@@ -53,7 +54,7 @@ In the Spike glycoprotein, statistical model comparison across 9 sarbecoviruses 
 Polarizing the reticulation demonstrates that the divergent RBD cassette was introgressed into the RaTG13 lineage from an unsampled bat reservoir ($Z = 20.9, P = 2.1 \times 10^{-9}$), while the ancestral SARS-CoV-2 / BANAL-52 trunk preserved the human-compatible ACE2 contact ridge ($94.2\%$ synapomorphic concordance, $P = 1.75 \times 10^{-23}$), reducing residual metric strain by $74.0\%$ ($3.34\% \to 0.87\%$).
 Across the 30.9~kb genome of 83 sarbecoviruses, consolidating 45 detected tracts yields an ARG of 44 unique reticulations.
 The consolidated network explains $98.82\%$ of total metric strain, matching the $98.85\%$ explained by GARD's 22 unconstrained trees while cutting parameter complexity by $58\%$ (1,559 vs.\ 3,674 parameters).
-It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract concordance, $P < 10^{-15}$).
+It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract concordance under the Synapomorphic Site Concordance Ratio, SSCR; $P < 10^{-15}$).
 
 \begin{figure*}[p]
 \centering
@@ -72,7 +73,7 @@ It validates reticulation polarity across 38 events ($81.8\%$ mean in-tract conc
 
 Bacterial evolution is accelerated by natural transformation and homologous recombination, driving rapid antimicrobial resistance (AMR), capsular serotype switching, and antigenic diversification from commensal reservoirs \citep{didelot2010impact,croucher2011rapid}.
 In naturally competent pathogens such as \textit{Streptococcus pneumoniae}, horizontal gene transfer imports replacement tracts ranging from tens of base pairs to over 70~kilobases across species boundaries (e.g., from viridans streptococci \textit{Streptococcus mitis} and \textit{Streptococcus oralis}).
-Resolving these events across bacterial cohorts has historically required heavy computation: ancestral inference tools like ClonalFrame \citep{didelot2007inference} and Gubbins \citep{croucher2015rapid} rely on iterative phylogenetic reconstruction and tree peeling via maximum likelihood, demanding hours to weeks of compute.
+Resolving these events across bacterial cohorts has historically required heavy computation: ancestral inference tools like ClonalFrame \citep{didelot2007inference}, ClonalFrameML \citep{didelot2015clonalframeml}, and Gubbins \citep{croucher2015rapid} rely on iterative phylogenetic reconstruction and tree peeling via maximum likelihood, demanding hours to weeks of compute.
 
 \RhizAeon bypasses iterative tree reconstruction by tracking whole-chromosome sequence trajectories in continuous metric space, quantifying spatial turbulence as breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (Figure~\ref{fig:spneumoniae_chromosome_landscape}A).
 We evaluated \RhizAeon on the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 lineage of \textit{S.~pneumoniae} (PMEN1, ATCC 700669; 11 representative global isolates spanning 1984--2008; \citealt{croucher2011rapid}).
@@ -93,17 +94,16 @@ Simultaneously, multi-scale scanning resolves the layered mosaic anatomy of resi
 In isolate 1731, \RhizAeon resolves a focal 20.7~kb introgression across \textit{pbp2x} ($Z = 5.35$).
 Fine-scale scanning pinpoints the exact 1,121~bp active-site transpeptidase domain replacement ($P = 9.85 \times 10^{-35}, Z = 14.40$) imported from commensal viridans streptococci to abolish $\beta$-lactam binding.
 In isolate 2682, a massive 73.9~kb mega-cassette ($Z = 6.42$) co-transferred \textit{pbp2x} resistance and the capsular locus in a single transformation event (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
-In isolate 3355, \RhizAeon deconvolves the capsular serotype switch from 23F to 19A (15.5~kb, $Z = 3.19$) that enabled escape from the 7-valent conjugate vaccine (PCV7), accompanied by a linked low-affinity \textit{pbp1a} allele.
+In isolate 3355, \RhizAeon deconvolves the capsular serotype switch from 23F to 19A (15.5~kb, $Z = 3.19$) that enabled escape from the 7-valent pneumococcal conjugate vaccine (PCV7), accompanied by a linked low-affinity \textit{pbp1a} allele.
 A two-partition tanglegram corroborates this incongruence (Figure~\ref{fig:spneumoniae_chromosome_landscape}C): whereas all 11 isolates form a monophyletic complex across the core chromosome, isolates 1731 and 2682 translocate into the divergent commensal viridans cluster (\textit{S.~mitis} / \textit{S.~oralis}, $\Delta d > 6\%$) within the \textit{pbp2x} catalytic domain.
 
 \RhizAeon synthesizes these transfers into a polarized ARG for PMEN1 clinical adaptation (Figure~\ref{fig:spneumoniae_chromosome_landscape}D).
 Standard pipelines partition chromosomes into arbitrary windows, producing conflicting gene trees that fracture the clonal genealogy.
 The polarized ARG anchors all horizontal transfers onto the vertical Spain23F-1 backbone.
 It parameterizes the focal \textit{pbp2x} catalytic replacement in 1731, the 73.9~kb mega-cassette in 2682, and the 19A capsular replacement in 3355.
-On the 2.22~Mb PMEN1 cohort, ClonalFrame required 705~hours ($\sim 1$~month) of MCMC sampling, and Gubbins required 1.5~hours (5,400~seconds) of iterative tree peeling.
-\RhizAeon completes whole-chromosome metric projection, trajectory tracking, and changepoint detection in 114~ms (127~ms in native Rust).
-The method achieves an over 30,000-fold speedup over Gubbins and an 18,000,000-fold speedup over ClonalFrame.
-Rapid execution enables real-time surveillance of multidrug resistance and vaccine escape across bacterial pathogens.
+On the 2.22~Mb PMEN1 cohort, full-chromosome deconvolution under iterative phylogenetic tools such as Gubbins required $\sim 14.5$~hours of multicore compute to infer reticulation boundaries across successive tree iterations.
+In contrast, \RhizAeon completes whole-chromosome metric projection, trajectory tracking, and changepoint detection in 114~ms of core scan time (161~ms in native Rust), and finishes the complete end-to-end deconvolution pipeline across the 2.22~Mb chromosome in 42.6~seconds.
+This represents an over 1,200-fold end-to-end wall-time acceleration over iterative tree peeling, enabling real-time genomic surveillance of multidrug resistance and vaccine escape across bacterial pathogens.
 
 \begin{figure*}[p]
 \centering

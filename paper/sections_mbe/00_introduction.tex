@@ -27,10 +27,11 @@ The computational arithmetic is punishing.
 Because the joint combinatorial space of partition boundaries and tree topologies scales exponentially with breakpoint count and cubically with taxon count ($\mathcal{O}(L^K \cdot N^3)$ for $K$ breakpoints across $N$ taxa of length $L$), multi-breakpoint searches across hundreds of genomes require days of cluster compute.
 Sequence heuristics take the opposite extreme.
 Suites such as 3Seq \citep{lam20183seq} and RDP5 \citep{martin2021rdp5} scan sequence triplets for localized clustering of polymorphic mutations within sliding windows.
-They evaluate rapidly, yet they operate without a global phylogenetic reference frame.
-When substitution rates vary across sites and lineages, localized mutational clustering mimics reciprocal genetic exchange.
-Under realistic Gamma rate heterogeneity, this mutational clustering inflates heuristic false positive rates beyond thirty percent \citep{posada2001evaluation,kosakovsky2006gard}.
-When recombinant segments descend from unsampled ancestral lineages, heuristics either fail entirely or misidentify recombinant lineages as parental donors, placing arbitrary point boundaries inside flat, uninformative genomic plateaus without confidence intervals.
+While evaluating rapidly across small cohorts, they require $\mathcal{O}(N^3 L)$ comparisons across all sequence triplets, becoming computationally burdensome as surveillance cohorts scale.
+More fundamentally, pairwise and triplet scans operate without a global phylogenetic reference frame.
+Historically, early statistical heuristics based on uncorrected homoplasy or compatibility suffered severe false positive inflation under rate heterogeneity across sites \citep{posada2001evaluation,posada2002evaluation}.
+Modern triplet methods have achieved tighter control on non-recombinant nulls, yet they suffer from severe combinatorial event overcounting: when a recombinant lineage expands into an outbreak swarm or carries multiple donor segments, triplet scanning evaluates every combination of descendant and parental leaves independently, reporting dozens of redundant, fractured events per genuine reticulation.
+Furthermore, when recombinant segments descend from unsampled ancestral lineages, closed-world triplet algorithms are forced to misattribute foreign tracts to innocent contemporary leaves.
 
 Resolving reticulate evolution at genome scale requires abandoning discrete trees while retaining topological protection against mutational rate variation.
 Genomes trace continuous trajectories through sequence space.
@@ -44,6 +45,6 @@ Clonal evolution produces balanced thermal fluctuations that cancel out as a cen
 Recombination breaks this physical equilibrium, imparting sustained directional momentum that pinpoints crossover boundaries and consolidates co-recombinant transmission swarms into unified ancestral events.
 
 We validated \RhizAeon across coalescent benchmarks, specialized operational stress tests, and a grand continuous parameter sweep of 1,000,000 whole genomes.
-Across the canonical 3,200-trial coalescent benchmark of \citet{posada2001evaluation}, \RhizAeon maintained an empirical false positive rate of 0.58\% under extreme Gamma rate heterogeneity while recovering calibrated ancestral event counts.
+Across the canonical 3,200-trial coalescent benchmark of \citet{posada2001evaluation}, \RhizAeon maintained an empirical false positive rate of 0.58\% (95\% Wilson CI [0.28\%, 1.20\%]) across 1,200 null alignments under Gamma rate heterogeneity (compared to 0.17\% for 3SEQ, 95\% CI [0.05\%, 0.60\%]), while strictly suppressing the combinatorial event overcounting that inflates triplet scans by up to ten-fold.
 In operational stress tests modeling epidemic swarms, multi-parent cascades, ghost donor introgression, and micro-conversions down to 50 base pairs, trajectory deconvolution eliminated the combinatorial false alarms that cripple pairwise heuristics.
 Empirical evaluations across 30.9~kb Sarbecovirus genomes, the 2.22~Mb multidrug-resistant \textit{Streptococcus pneumoniae} PMEN1 chromosome, and 379 primate \textit{HLA} Class~I alleles demonstrate that \RhizAeon resolves complex whole-genome mosaicism and polarized Ancestral Recombination Graphs in fractions of a second without taxon subsampling.

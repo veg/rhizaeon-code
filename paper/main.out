@@ -1,49 +1,53 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Geometric Foundations and Continuous Trajectory Theory}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Architectural Overview and Method Pipeline}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Sequence Metric Space and Buneman Coordinates}{section.2}% 4
-\BOOKMARK [3][-]{section*.2}{Informational Capacity and the Landmark Identifiability Assumption.}{subsection.2.2}% 5
-\BOOKMARK [2][-]{subsection.2.3}{Rotary Phase Embeddings and Markov Substitution Priors}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.4}{The Ancestral Root Sink Token}{section.2}% 7
-\BOOKMARK [2][-]{subsection.2.5}{Brownian Bridges and Invariance Principles for Macroscopic Crossovers \(Tier 1\)}{section.2}% 8
-\BOOKMARK [2][-]{subsection.2.6}{Multi-Scale Dyadic Filters and Running Drawdown for Localized Conversions \(Tier 2\)}{section.2}% 9
-\BOOKMARK [2][-]{subsection.2.7}{Dynamical Metric Field Deconvolution of Multi-Parental Mosaics \(Tier 3\)}{section.2}% 10
-\BOOKMARK [2][-]{subsection.2.8}{Informational Resolution Limits and Profile Polishing}{section.2}% 11
-\BOOKMARK [2][-]{subsection.2.9}{Reticulation Graph Adjudication and Ancestral Event Grouping}{section.2}% 12
-\BOOKMARK [1][-]{section.3}{Empirical Benchmarks and Real-World Validation}{}% 13
-\BOOKMARK [2][-]{subsection.3.1}{Coalescent Benchmarks: The Hyper-Recombination Paradox and Spatial Observability}{section.3}% 14
-\BOOKMARK [2][-]{subsection.3.2}{Adversarial Null Calibration and Immunity to Biological Heterotachy}{section.3}% 15
-\BOOKMARK [2][-]{subsection.3.3}{Epidemic Clonal Expansion: Triplet Redundancy and Event Consolidation}{section.3}% 16
-\BOOKMARK [2][-]{subsection.3.4}{Deconvolution of Multi-Way Mosaic Swarms: Scenario 1.2 Benchmark}{section.3}% 17
-\BOOKMARK [2][-]{subsection.3.5}{Unsampled Ghost Lineage Introgression and Biological Mosaics}{section.3}% 18
-\BOOKMARK [2][-]{subsection.3.6}{Bacterial Micro-Conversion and Scale-Space Resolution Limits: Scenario 1.4 Suite}{section.3}% 19
-\BOOKMARK [2][-]{subsection.3.7}{Computational Scalability and Real-Time Genomic Surveillance}{section.3}% 20
-\BOOKMARK [2][-]{subsection.3.8}{The Empirical Operational Phase Envelope Across 1,000,000 Whole Genomes}{section.3}% 21
-\BOOKMARK [2][-]{subsection.3.9}{Whole-Genome Sarbecovirus Reticulation and Recombination Landscapes}{section.3}% 22
-\BOOKMARK [2][-]{subsection.3.10}{Bacterial Pathogen Evolution: Chromosome-Scale Recombination, Vaccine Escape, and Antimicrobial Resistance in Streptococcus pneumoniae}{section.3}% 23
-\BOOKMARK [2][-]{subsection.3.11}{Primate Immunogenomics: Resolving the 35-Year MHC Class I Domain Paradox and Trans-Species Reticulation Across Hominoidea}{section.3}% 24
-\BOOKMARK [1][-]{section.4}{Discussion and Algorithmic Scaling}{}% 25
-\BOOKMARK [2][-]{subsection.4.1}{Linear Manifold Geometry vs. Combinatorial Triplet Search}{section.4}% 26
-\BOOKMARK [2][-]{subsection.4.2}{Theoretical Boundaries: Pervasive Recombination and the Limits of Parental Attribution}{section.4}% 27
-\BOOKMARK [2][-]{subsection.4.3}{Data Governance and Biosafety Compliance}{section.4}% 28
-\BOOKMARK [1][-]{section.5}{Materials and Methods}{}% 29
-\BOOKMARK [2][-]{subsection.5.1}{Farthest-Point Landmark Sampling and Metric Basis Construction}{section.5}% 30
-\BOOKMARK [3][-]{section*.19}{Full-Cohort Representation \(M 64\) and Two-Pass Clonal Backbone Re-Anchoring \(M > 64\).}{subsection.5.1}% 31
-\BOOKMARK [2][-]{subsection.5.2}{Analytical Gower Out-of-Sample Trajectory Projection}{section.5}% 32
-\BOOKMARK [2][-]{subsection.5.3}{Generalized Tree-RoPE and Continuous-Time Markov Substitution Prior}{section.5}% 33
-\BOOKMARK [2][-]{subsection.5.4}{Unpolarized Root Sink Architecture and Autapomorphy Absorption}{section.5}% 34
-\BOOKMARK [2][-]{subsection.5.5}{Continuous Trajectory Integration and Brownian Bridge Inference}{section.5}% 35
-\BOOKMARK [2][-]{subsection.5.6}{Dyadic Scale-Space Matched Filtering and Running Drawdown}{section.5}% 36
-\BOOKMARK [2][-]{subsection.5.7}{Physical Force Field Deconvolution and Random Matrix Halting}{section.5}% 37
-\BOOKMARK [2][-]{subsection.5.8}{Profile Maximum Likelihood Breakpoint Polishing}{section.5}% 38
-\BOOKMARK [3][-]{section*.20}{Continuous Gap Bridging Across Stochastic Non-Informative Dips.}{subsection.5.8}% 39
-\BOOKMARK [2][-]{subsection.5.9}{Reticulation Graph Adjudication, Transitive Chains, and Ancestral Event Grouping}{section.5}% 40
-\BOOKMARK [3][-]{section*.21}{Intra-Swarm Sister Isolation, Donor Clade Deduplication, and Sister Preservation.}{subsection.5.9}% 41
-\BOOKMARK [2][-]{subsection.5.10}{Outgroup-Invariant Statistical Due Diligence}{section.5}% 42
-\BOOKMARK [2][-]{subsection.5.11}{The Reticulation Fidelity Scoring Framework}{section.5}% 43
-\BOOKMARK [2][-]{subsection.5.12}{Synthetic Benchmark Protocols: Epidemic Expansions, Multi-Way Mosaics, Ghost Donors, and Micro-Conversions}{section.5}% 44
-\BOOKMARK [3][-]{section*.22}{Scenario 1.1: Epidemic Clonal Expansion Suite.}{subsection.5.12}% 45
-\BOOKMARK [4][-]{section*.23}{Scenario 1.2: Multi-Way Mosaic Swarms Suite.}{section*.22}% 46
-\BOOKMARK [4][-]{section*.24}{Scenario 1.3: Unsampled Ghost Lineage Introgression Suite.}{section*.22}% 47
-\BOOKMARK [4][-]{section*.25}{Scenario 1.4: Bacterial Micro-Conversion and Scale-Space Resolution Suite.}{section*.22}% 48
-\BOOKMARK [4][-]{section*.26}{Scenario 1.5: The One-Million-Genome Grand Continuous Parameter Sweep.}{section*.22}% 49
+\BOOKMARK [1][-]{section.2}{The RhizAeon Framework: Principles of Operation}{}% 2
+\BOOKMARK [1][-]{section.3}{Coalescent Simulation Benchmark and Operational Evaluation}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Coalescent ARG Benchmark and Calibration Against Triplet Scanning}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Performance Across Specialized Surveillance and Evolutionary Regimes}{section.3}% 5
+\BOOKMARK [3][-]{section*.3}{Epidemic Clonal Expansion}{subsection.3.2}% 6
+\BOOKMARK [4][-]{section*.4}{Multi-Way Mosaic Swarms}{section*.3}% 7
+\BOOKMARK [4][-]{section*.5}{Ghost Donor Introgression}{section*.3}% 8
+\BOOKMARK [4][-]{section*.6}{Bacterial Micro-Conversions}{section*.3}% 9
+\BOOKMARK [2][-]{subsection.3.3}{The Continuous Operational Phase Envelope of Reticulation Deconvolution}{section.3}% 10
+\BOOKMARK [1][-]{section.4}{Empirical Genomic Applications}{}% 11
+\BOOKMARK [2][-]{subsection.4.1}{Deconvolving Recombination Landscapes and Mosaic Genomes in Sarbecoviruses}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.2}{Bacterial AMR Mosaicism and Vaccine Escape in Streptococcus pneumoniae}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.3}{Ectopic Gene Conversion and Inter-Locus Chimerism in Primate MHC Class I}{section.4}% 14
+\BOOKMARK [1][-]{section.5}{Discussion}{}% 15
+\BOOKMARK [2][-]{subsection.5.1}{Continuous Trajectory Mechanics in Reticulate Evolution}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.2}{Resolving Real-World Evolutionary Complexities}{section.5}% 17
+\BOOKMARK [2][-]{subsection.5.3}{Translational Surveillance and Vaccine Escape}{section.5}% 18
+\BOOKMARK [2][-]{subsection.5.4}{Limitations, Boundary Conditions, and Outlook}{section.5}% 19
+\BOOKMARK [1][-]{section.6}{Materials and Methods}{}% 20
+\BOOKMARK [2][-]{subsection.6.1}{Metric Space Embedding and Gower Trajectory Projection}{section.6}% 21
+\BOOKMARK [2][-]{subsection.6.2}{Continuous Phylogenetic Cross-Attention and the Unpolarized Root Sink}{section.6}% 22
+\BOOKMARK [2][-]{subsection.6.3}{Statistical Changepoint Inference and Multi-Scale Deconvolution}{section.6}% 23
+\BOOKMARK [2][-]{subsection.6.4}{Attention Force Field Deconvolution and Multi-Channel Trajectory Resolution}{section.6}% 24
+\BOOKMARK [2][-]{subsection.6.5}{Reticulation Graph Adjudication and Ancestral Event Grouping}{section.6}% 25
+\BOOKMARK [2][-]{subsection.6.6}{Coalescent Simulation Suites and Bipartite Hungarian Evaluation}{section.6}% 26
+\BOOKMARK [2][-]{subsection.6.7}{Empirical Genomic Datasets, Software Availability, and Data Distribution}{section.6}% 27
+\BOOKMARK [1][-]{section.supp.section.1}{Foundational Modeling Assumptions and Physical Boundary Conditions}{}% 28
+\BOOKMARK [2][-]{section*.12}{Assumption 1 \(Metric Embeddability of Evolutionary Divergence\).}{section.supp.section.1}% 29
+\BOOKMARK [3][-]{section*.13}{Assumption 2 \(Stationary Substitution Background and the Brownian Null\).}{section*.12}% 30
+\BOOKMARK [4][-]{section*.14}{Assumption 3 \(The Unpolarized Root Token as an Autapomorphic Sink\).}{section*.13}% 31
+\BOOKMARK [4][-]{section*.15}{Assumption 4 \(Spectral Landmark Representation on Simplex Delta\136K\).}{section*.13}% 32
+\BOOKMARK [4][-]{section*.16}{Physical Limits and Resolution Boundaries.}{section*.13}% 33
+\BOOKMARK [1][-]{section.supp.section.2}{Complete Algorithmic Pipeline and Mathematical Formulations}{}% 34
+\BOOKMARK [2][-]{subsection.supp.subsection.2.1}{Lossless SNP Compression and Prefix Distance Tensor}{section.supp.section.2}% 35
+\BOOKMARK [2][-]{subsection.supp.subsection.2.2}{Global Divergence Matrix and Classical MDS Basis}{section.supp.section.2}% 36
+\BOOKMARK [2][-]{subsection.supp.subsection.2.3}{Exact Gower Out-of-Sample Continuous Trajectory Projection}{section.supp.section.2}% 37
+\BOOKMARK [2][-]{subsection.supp.subsection.2.4}{Continuous Phylogenetic Cross-Attention with Tree-RoPE and PhyloBias}{section.supp.section.2}% 38
+\BOOKMARK [2][-]{subsection.supp.subsection.2.5}{Cumulative Attention Curves and Differential Drift}{section.supp.section.2}% 39
+\BOOKMARK [2][-]{subsection.supp.subsection.2.6}{Multi-Scale Dyadic Scale-Space Matched Filter and Running Drawdown}{section.supp.section.2}% 40
+\BOOKMARK [2][-]{subsection.supp.subsection.2.7}{Profile Maximum-Likelihood Breakpoint Polisher}{section.supp.section.2}% 41
+\BOOKMARK [1][-]{section.supp.section.3}{Ancestral Recombination Graph \(ARG\) Reconstruction and Validation}{}% 42
+\BOOKMARK [2][-]{subsection.supp.subsection.3.1}{Ancestral Event Consolidation}{section.supp.section.3}% 43
+\BOOKMARK [2][-]{subsection.supp.subsection.3.2}{Structural Model Classes}{section.supp.section.3}% 44
+\BOOKMARK [2][-]{subsection.supp.subsection.3.3}{Multidimensional Statistical Validation Engine}{section.supp.section.3}% 45
+\BOOKMARK [1][-]{section.supp.section.4}{Coalescent ARG Simulation Protocol}{}% 46
+\BOOKMARK [1][-]{section.supp.section.5}{Specialized Epidemiological and Genomic Simulation Suites}{}% 47
+\BOOKMARK [1][-]{section.supp.section.6}{Grand-Scale Continuous Parameter Sweep \(1,000,000 Genomes\)}{}% 48
+\BOOKMARK [1][-]{section.supp.section.7}{Ground Truth Extraction and Bijective Bipartite Matching}{}% 49
+\BOOKMARK [1][-]{section.supp.section.8}{Empirical Genomic Cohorts and Annotations}{}% 50
+\BOOKMARK [2][-]{section*.17}{Sarbecovirus Whole-Genome Cohort.}{section.supp.section.8}% 51
+\BOOKMARK [3][-]{section*.18}{Streptococcus pneumoniae PMEN1 Whole Chromosome.}{section*.17}% 52
+\BOOKMARK [4][-]{section*.19}{Hominoidea MHC Class I Allelic Cohort.}{section*.18}% 53

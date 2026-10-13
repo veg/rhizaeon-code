@@ -1,4 +1,4 @@
-\begin{thebibliography}{51}
+\begin{thebibliography}{35}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -32,13 +32,6 @@ L.~D. Barber, L.~Percival, N.~M. Valiante, L.~Chen, C.~Lee, J.~E. Gumperz,
   (2):\penalty0 735--740, 1996.
 \newblock \doi{10.1084/jem.184.2.735}.
 
-\bibitem[Boni et~al.(2007)Boni, Posada, and Feldman]{boni2007exact}
-Maciej~F Boni, David Posada, and Marcus~W Feldman.
-\newblock An exact nonparametric method for inferring mosaic structure with
-  application to genetics data and simulated data.
-\newblock \emph{Genetics}, 176\penalty0 (2):\penalty0 1035--1047, 2007.
-\newblock \doi{10.1534/genetics.106.068874}.
-
 \bibitem[Boni et~al.(2020)Boni, Lemey, Jiang, Lam, Perry, Castoe, Rambaut, and
   Robertson]{boni2020evolutionary}
 Maciej~F Boni, Philippe Lemey, Xiao-Wei Jiang, Tommy Tsan-Yuk Lam, Martha~B
@@ -49,28 +42,12 @@ Maciej~F Boni, Philippe Lemey, Xiao-Wei Jiang, Tommy Tsan-Yuk Lam, Martha~B
   2020.
 \newblock \doi{10.1038/s41564-020-0771-4}.
 
-\bibitem[Bruen et~al.(2006)Bruen, Philippe, and Bryant]{bruen2006simple}
-Trevor~C Bruen, Herv{\'e} Philippe, and David Bryant.
-\newblock A simple and robust statistical test for detecting the presence of
-  recombination.
-\newblock \emph{Genetics}, 172\penalty0 (4):\penalty0 2665--2681, 2006.
-\newblock \doi{10.1534/genetics.105.048975}.
-
 \bibitem[Buneman(1974)]{buneman1974note}
 Peter Buneman.
 \newblock A note on the metric properties of trees.
 \newblock \emph{Journal of Combinatorial Theory, Series B}, 17\penalty0
   (1):\penalty0 48--50, 1974.
 \newblock \doi{10.1016/0095-8956(74)90047-1}.
-
-\bibitem[Carr et~al.(1998)Carr, Salminen, Albert, Sanders-Buell, Gotte, Birx,
-  and McCutchan]{carr1998full}
-Jean~K Carr, Mika~O Salminen, Jan Albert, Eric Sanders-Buell, Daniela Gotte,
-  Deborah~L Birx, and Francine~E McCutchan.
-\newblock Full genome sequences of human immunodeficiency virus type 1 subtypes
-  {G} and {A/G} intersubtype recombinants.
-\newblock \emph{Virology}, 247\penalty0 (1):\penalty0 22--31, 1998.
-\newblock \doi{10.1006/viro.1998.9211}.
 
 \bibitem[Croucher et~al.(2011)Croucher, Harris, Fraser, Quail, Burton, van~der
   Linden, McGee, von Gottberg, Song, Ko, Pichon, Baker, Parry, Lambertsen,
@@ -94,11 +71,6 @@ Nicholas~J Croucher, Andrew~J Page, Thomas~R Connor, Aidan~J Delaney,
   whole genome sequences using {Gubbins}.
 \newblock \emph{Nucleic Acids Research}, 43\penalty0 (3):\penalty0 e15, 2015.
 \newblock \doi{10.1093/nar/gku1196}.
-
-\bibitem[Deleuze and Guattari(1987)]{deleuze1987thousand}
-Gilles Deleuze and F{\'e}lix Guattari.
-\newblock \emph{A Thousand Plateaus: Capitalism and Schizophrenia}.
-\newblock University of Minnesota Press, 1987.
 
 \bibitem[Didelot and Falush(2007)]{didelot2007inference}
 Xavier Didelot and Daniel Falush.
@@ -128,32 +100,6 @@ Monroe~D. Donsker.
   1--12, 1951.
 \newblock \doi{10.1090/memo/0006}.
 
-\bibitem[Fortier and Pritchard(2025)]{fortier2025ancient}
-Alyssa~Lyn Fortier and Jonathan~K. Pritchard.
-\newblock Ancient trans-species polymorphism at the {Major Histocompatibility
-  Complex} in primates.
-\newblock \emph{eLife}, 14:\penalty0 RP103547, 2025.
-\newblock \doi{10.7554/elife.103547}.
-
-\bibitem[Geller et~al.(2002)Geller, Adams, Guethlein, Little, Madrigal, and
-  Parham]{geller2002linkage}
-Ron Geller, Erin Adams, Lisbeth Guethlein, Ann-Margaret Little, Alejandro
-  Madrigal, and Peter Parham.
-\newblock Linkage of {Patr-AL} to {Patr-A} and {-B} in the major
-  histocompatibility complex of the common chimpanzee (\textit{Pan
-  troglodytes}).
-\newblock \emph{Immunogenetics}, 54\penalty0 (6):\penalty0 441--444, 2002.
-\newblock \doi{10.1007/s00251-002-0452-x}.
-
-\bibitem[Glais et~al.(2002)Glais, Tribodet, and Kerlan]{glais2002}
-I~Glais, M~Tribodet, and C~Kerlan.
-\newblock Genomic variability in {Potato} potyvirus {Y} ({PVY}): evidence that
-  {PVY(N)W} and {PVY(NTN)} variants are single to multiple recombinants between
-  {PVY(O)} and {PVY(N)} isolates.
-\newblock \emph{Archives of Virology}, 147\penalty0 (2):\penalty0 363--378,
-  2002.
-\newblock \doi{10.1007/s705-002-8325-0}.
-
 \bibitem[Gonzalez(1985)]{gonzalez1985clustering}
 Teofilo~F. Gonzalez.
 \newblock Clustering to minimize the maximum intercluster distance.
@@ -173,12 +119,13 @@ J.~C. Gower.
 \newblock \emph{Biometrika}, 55\penalty0 (3):\penalty0 582--585, 1968.
 \newblock \doi{10.1093/biomet/55.3.582}.
 
-\bibitem[Griffiths and Marjoram(1996)]{griffiths1996ancestral}
-Robert~C Griffiths and Paul Marjoram.
-\newblock Ancestral inference from gene trees with recombination.
-\newblock \emph{Theoretical Population Biology}, 50\penalty0 (3):\penalty0
-  341--377, 1996.
-\newblock \doi{10.1006/tpbi.1996.0034}.
+\bibitem[Hasegawa et~al.(1985)Hasegawa, Kishino, and Yano]{hasegawa1985dating}
+Masami Hasegawa, Hirohisa Kishino, and Taka-aki Yano.
+\newblock Dating of the human-ape splitting by a molecular clock of
+  mitochondrial {DNA}.
+\newblock \emph{Journal of Molecular Evolution}, 22\penalty0 (2):\penalty0
+  160--174, 1985.
+\newblock \doi{10.1007/BF02101694}.
 
 \bibitem[Hudson(1983)]{hudson1983properties}
 Richard~R Hudson.
@@ -186,17 +133,11 @@ Richard~R Hudson.
 \newblock \emph{Genetical Research}, 41\penalty0 (3):\penalty0 261--269, 1983.
 \newblock \doi{10.1017/s0016672300021350}.
 
-\bibitem[Jansen~van Rensburg et~al.(2024)Jansen~van Rensburg, Berger, Yassine,
-  Shaw, Fohrmann, Bray, Jolley, Maiden, and
-  Brueggemann]{jansen2024pneumococcal}
-Melissa~J Jansen~van Rensburg, Duncan~J Berger, Iman Yassine, David Shaw, Andy
-  Fohrmann, James~E Bray, Keith~A Jolley, Martin C~J Maiden, and Angela~B
-  Brueggemann.
-\newblock Development of the {Pneumococcal Genome Library}, a core genome
-  multilocus sequence typing scheme, and a taxonomic life identification number
-  barcoding system to investigate and define pneumococcal population structure.
-\newblock \emph{Microbial Genomics}, 10\penalty0 (8):\penalty0 001280, 2024.
-\newblock \doi{10.1099/mgen.0.001280}.
+\bibitem[Kolmogorov(1933)]{kolmogorov1933sulla}
+Andrei~N. Kolmogorov.
+\newblock Sulla determinazione empirica di una legge di distribuzione.
+\newblock \emph{Giornale dell'Istituto Italiano degli Attuari}, 4:\penalty0
+  83--91, 1933.
 
 \bibitem[Kosakovsky~Pond et~al.(2006)Kosakovsky~Pond, Posada, Gravenor, Woelk,
   and Frost]{kosakovsky2006gard}
@@ -246,13 +187,6 @@ Giuseppe Maccari, James Robinson, Keith Ballingall, Lisbeth~A. Guethlein, Unni
   2017.
 \newblock \doi{10.1093/nar/gkw1050}.
 
-\bibitem[Marchenko and Pastur(1967)]{marchenko1967distribution}
-Vladimir~A. Marchenko and Leonid~A. Pastur.
-\newblock Distribution of eigenvalues for some sets of random matrices.
-\newblock \emph{Mathematics of the USSR-Sbornik}, 1\penalty0 (4):\penalty0
-  457--483, 1967.
-\newblock \doi{10.1070/SM1967v001n04ABEH001994}.
-
 \bibitem[Martin et~al.(2015)Martin, Murrell, Golden, Khoosal, and
   Muhire]{martin2015rdp4}
 Darren~P Martin, Ben Murrell, Michael Golden, Arshan Khoosal, and Brejnev
@@ -280,15 +214,24 @@ Gil A~T McVean, Simon~R Myers, Sarah Hunt, Panos Deloukas, David~R Bentley, and
 \newblock \emph{Science}, 304\penalty0 (5670):\penalty0 581--584, 2004.
 \newblock \doi{10.1126/science.1092500}.
 
-\bibitem[Minh et~al.(2020)Minh, Schmidt, Chernomor, Schrempf, Woodhams, von
-  Haeseler, and Lanfear]{minh2020iqtree2}
-Bui~Quang Minh, Heiko~A Schmidt, Olga Chernomor, Dominik Schrempf, Michael~D
-  Woodhams, Arndt von Haeseler, and Robert Lanfear.
-\newblock {IQ-TREE} 2: New models and efficient methods for phylogenetic
-  inference in the genomic era.
-\newblock \emph{Molecular Biology and Evolution}, 37\penalty0 (5):\penalty0
-  1530--1534, 2020.
-\newblock \doi{10.1093/molbev/msaa015}.
+\bibitem[Murrell et~al.(2012)Murrell, Wertheim, Moola, Weighill, Scheffler, and
+  Kosakovsky~Pond]{murrell2012detecting}
+Ben Murrell, Joel~O Wertheim, Sasha Moola, Thomas Weighill, Konrad Scheffler,
+  and Sergei~L Kosakovsky~Pond.
+\newblock Detecting individual sites subject to episodic diversifying
+  selection.
+\newblock \emph{PLoS Genetics}, 8\penalty0 (7):\penalty0 e1002764, 2012.
+\newblock \doi{10.1371/journal.pgen.1002764}.
+
+\bibitem[Murrell et~al.(2015)Murrell, Weaver, Smith, Wertheim, Murrell,
+  Aylward, Eren, Pollner, Martin, Frost, and Kosakovsky~Pond]{murrell2015gene}
+Ben Murrell, Steven Weaver, Martin~D Smith, Joel~O Wertheim, Sasha Murrell,
+  William Aylward, Kemal Eren, Tristan Pollner, Darren~P Martin, Simon D~W
+  Frost, and Sergei~L Kosakovsky~Pond.
+\newblock Gene-wide identification of episodic selection.
+\newblock \emph{Molecular Biology and Evolution}, 32\penalty0 (5):\penalty0
+  1365--1371, 2015.
+\newblock \doi{10.1093/molbev/msv035}.
 
 \bibitem[Parham et~al.(1995)Parham, Adams, and Arnett]{parham1995origins}
 Peter Parham, Erin~J. Adams, and Kelly~L. Arnett.
@@ -323,35 +266,11 @@ Loren~H Rieseberg, Olivier Raymond, David~M Rosenthal, Zhao Lai, Kevin
 \newblock \emph{Science}, 301\penalty0 (5637):\penalty0 1211--1216, 2003.
 \newblock \doi{10.1126/science.1086949}.
 
-\bibitem[Robinson et~al.(2020)Robinson, Barker, Georgiou, Cooper, Flicek, and
-  Marsh]{robinson2020ipd}
-James Robinson, Dominic~J. Barker, Xenia Georgiou, Michael~A. Cooper, Paul
-  Flicek, and Steven G.~E. Marsh.
-\newblock {IPD-IMGT/HLA} database.
-\newblock \emph{Nucleic Acids Research}, 48\penalty0 (D1):\penalty0 D948--D955,
-  2020.
-\newblock \doi{10.1093/nar/gkz950}.
-
 \bibitem[Schierup and Hein(2000)]{schierup2000consequences}
 Mikkel~H Schierup and Jotun Hein.
 \newblock Consequences of recombination on traditional phylogenetic analysis.
 \newblock \emph{Genetics}, 156\penalty0 (2):\penalty0 879--891, 2000.
 \newblock \doi{10.1093/genetics/156.2.879}.
-
-\bibitem[{\v{S}}id{\'a}k(1967)]{sidak1967rectangular}
-Zbyn{\v{e}}k {\v{S}}id{\'a}k.
-\newblock Rectangular confidence regions for the means of multivariate normal
-  distributions.
-\newblock \emph{Journal of the American Statistical Association}, 62\penalty0
-  (318):\penalty0 626--633, 1967.
-\newblock \doi{10.1080/01621459.1967.10482935}.
-
-\bibitem[Simmonds and Welch(2006)]{simmonds2005}
-Peter Simmonds and Jenny Welch.
-\newblock Frequency and dynamics of recombination within different species of
-  human enteroviruses.
-\newblock \emph{Journal of Virology}, 80\penalty0 (1):\penalty0 483--493, 2006.
-\newblock \doi{10.1128/jvi.80.1.483-493.2006}.
 
 \bibitem[Simon-Loriere and Holmes(2011)]{simonloriere2011recombination}
 Etienne Simon-Loriere and Edward~C Holmes.
@@ -360,29 +279,11 @@ Etienne Simon-Loriere and Edward~C Holmes.
   617--626, 2011.
 \newblock \doi{10.1038/nrmicro2614}.
 
-\bibitem[Smith et~al.(2023)Smith, Ye, and Turakhia]{smith2023tracking}
-Kyle Smith, Cheng Ye, and Yatish Turakhia.
-\newblock Tracking and curating putative {SARS-CoV-2} recombinants with
-  {RIVET}.
-\newblock \emph{Bioinformatics}, 39\penalty0 (9):\penalty0 btad538, 2023.
-\newblock \doi{10.1093/bioinformatics/btad538}.
-
 \bibitem[Su et~al.(2024)Su, Ahmed, Lu, Pan, Bo, and Liu]{su2024roformer}
 Jianlin Su, Murtadha Ahmed, Yu~Lu, Shengfeng Pan, Wen Bo, and Yunfeng Liu.
 \newblock {RoFormer}: Enhanced transformer with {Rotary Position Embedding}.
 \newblock \emph{Neurocomputing}, 568:\penalty0 127063, 2024.
 \newblock \doi{10.1016/j.neucom.2023.127063}.
-
-\bibitem[Su et~al.(2000)Su, Graf, Zhang, von Briesen, Xing, K{\"o}stler, Melzl,
-  Wolf, Shao, and Wagner]{su2000characterization}
-Ling Su, Marcus Graf, Ying Zhang, Hagen von Briesen, Hui Xing, Josef
-  K{\"o}stler, H~Melzl, Hans Wolf, Yiming Shao, and Ralf Wagner.
-\newblock Characterization of a virtually full-length human immunodeficiency
-  virus type 1 genome of a prevalent intersubtype ({C/B}$'$) recombinant strain
-  in {China}.
-\newblock \emph{Journal of Virology}, 74\penalty0 (23):\penalty0 11367--11376,
-  2000.
-\newblock \doi{10.1128/jvi.74.23.11367-11376.2000}.
 
 \bibitem[Tamura and Nei(1993)]{tamura1993estimation}
 Koichiro Tamura and Masatoshi Nei.
@@ -391,47 +292,5 @@ Koichiro Tamura and Masatoshi Nei.
 \newblock \emph{Molecular Biology and Evolution}, 10\penalty0 (3):\penalty0
   512--526, 1993.
 \newblock \doi{10.1093/oxfordjournals.molbev.a040023}.
-
-\bibitem[Tamura et~al.(2023)Tamura, Ito, Uriu, Zahradnik, Kida, Anraku, Nasser,
-  Toyoda, Mizuma, Shimizu, et~al.]{tamura2023xbb}
-Tomokazu Tamura, Junpei Ito, Keiya Uriu, Jiri Zahradnik, Isaac Kida, Yuki
-  Anraku, Hesham Nasser, Mai Toyoda, Keita Mizuma, Ryo Shimizu, et~al.
-\newblock Virological characteristics of the {SARS-CoV-2} {XBB} variant derived
-  from recombination of two {Omicron} subvariants.
-\newblock \emph{The Lancet Microbe}, 4\penalty0 (7):\penalty0 e529--e539, 2023.
-\newblock \doi{10.1016/S2666-5247(22)00384-4}.
-
-\bibitem[Temmam et~al.(2022)Temmam, Vongphayloth, Baquero, Munier, Bonomi,
-  Regnault, Douangboubpha, Karami, Chr{\'e}tien, Sanamxay, Xayaphet,
-  Paphaphanh, Lacoste, Somlor, Lakeomany, Phommavanh, P{\'e}rot, Dehan, Amara,
-  Donati, Bigot, Nilges, Rey, van~der Werf, Brey, and Eloit]{temmam2022bat}
-Sarah Temmam, Khamsing Vongphayloth, Eduard Baquero, Sandie Munier,
-  Massimiliano Bonomi, B{\'e}atrice Regnault, Bounsavane Douangboubpha, Yasaman
-  Karami, Delphine Chr{\'e}tien, Daosavanh Sanamxay, Vilakhan Xayaphet,
-  Phetphoumin Paphaphanh, Vincent Lacoste, Somphavanh Somlor, Khaithong
-  Lakeomany, Nothasin Phommavanh, Philippe P{\'e}rot, Oc{\'e}ane Dehan,
-  Faustine Amara, Flora Donati, Thomas Bigot, Michael Nilges, F{\'e}lix~A. Rey,
-  Sylvie van~der Werf, Paul~T. Brey, and Marc Eloit.
-\newblock {Bat coronaviruses related to SARS-CoV-2 and infectious for human
-  cells}.
-\newblock \emph{Nature}, 604\penalty0 (7905):\penalty0 330--336, 2022.
-\newblock \doi{10.1038/s41586-022-04532-4}.
-
-\bibitem[Turakhia et~al.(2022)Turakhia, Thornlow, Hinrichs, De~Maio, Gozashti,
-  Lanfear, Haussler, and Corbett-Detig]{turakhia2022pandemic}
-Yatish Turakhia, Bryan Thornlow, Angie~S Hinrichs, Nicola De~Maio, Landen
-  Gozashti, Robert Lanfear, David Haussler, and Russell Corbett-Detig.
-\newblock Pandemic-scale phylogenomics reveals the {SARS-CoV-2} recombination
-  landscape.
-\newblock \emph{Nature}, 609\penalty0 (7929):\penalty0 994--997, 2022.
-\newblock \doi{10.1038/s41586-022-05189-9}.
-
-\bibitem[Worobey et~al.(2002)Worobey, Rambaut, Pybus, and
-  Robertson]{worobey2002questioning}
-Michael Worobey, Andrew Rambaut, Oliver~G. Pybus, and David~L. Robertson.
-\newblock Questioning the evidence for genetic recombination in the 1918
-  "spanish flu" virus.
-\newblock \emph{Science}, 296\penalty0 (5566):\penalty0 211, 2002.
-\newblock \doi{10.1126/science.296.5566.211a}.
 
 \end{thebibliography}

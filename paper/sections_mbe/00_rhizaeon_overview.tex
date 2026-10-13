@@ -39,9 +39,11 @@ The directional force acts persistently from the breakpoint onward, driving cumu
 The resulting profile forms a triangular arch whose vertex pinpoints the breakpoint.
 For a double crossover (hereafter referred to as a  cassette), a sequence acquires a localized foreign tract before returning to its home lineage.
 The directional force turns on at the tract entrance and turns off at the exit, producing a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and an equally steep descent at the second breakpoint.
-When the true donor is absent from the dataset---such as an unsampled animal reservoir or an extinct lineage---some existing heuristics invariably misidentify innocent sister taxa as parental donors.
-\RhizAeon resolves this failure mode through ghost donor introgression: the sequence experiences a powerful force ejecting it from its home corridor, but the deflection fails to align with any contemporary reference lineage.
-By recognizing this uncoupled displacement, \RhizAeon autonomously attributes the event to an unsampled ghost ancestor without framing sister taxa.
+When the true donor is absent from the dataset---such as an unsampled animal reservoir or an extinct lineage---closed-world heuristics invariably misidentify innocent contemporary taxa as parental donors.
+\RhizAeon addresses this challenge through directional consistency constraints and principled abstention.
+When an unsampled donor lacks any close relatives in the alignment (Pure Ghost and Deep Reservoir regimes), the introgressed segment fails to show coherent directional affinity toward any contemporary reference lineage.
+Rather than manufacturing a false pairing with an arbitrary leaf, \RhizAeon strictly abstains from reporting spurious transfers (achieving zero false framing on contemporary background parents).
+When a surrogate sister lineage is present in the dataset, \RhizAeon reliably captures the introgression and attributes the transfer to the surrogate sister clade with 98.3\% accuracy.
 
 Localizing breakpoints combines the multi-scale speed of the force field with the fine-scale precision of phylogenetic likelihood.
 In natural genomes, recombination tracts vary by orders of magnitude---from fifty-base-pair micro-casettes to multi-kilobase cassettes.

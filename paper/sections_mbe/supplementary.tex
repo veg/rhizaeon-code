@@ -51,7 +51,7 @@ Consequently, autapomorphic bursts reduce contemporary affinity without surging 
 
 \paragraph{Assumption 4 (Spectral Landmark Representation on Simplex \texorpdfstring{$\Delta^K$}{Delta\textasciicircum K}).}
 To scale linearly across vast genomic cohorts ($N > 1{,}000$ genomes), \RhizAeon assumes that the evolutionary variance of a population can be faithfully captured by $K$ spectral landmark centroids ($K \ll N$) on the probability simplex $\Delta^K$.
-Landmarks are selected via $k$-medoids clustering on global distance matrix $\mathbf{D}_{\mathrm{glob}}$, ensuring uniform coverage of deep clades.
+Landmarks are selected via sequential Farthest-Point Sampling \citep{gonzalez1985clustering} on global distance matrix $\mathbf{D}_{\mathrm{glob}}$, ensuring uniform coverage across deep clades.
 Every contemporary genome $i$ is tracked as a continuous barycentric coordinate vector $\bm{\alpha}_i(u) \in \Delta^K$.
 This reduces computational complexity from $\mathcal{O}(N^2 L)$ or $\mathcal{O}(N^3 L)$ down to $\mathcal{O}(N K L)$ while preserving sensitivity to cross-clade transfers.
 
@@ -116,7 +116,7 @@ Phylogenetic distance constraints are injected through two mechanisms:
     \begin{equation}
     \mathrm{PhyloBias}_{ij} = \ln\left[\epsilon_0 + (1 - \epsilon_0)\exp(-\lambda_h D_{\mathrm{glob}, ij})\right],
     \end{equation}
-    where $\epsilon_0 = 0.05$ represents the neutral substitution floor.
+    where $\epsilon_0 = 0.25$ represents the equilibrium neutral substitution floor.
 \end{enumerate}
 The resulting attention tensor $\mathbf{A} \in \mathbb{R}^{L \times N \times (N+1)}$ evaluates attention from each query sequence $i$ to all reference taxa $j \in \{1, \dots, N\}$ and the root sink at index $0$:
 \begin{equation}
@@ -264,14 +264,14 @@ Four specialized simulation generators probed operational regimes outside the ne
 To evaluate algorithmic robustness, false positive rate calibration, and multi-event mosaic resolution across unconstrained continuous evolutionary space rather than isolated grid points or hand-crafted scenarios, we executed a grand continuous parameter sweep of 1,000,000 independent whole-genome alignments ($333{,}334$ non-recombinant clonal nulls and $666{,}666$ recombinant chimeras; Table~\ref{tab:grand_sweep_1m_envelope}, Figures~\ref{fig:grand_sweep_1m_phase_diagram} and \ref{fig:grand_sweep_1m_multievent}).
 Each trial sampled an independent parameter vector uniformly or log-uniformly across evolutionary phase space:
 \begin{itemize}
-    \item \textbf{Alignment Length ($L$)}: Sampled log-uniformly from $L \sim \text{LogUniform}(1{,}000, 30{,}000)$~nt, discretized to multiples of $50$~nt ($L \in [1{,}000, 30{,}000]$~nt, median $5{,}450$~nt).
+    \item \textbf{Alignment Length ($L$)}: Sampled log-uniformly from $L \sim \text{LogUniform}(300, 30{,}000)$~nt, discretized to multiples of $50$~nt ($L \in [300, 30{,}000]$~nt, median $5{,}450$~nt).
     \item \textbf{Sample Taxon Count ($N$)}: Stratified across three cohort surveillance regimes: 40\% small viral/microbial outbreak cohorts ($N \sim \text{Uniform}(4, 30)$ taxa), 40\% medium surveillance cohorts ($N \sim \text{Uniform}(31, 100)$ taxa), and 20\% large population cohorts ($N \sim \text{Uniform}(101, 250)$ taxa).
-    \item \textbf{Parental Divergence ($d_{\mathrm{parent}}$)}: Log-uniformly distributed across $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.250)$ substitutions per site (with pairwise tree divergence extending to $0.350$ subs/site across deep branches).
+    \item \textbf{Parental Divergence ($d_{\mathrm{parent}}$)}: Log-uniformly distributed across $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.350)$ substitutions per site.
     \item \textbf{Substitution Dynamics}: Continuous-time Markov substitution under the HKY85 model with transition/transversion ratio $\kappa = 2.0$ and empirical base frequencies $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$. Position-specific finite-time transition matrices $\mathbf{P}(t)$ were precomputed analytically per trial for rapid, exact simulation without transcendental overhead.
     \item \textbf{Site Rate Heterogeneity and Biological Heterotachy ($\alpha$)}:
     \begin{itemize}
         \item \textit{Strict Molecular Clock} (25\% of trials, $N = 250{,}000$ overall; $83{,}311$ in null partition): $\alpha = 1{,}000.0$ (uniform substitution rates across all sites).
-        \item \textit{Continuous Gamma Heterotachy} (75\% of trials, $N = 750{,}000$ overall; $250{,}023$ in null partition): Shape parameter drawn log-uniformly from $\alpha \sim \text{LogUniform}(0.05, 5.00)$, with position-specific relative mutation rates $r_u \sim \text{Gamma}(\alpha, \alpha)$ sampled independently per site and clamped to $[0.01, 50.0]$.
+        \item \textit{Continuous Gamma Heterotachy} (75\% of trials, $N = 750{,}000$ overall; $250{,}023$ in null partition): Shape parameter drawn log-uniformly from $\alpha \sim \text{LogUniform}(0.20, 5.00)$, with position-specific relative mutation rates $r_u \sim \text{Gamma}(\alpha, \alpha)$ sampled independently per site and clamped to $[0.01, 50.0]$.
     \end{itemize}
     \item \textbf{Lineage Architecture and Transmission Drift}: The ancestral root sequence evolved into parental nodes $P_1$, $P_2$, and optional $P_3$ (for cohorts with $N \ge 8$ taxa). Contemporary leaves accumulated post-recombination private mutations along terminal branches with transmission drift $d_{\mathrm{drift}} \sim \text{Uniform}(0.0005, 0.0035)$ subs/site.
     \item \textbf{Reticulation Cardinality ($K_{\mathrm{true}}$)}:

@@ -6,8 +6,8 @@
 \includegraphics[width=\linewidth,keepaspectratio]{figures/fig_posada_crandall_benchmark.pdf}
 \caption{\textbf{Head-to-head performance of \RhizAeon versus 3SEQ across the 3,200-trial Posada \& Crandall benchmark ($N = 10$, $L = 1{,}000$ nt).}
 \textbf{A.} Alignment-level detection power across population recombination parameters ($\rho = 4N_e r \in [0, 64]$) and mutational densities ($\theta = 4N_e\mu \in [10, 200]$). Both methods achieve identical power trajectories, reaching $98.0\%$ at $\theta = 200$.
-\textbf{B.} Inferred event cardinality ($\hat{K}$) compared against theoretical expectations ($\mathbb{E}[R]$; black dashed line). Triplet scanning overcounts events up to 10-fold ($\hat{K} = 17.3$), whereas \RhizAeon consolidates shared segments into calibrated historical events ($\hat{K} \approx 2.1\text{--}4.6$).
-\textbf{C.} Empirical false positive rate (FPR, \%) across 1,200 non-recombinant alignments under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Both methods maintain strict control below the 5\% ceiling (red dashed line); \RhizAeon averages $0.58\%$.}
+\textbf{B.} Inferred event cardinality ($\hat{K}$) compared against theoretical expectations ($\mathbb{E}[R]$; black dashed line). Triplet scanning overcounts events up to 10-fold ($\hat{K} = 16.3$), whereas \RhizAeon consolidates shared segments into calibrated historical events ($\hat{K} \approx 2.1\text{--}4.6$).
+\textbf{C.} Empirical false positive rate (FPR, \%) across 1,200 non-recombinant alignments under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Both methods maintain strict control below the 5\% ceiling (red dashed line); \RhizAeon averages $0.58\%$ ($7 / 1{,}200$) and 3SEQ averages $0.17\%$ ($2 / 1{,}200$).}
 \label{fig:posada_benchmark}
 \end{figure*}
 
@@ -15,9 +15,10 @@
 \label{subsec:posada_benchmark}
 
 To establish a baseline against standard pairwise and triplet methods, we evaluated \RhizAeon across the 3,200-trial coalescent benchmark of \citet{posada2001evaluation} ($N = 10$ taxa, $L = 1{,}000$~nt; Figure~\ref{fig:posada_benchmark}, Supplementary Table~\ref{tab:supp_posada_summary}).
-Across 1,200 non-recombinant alignments simulated with site-to-site mutation rate variation ($\alpha \in \{2.0, 0.5, 0.05\}$), \RhizAeon maintained an empirical false positive rate of 0.58\% (7 false alarms; Figure~\ref{fig:posada_benchmark}C), comparable to 3SEQ (0.17\%) and well below the nominal 5\% significance threshold.
-Rate variation alone does not produce false recombination signals.
-Even under extreme rate clustering ($\alpha = 0.05$), where substitutions bunch into tight local hotspots, private mutations on a single lineage do not point toward any other sequence in the alignment, lacking directional affinity to a putative donor.
+Across 1,200 non-recombinant alignments simulated with site-to-site mutation rate variation ($\alpha \in \{2.0, 0.5, 0.05\}$), both algorithms maintained strict false positive control well below the nominal 5\% ceiling (Figure~\ref{fig:posada_benchmark}C).
+3SEQ exhibited a tighter false alarm rate on these small 10-taxon null alignments (0.17\%, 2 false alarms / 1,200 trials; 95\% Wilson score interval [0.05\%, 0.60\%]), whereas \RhizAeon yielded 0.58\% (7 false alarms / 1,200 trials; 95\% Wilson score interval [0.28\%, 1.20\%]).
+These occasional false alarms occurred primarily at high sequence divergence ($\theta = 200$, where 4 of the 7 false alarms occurred across $\alpha \in \{2.0, 0.05\}$) due to stochastic homoplasy across the 1,000~nt locus, rather than concentrating exclusively at extreme heterotachy.
+Under severe rate variation ($\alpha = 0.05$), private mutations on a single lineage lack directional affinity toward candidate donors, routing harmlessly into the root sink.
 
 Across the 1,600 recombinant alignments, detection power depended on mutational availability (Figure~\ref{fig:posada_benchmark}A).
 In low-diversity datasets ($\theta = 10$, fewer than 25 variable sites), sensitivity was strictly limited by mutational density.
@@ -76,12 +77,13 @@ In Nested Russian Dolls and Triple Crossovers, 3SEQ similarly failed to untangle
 In natural populations, recombination and horizontal gene transfer frequently involve donor lineages that are absent from the contemporary sample, including unsampled zoonotic reservoirs, extinct ancestral variants, or unsequenced strains (Figure~\ref{fig:specialized_scenarios}C).
 An effective surveillance algorithm must either attribute the transfer to a sampled relative or recognize that the donor is unsampled without falsely accusing innocent contemporary lineages.
 \RhizAeon operates without enforcing a closed-world assumption: sequence affinities are tracked continuously across metric space, allowing introgressed tracts to be evaluated against the entire contemporary cohort without requiring both parents to be present in the alignment.
-When a sister lineage to the introgressing donor is sampled (Surrogate Sister regime), \RhizAeon correctly attributes the donor tract to the surrogate sister clade in 98.3\% of trials (100.0\% across all swarms at $d_{\mathrm{parent}} \ge 0.05$; Figure~\ref{fig:specialized_scenarios}C), recovering the 1.5~kb cassette with high spatial precision ($J = 0.94\text{--}0.99$) and zero false alarms on innocent background parents.
-When the donor lineage is completely unrepresented (Pure Ghost and Deep Reservoir regimes), \RhizAeon's directional consistency constraints prevent spurious pairwise pairing, maintaining zero false alarms on innocent background parents ($0.0\%$ at $d_{\mathrm{parent}} \ge 0.05$) and keeping false donor framing at or below 6.0\%.
+When a sister lineage to the introgressing donor is sampled (Surrogate Sister regime), \RhizAeon achieves 91.2\% tract recall and correctly attributes the donor tract to the surrogate sister clade in 98.3\% of trials (100.0\% across all swarms at $d_{\mathrm{parent}} \ge 0.05$; Figure~\ref{fig:specialized_scenarios}C), recovering the 1.5~kb cassette with high spatial precision ($J = 0.94\text{--}0.99$) and keeping false alarms on innocent background parents down to 2.2\%.
+In sharp contrast, when the introgressing donor is completely unrepresented in the sample (Pure Ghost and Deep Reservoir regimes), \RhizAeon's directional consistency constraints result in principled abstention: tract recall is 0.000 (0 / 360 replicates), because the algorithm refuses to forge an ungrounded reticulation link to an unrelated contemporary leaf.
+By abstaining in the absence of a sampled donor or surrogate sister, \RhizAeon maintains a 0.0\% false parent alarm rate in Pure Ghost cohorts and $\le 6.1\%$ in Deep Reservoir cohorts ($0.0\%$ at $d_{\mathrm{parent}} \ge 0.05$).
 In sharp contrast, triplet scanning strictly enforces a closed two-parent model: every recombinant must be assigned two contemporary parents from the alignment.
-Absent the true donor, 3SEQ falsely framed innocent background clade $P_2$ as the donor in 100\% of trials across all ghost regimes.
-In Surrogate Sister cohorts, donor accuracy fell to 9.3\%--39.3\% (Figure~\ref{fig:specialized_scenarios}C) while falsely accusing 37.5\%--56.4\% of background parent taxa.
-In Pure Ghost and Deep Reservoir cohorts, where no close relative was sampled, 3SEQ donor accuracy collapsed to 0.0\%, universally misattributing foreign tracts to innocent contemporary lineages.
+While 3SEQ flags the recombinant tract in 88.1\%--88.7\% of trials, it universally misattributes the foreign introgression: absent the true donor, 3SEQ falsely framed innocent background parent $P_2$ as the donor in 100\% of trials across all ghost regimes (Figure~\ref{fig:specialized_scenarios}C).
+In Surrogate Sister cohorts, 3SEQ donor accuracy fell to 9.3\%--39.3\% while falsely accusing 37.5\%--56.4\% of background parent taxa.
+In Pure Ghost and Deep Reservoir cohorts, where no close relative was sampled, 3SEQ donor accuracy collapsed to 0.0\%, manufacturing false donor attributions across every single detected trial.
 
 \paragraph{Bacterial Micro-Conversions}
 In bacterial transformation (e.g., \emph{Streptococcus pneumoniae}, \emph{Helicobacter pylori}) and eukaryotic gene conversion, homologous exchange frequently occurs via micro-conversions: short non-reciprocal replacement tracts spanning tens to hundreds of base pairs (Figure~\ref{fig:specialized_scenarios}D).
