@@ -12,153 +12,304 @@
       "concordance_pct": 57.14285714285714,
       "mean_distance_nt": 361.2857142857143,
       "median_distance_nt": 134.0,
+      "matched_ref_within_tol": 12,
+      "concordance_ref_pct": 57.14285714285714,
+      "mean_distance_ref_nt": 356.0,
+      "median_distance_ref_nt": 109.0,
       "matches": [
         {
           "gard_region": 1,
+          "gard_bp_aln78": 1732,
+          "gard_bp_aln83": 1732,
           "gard_bp": 1732,
+          "gard_bp_ref": 1680,
           "rhizaeon_closest_bp": 1199,
+          "rhizaeon_closest_bp_ref_of_aln": 1147,
           "distance_nt": 533,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 1147,
+          "distance_ref_nt": 533,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 2,
+          "gard_bp_aln78": 3154,
+          "gard_bp_aln83": 3154,
           "gard_bp": 3154,
+          "gard_bp_ref": 3093,
           "rhizaeon_closest_bp": 3039,
+          "rhizaeon_closest_bp_ref_of_aln": 2984,
           "distance_nt": 115,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 2984,
+          "distance_ref_nt": 109,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 3,
+          "gard_bp_aln78": 3761,
+          "gard_bp_aln83": 3761,
           "gard_bp": 3761,
+          "gard_bp_ref": 3649,
           "rhizaeon_closest_bp": 3716,
+          "rhizaeon_closest_bp_ref_of_aln": 3604,
           "distance_nt": 45,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 3604,
+          "distance_ref_nt": 45,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 4,
+          "gard_bp_aln78": 5193,
+          "gard_bp_aln83": 5193,
           "gard_bp": 5193,
+          "gard_bp_ref": 4973,
           "rhizaeon_closest_bp": 5270,
+          "rhizaeon_closest_bp_ref_of_aln": 5050,
           "distance_nt": 77,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 5050,
+          "distance_ref_nt": 77,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 5,
+          "gard_bp_aln78": 8431,
+          "gard_bp_aln83": 8431,
           "gard_bp": 8431,
+          "gard_bp_ref": 8208,
           "rhizaeon_closest_bp": 7958,
+          "rhizaeon_closest_bp_ref_of_aln": 7735,
           "distance_nt": 473,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 7735,
+          "distance_ref_nt": 473,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 6,
+          "gard_bp_aln78": 11671,
+          "gard_bp_aln83": 11671,
           "gard_bp": 11671,
+          "gard_bp_ref": 11445,
           "rhizaeon_closest_bp": 11877,
+          "rhizaeon_closest_bp_ref_of_aln": 11651,
           "distance_nt": 206,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 11651,
+          "distance_ref_nt": 206,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 7,
+          "gard_bp_aln78": 12854,
+          "gard_bp_aln83": 12854,
           "gard_bp": 12854,
+          "gard_bp_ref": 12622,
           "rhizaeon_closest_bp": 12988,
+          "rhizaeon_closest_bp_ref_of_aln": 12756,
           "distance_nt": 134,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 12756,
+          "distance_ref_nt": 134,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 8,
+          "gard_bp_aln78": 14633,
+          "gard_bp_aln83": 14633,
           "gard_bp": 14633,
+          "gard_bp_ref": 14401,
           "rhizaeon_closest_bp": 12988,
+          "rhizaeon_closest_bp_ref_of_aln": 12756,
           "distance_nt": 1645,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 12756,
+          "distance_ref_nt": 1645,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 9,
+          "gard_bp_aln78": 16186,
+          "gard_bp_aln83": 16186,
           "gard_bp": 16186,
+          "gard_bp_ref": 15954,
           "rhizaeon_closest_bp": 18167,
+          "rhizaeon_closest_bp_ref_of_aln": 17935,
           "distance_nt": 1981,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 17935,
+          "distance_ref_nt": 1981,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 10,
+          "gard_bp_aln78": 17155,
+          "gard_bp_aln83": 17155,
           "gard_bp": 17155,
+          "gard_bp_ref": 16923,
           "rhizaeon_closest_bp": 18167,
+          "rhizaeon_closest_bp_ref_of_aln": 17935,
           "distance_nt": 1012,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 17935,
+          "distance_ref_nt": 1012,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 11,
+          "gard_bp_aln78": 20197,
+          "gard_bp_aln83": 20197,
           "gard_bp": 20197,
+          "gard_bp_ref": 19965,
           "rhizaeon_closest_bp": 20217,
+          "rhizaeon_closest_bp_ref_of_aln": 19985,
           "distance_nt": 20,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 19985,
+          "distance_ref_nt": 20,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 12,
+          "gard_bp_aln78": 20750,
+          "gard_bp_aln83": 20750,
           "gard_bp": 20750,
+          "gard_bp_ref": 20518,
           "rhizaeon_closest_bp": 20909,
+          "rhizaeon_closest_bp_ref_of_aln": 20677,
           "distance_nt": 159,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 20677,
+          "distance_ref_nt": 159,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 13,
+          "gard_bp_aln78": 21430,
+          "gard_bp_aln83": 21430,
           "gard_bp": 21430,
+          "gard_bp_ref": 21198,
           "rhizaeon_closest_bp": 21539,
+          "rhizaeon_closest_bp_ref_of_aln": 21307,
           "distance_nt": 109,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 21307,
+          "distance_ref_nt": 109,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 14,
+          "gard_bp_aln78": 21643,
+          "gard_bp_aln83": 21643,
           "gard_bp": 21643,
+          "gard_bp_ref": 21411,
           "rhizaeon_closest_bp": 21578,
+          "rhizaeon_closest_bp_ref_of_aln": 21346,
           "distance_nt": 65,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 21346,
+          "distance_ref_nt": 65,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 15,
+          "gard_bp_aln78": 22747,
+          "gard_bp_aln83": 22756,
           "gard_bp": 22747,
+          "gard_bp_ref": 22460,
           "rhizaeon_closest_bp": 22849,
+          "rhizaeon_closest_bp_ref_of_aln": 22562,
           "distance_nt": 102,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 22562,
+          "distance_ref_nt": 102,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 16,
+          "gard_bp_aln78": 23692,
+          "gard_bp_aln83": 23701,
           "gard_bp": 23692,
+          "gard_bp_ref": 23396,
           "rhizaeon_closest_bp": 23620,
+          "rhizaeon_closest_bp_ref_of_aln": 23324,
           "distance_nt": 72,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 23324,
+          "distance_ref_nt": 72,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 17,
+          "gard_bp_aln78": 24452,
+          "gard_bp_aln83": 24461,
           "gard_bp": 24452,
+          "gard_bp_ref": 24144,
           "rhizaeon_closest_bp": 24532,
+          "rhizaeon_closest_bp_ref_of_aln": 24224,
           "distance_nt": 80,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 24224,
+          "distance_ref_nt": 80,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 18,
+          "gard_bp_aln78": 25151,
+          "gard_bp_aln83": 25160,
           "gard_bp": 25151,
+          "gard_bp_ref": 24843,
           "rhizaeon_closest_bp": 25438,
+          "rhizaeon_closest_bp_ref_of_aln": 25130,
           "distance_nt": 287,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 25130,
+          "distance_ref_nt": 287,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 19,
+          "gard_bp_aln78": 26638,
+          "gard_bp_aln83": 26647,
           "gard_bp": 26638,
+          "gard_bp_ref": 26323,
           "rhizaeon_closest_bp": 26378,
+          "rhizaeon_closest_bp_ref_of_aln": 26069,
           "distance_nt": 260,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 26069,
+          "distance_ref_nt": 254,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 20,
+          "gard_bp_aln78": 28165,
+          "gard_bp_aln83": 28174,
           "gard_bp": 28165,
+          "gard_bp_ref": 27388,
           "rhizaeon_closest_bp": 28311,
+          "rhizaeon_closest_bp_ref_of_aln": 27435,
           "distance_nt": 146,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 27435,
+          "distance_ref_nt": 47,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 21,
+          "gard_bp_aln78": 28571,
+          "gard_bp_aln83": 28580,
           "gard_bp": 28571,
+          "gard_bp_ref": 27685,
           "rhizaeon_closest_bp": 28637,
+          "rhizaeon_closest_bp_ref_of_aln": 27751,
           "distance_nt": 66,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 27751,
+          "distance_ref_nt": 66,
+          "matched_ref_within_tol": true
         }
       ]
     }
@@ -174,155 +325,306 @@
       "total_rhizaeon_breakpoints": 82,
       "matched_within_tol": 13,
       "concordance_pct": 61.904761904761905,
-      "mean_distance_nt": 269.6666666666667,
-      "median_distance_nt": 99.0,
+      "mean_distance_nt": 269.23809523809524,
+      "median_distance_nt": 107.0,
+      "matched_ref_within_tol": 14,
+      "concordance_ref_pct": 66.66666666666666,
+      "mean_distance_ref_nt": 247.0952380952381,
+      "median_distance_ref_nt": 99.0,
       "matches": [
         {
           "gard_region": 1,
+          "gard_bp_aln78": 1732,
+          "gard_bp_aln83": 1732,
           "gard_bp": 1732,
+          "gard_bp_ref": 1680,
           "rhizaeon_closest_bp": 1775,
+          "rhizaeon_closest_bp_ref_of_aln": 1723,
           "distance_nt": 43,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 1723,
+          "distance_ref_nt": 43,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 2,
+          "gard_bp_aln78": 3154,
+          "gard_bp_aln83": 3154,
           "gard_bp": 3154,
+          "gard_bp_ref": 3093,
           "rhizaeon_closest_bp": 3203,
+          "rhizaeon_closest_bp_ref_of_aln": 3142,
           "distance_nt": 49,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 3142,
+          "distance_ref_nt": 49,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 3,
+          "gard_bp_aln78": 3761,
+          "gard_bp_aln83": 3761,
           "gard_bp": 3761,
+          "gard_bp_ref": 3649,
           "rhizaeon_closest_bp": 3807,
+          "rhizaeon_closest_bp_ref_of_aln": 3695,
           "distance_nt": 46,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 3695,
+          "distance_ref_nt": 46,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 4,
+          "gard_bp_aln78": 5193,
+          "gard_bp_aln83": 5193,
           "gard_bp": 5193,
+          "gard_bp_ref": 4973,
           "rhizaeon_closest_bp": 4868,
+          "rhizaeon_closest_bp_ref_of_aln": 4651,
           "distance_nt": 325,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 4651,
+          "distance_ref_nt": 322,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 5,
+          "gard_bp_aln78": 8431,
+          "gard_bp_aln83": 8431,
           "gard_bp": 8431,
+          "gard_bp_ref": 8208,
           "rhizaeon_closest_bp": 8483,
+          "rhizaeon_closest_bp_ref_of_aln": 8260,
           "distance_nt": 52,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 8260,
+          "distance_ref_nt": 52,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 6,
+          "gard_bp_aln78": 11671,
+          "gard_bp_aln83": 11671,
           "gard_bp": 11671,
+          "gard_bp_ref": 11445,
           "rhizaeon_closest_bp": 11030,
+          "rhizaeon_closest_bp_ref_of_aln": 10804,
           "distance_nt": 641,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 10804,
+          "distance_ref_nt": 641,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 7,
+          "gard_bp_aln78": 12854,
+          "gard_bp_aln83": 12854,
           "gard_bp": 12854,
+          "gard_bp_ref": 12622,
           "rhizaeon_closest_bp": 13001,
+          "rhizaeon_closest_bp_ref_of_aln": 12769,
           "distance_nt": 147,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 12769,
+          "distance_ref_nt": 147,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 8,
+          "gard_bp_aln78": 14633,
+          "gard_bp_aln83": 14633,
           "gard_bp": 14633,
+          "gard_bp_ref": 14401,
           "rhizaeon_closest_bp": 14807,
+          "rhizaeon_closest_bp_ref_of_aln": 14575,
           "distance_nt": 174,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 14575,
+          "distance_ref_nt": 174,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 9,
+          "gard_bp_aln78": 16186,
+          "gard_bp_aln83": 16186,
           "gard_bp": 16186,
+          "gard_bp_ref": 15954,
           "rhizaeon_closest_bp": 14807,
+          "rhizaeon_closest_bp_ref_of_aln": 14575,
           "distance_nt": 1379,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 14575,
+          "distance_ref_nt": 1379,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 10,
+          "gard_bp_aln78": 17155,
+          "gard_bp_aln83": 17155,
           "gard_bp": 17155,
+          "gard_bp_ref": 16923,
           "rhizaeon_closest_bp": 18299,
+          "rhizaeon_closest_bp_ref_of_aln": 18067,
           "distance_nt": 1144,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 18067,
+          "distance_ref_nt": 1144,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 11,
+          "gard_bp_aln78": 20197,
+          "gard_bp_aln83": 20197,
           "gard_bp": 20197,
+          "gard_bp_ref": 19965,
           "rhizaeon_closest_bp": 19850,
+          "rhizaeon_closest_bp_ref_of_aln": 19618,
           "distance_nt": 347,
-          "matched_within_tol": false
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 19618,
+          "distance_ref_nt": 347,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 12,
+          "gard_bp_aln78": 20750,
+          "gard_bp_aln83": 20750,
           "gard_bp": 20750,
+          "gard_bp_ref": 20518,
           "rhizaeon_closest_bp": 20651,
+          "rhizaeon_closest_bp_ref_of_aln": 20419,
           "distance_nt": 99,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 20419,
+          "distance_ref_nt": 99,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 13,
+          "gard_bp_aln78": 21430,
+          "gard_bp_aln83": 21430,
           "gard_bp": 21430,
+          "gard_bp_ref": 21198,
           "rhizaeon_closest_bp": 21539,
+          "rhizaeon_closest_bp_ref_of_aln": 21307,
           "distance_nt": 109,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 21307,
+          "distance_ref_nt": 109,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 14,
+          "gard_bp_aln78": 21643,
+          "gard_bp_aln83": 21643,
           "gard_bp": 21643,
+          "gard_bp_ref": 21411,
           "rhizaeon_closest_bp": 21621,
+          "rhizaeon_closest_bp_ref_of_aln": 21389,
           "distance_nt": 22,
-          "matched_within_tol": true
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 21389,
+          "distance_ref_nt": 22,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 15,
-          "gard_bp": 22747,
+          "gard_bp_aln78": 22747,
+          "gard_bp_aln83": 22756,
+          "gard_bp": 22756,
+          "gard_bp_ref": 22460,
           "rhizaeon_closest_bp": 22649,
-          "distance_nt": 98,
-          "matched_within_tol": true
+          "rhizaeon_closest_bp_ref_of_aln": 22353,
+          "distance_nt": 107,
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 22353,
+          "distance_ref_nt": 107,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 16,
-          "gard_bp": 23692,
+          "gard_bp_aln78": 23692,
+          "gard_bp_aln83": 23701,
+          "gard_bp": 23701,
+          "gard_bp_ref": 23396,
           "rhizaeon_closest_bp": 23629,
-          "distance_nt": 63,
-          "matched_within_tol": true
+          "rhizaeon_closest_bp_ref_of_aln": 23324,
+          "distance_nt": 72,
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 23324,
+          "distance_ref_nt": 72,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 17,
-          "gard_bp": 24452,
+          "gard_bp_aln78": 24452,
+          "gard_bp_aln83": 24461,
+          "gard_bp": 24461,
+          "gard_bp_ref": 24144,
           "rhizaeon_closest_bp": 24484,
-          "distance_nt": 32,
-          "matched_within_tol": true
+          "rhizaeon_closest_bp_ref_of_aln": 24167,
+          "distance_nt": 23,
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 24167,
+          "distance_ref_nt": 23,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 18,
-          "gard_bp": 25151,
+          "gard_bp_aln78": 25151,
+          "gard_bp_aln83": 25160,
+          "gard_bp": 25160,
+          "gard_bp_ref": 24843,
           "rhizaeon_closest_bp": 25183,
-          "distance_nt": 32,
-          "matched_within_tol": true
+          "rhizaeon_closest_bp_ref_of_aln": 24866,
+          "distance_nt": 23,
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 24866,
+          "distance_ref_nt": 23,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 19,
-          "gard_bp": 26638,
+          "gard_bp_aln78": 26638,
+          "gard_bp_aln83": 26647,
+          "gard_bp": 26647,
+          "gard_bp_ref": 26323,
           "rhizaeon_closest_bp": 26953,
-          "distance_nt": 315,
-          "matched_within_tol": false
+          "rhizaeon_closest_bp_ref_of_aln": 26604,
+          "distance_nt": 306,
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 26604,
+          "distance_ref_nt": 281,
+          "matched_ref_within_tol": false
         },
         {
           "gard_region": 20,
-          "gard_bp": 28165,
+          "gard_bp_aln78": 28165,
+          "gard_bp_aln83": 28174,
+          "gard_bp": 28174,
+          "gard_bp_ref": 27388,
           "rhizaeon_closest_bp": 27718,
-          "distance_nt": 447,
-          "matched_within_tol": false
+          "rhizaeon_closest_bp_ref_of_aln": 27369,
+          "distance_nt": 456,
+          "matched_within_tol": false,
+          "rhizaeon_closest_bp_ref": 27369,
+          "distance_ref_nt": 19,
+          "matched_ref_within_tol": true
         },
         {
           "gard_region": 21,
-          "gard_bp": 28571,
+          "gard_bp_aln78": 28571,
+          "gard_bp_aln83": 28580,
+          "gard_bp": 28580,
+          "gard_bp_ref": 27685,
           "rhizaeon_closest_bp": 28670,
-          "distance_nt": 99,
-          "matched_within_tol": true
+          "rhizaeon_closest_bp_ref_of_aln": 27775,
+          "distance_nt": 90,
+          "matched_within_tol": true,
+          "rhizaeon_closest_bp_ref": 27775,
+          "distance_ref_nt": 90,
+          "matched_ref_within_tol": true
         }
       ]
     }

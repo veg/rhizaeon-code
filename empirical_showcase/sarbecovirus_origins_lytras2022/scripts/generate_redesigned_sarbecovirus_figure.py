@@ -111,9 +111,9 @@ ax_a_flux.set_ylabel("Breakpoint Flux $\\Phi_{\\mathrm{bp}}$ (Z/nt)", fontweight
 ax_a_flux.set_title("A   Genome-wide Recombination Flux $\\Phi_{\\mathrm{bp}}(u)$ and Benchmark Concordance Across 30.9 kb",
                     loc="left", fontweight="bold", pad=10)
 
-# Shaded Coldspots
+# Shaded Coldspots (in 83-Taxon Multiple Sequence Alignment coordinates)
 coldspots = [
-    (13442, 16236, "Coldspot: RdRp Catalytic Core"),
+    (13674, 16468, "Coldspot: RdRp Catalytic Core"),
     (24600, 25600, "Coldspot: Spike S2 Fusion Engine")
 ]
 for c_start, c_end, c_label in coldspots:
@@ -125,14 +125,14 @@ for c_start, c_end, c_label in coldspots:
                    fontweight="bold", color="#0072B2",
                    bbox=dict(boxstyle="round,pad=0.2", facecolor="#EBF5FB", edgecolor="#AECEDB", lw=0.6, alpha=0.92))
 
-# Major Hotspot Annotations
+# Major Hotspot Annotations (83-MSA coordinate | Wuhan-Hu-1 Reference coordinate)
 hotspot_calls = [
-    (12867, "RdRp exit\n(12,867 bp)", 0.72),
-    (21825, "Spike 5' / NTD\n(21,825 bp)", 0.92),
-    (22764, "Codon 313 hinge\n(22,764 bp)", 0.76),
-    (23618, "S1/S2 furin site\n(23,618 bp)", 0.60),
-    (25728, "Spike exit\n(25,728 bp)", 0.44),
-    (28810, "ORF8 / N cluster\n(28,810 bp)", 0.88)
+    (13001, "RdRp 5' entry\n(MSA 13,001 | Ref 12,769)", 0.72),
+    (21825, "Spike 5' / NTD\n(MSA 21,825 | Ref 21,566)", 0.92),
+    (22764, "Codon 313 hinge\n(MSA 22,764 | Ref 22,468)", 0.76),
+    (23629, "RBD 3' exit\n(MSA 23,629 | Ref 23,324)", 0.60),
+    (25728, "Spike 3' exit\n(MSA 25,728 | Ref 25,410)", 0.44),
+    (28810, "ORF8 / N cluster\n(MSA 28,810 | Ref 27,900)", 0.88)
 ]
 for pos, label, y_frac in hotspot_calls:
     y_val = flux_83[min(int(pos), len(flux_83)-1)]
@@ -141,7 +141,7 @@ for pos, label, y_frac in hotspot_calls:
         xy=(pos, y_val),
         xytext=(pos, np.max(flux_83) * y_frac),
         arrowprops=dict(facecolor="#222222", edgecolor="none", width=0.6, headwidth=4, shrink=0.08),
-        fontsize=6.8, ha="center",
+        fontsize=6.5, ha="center",
         bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#CCCCCC", alpha=0.92)
     )
 
@@ -172,7 +172,8 @@ for g_name in major_genes:
     rect = patches.Rectangle((x0, 0.1), width, 0.8, facecolor=col, edgecolor="#333333", lw=0.5)
     ax_a_genes.add_patch(rect)
     if width > 800:
-        ax_a_genes.text(x0 + width/2, 0.5, g_name, ha="center", va="center", fontsize=7.0, fontweight="bold", color="#111111")
+        x_lbl = x0 + width * 0.72 if g_name == "Spike" else x0 + width / 2
+        ax_a_genes.text(x_lbl, 0.5, g_name, ha="center", va="center", fontsize=7.0, fontweight="bold", color="#111111")
 
 s_ntd = GENES["Spike_NTD"]
 s_rbd = GENES["Spike_RBD"]
@@ -183,15 +184,15 @@ ax_a_genes.add_patch(patches.Rectangle((rdrp["aln_start"], 0.1), rdrp["aln_lengt
 ax_a_genes.text(rdrp["aln_start"] + rdrp["aln_length"]/2, 0.5, "RdRp", ha="center", va="center", fontsize=6.5, fontweight="bold", color="#111111")
 
 # =========================================================================
-# PANEL A3: Integrated Breakpoint Concordance Tickmark Tracks
+# PANEL A3: Integrated Breakpoint Concordance Tickmark Tracks (83-Taxon MSA Frame)
 # =========================================================================
-matches_78 = REPORT["dataset_78"]["gard_concordance"]["matches"]
-gard_bps = [m["gard_bp"] for m in matches_78]
-rhiz_bps = [m["rhizaeon_closest_bp"] for m in matches_78]
-dists = [m["distance_nt"] for m in matches_78]
+matches_83 = REPORT["dataset_83"]["gard_concordance"]["matches"]
+gard_bps = [m["gard_bp_aln83"] for m in matches_83]
+rhiz_bps = [m["rhizaeon_closest_bp"] for m in matches_83]
+dists = [m["distance_nt"] for m in matches_83]
 
-ax_a_ticks.set_xlim(-2200, 31200)
-ax_a_ticks.set_ylim(-0.25, 1.45)
+ax_a_ticks.set_xlim(-200, 31200)
+ax_a_ticks.set_ylim(-0.32, 1.50)
 ax_a_ticks.spines["left"].set_visible(False)
 ax_a_ticks.spines["right"].set_visible(False)
 ax_a_ticks.spines["top"].set_visible(False)
@@ -200,11 +201,11 @@ ax_a_ticks.tick_params(left=False, labelleft=False)
 
 y_rhiz = 1.05
 y_gard = 0.20
-ax_a_ticks.axhline(y_rhiz, xmin=0.065, xmax=0.995, color="#D55E00", lw=0.8, alpha=0.4)
-ax_a_ticks.axhline(y_gard, xmin=0.065, xmax=0.995, color="#0072B2", lw=0.8, alpha=0.4)
+ax_a_ticks.axhline(y_rhiz, xmin=0.005, xmax=0.995, color="#D55E00", lw=0.8, alpha=0.4)
+ax_a_ticks.axhline(y_gard, xmin=0.005, xmax=0.995, color="#0072B2", lw=0.8, alpha=0.4)
 
-ax_a_ticks.text(-200, y_rhiz, "RhizAeon Breakpoints", ha="right", va="center", fontsize=7.2, fontweight="bold", color="#D55E00")
-ax_a_ticks.text(-200, y_gard, "Published GARD (2022)", ha="right", va="center", fontsize=7.2, fontweight="bold", color="#0072B2")
+ax_a_ticks.text(-350, y_rhiz, "RhizAeon Breakpoints", ha="right", va="center", fontsize=7.2, fontweight="bold", color="#D55E00")
+ax_a_ticks.text(-350, y_gard, "Published GARD (2022)", ha="right", va="center", fontsize=7.2, fontweight="bold", color="#0072B2")
 
 for g, r, d in zip(gard_bps, rhiz_bps, dists):
     is_concordant = (d <= 150)
@@ -214,18 +215,19 @@ for g, r, d in zip(gard_bps, rhiz_bps, dists):
     ax_a_ticks.plot([r, g], [y_rhiz - 0.12, y_gard + 0.12], color=col, lw=0.9, ls="-" if is_concordant else ":", alpha=0.85)
 
 key_tick_callouts = [
-    (12854, 12866, "RdRp exit (12 nt)", 0.62),
-    (21430, 21516, "Spike 5' (86 nt)", 1.30),
-    (22764, 22719, "NTD/RBD (45 nt)", -0.16),
-    (24452, 24461, "S1/S2 (9 nt)", 1.30),
-    (25151, 25161, "S2 exit (10 nt)", -0.16)
+    (12854, 13001, "RdRp 5' (147 nt)", 0.62, 0),
+    (21643, 21621, "Spike 5' (22 nt)", 1.32, -450),
+    (22756, 22649, "NTD/RBD (107 nt)", -0.18, -500),
+    (23701, 23629, "RBD 3' (72 nt)", 1.32, -100),
+    (24461, 24484, "S2 (23 nt)", -0.18, 450),
+    (25160, 25183, "S2 exit (23 nt)", 1.32, 650)
 ]
-for g_val, r_val, lbl, y_pos in key_tick_callouts:
-    mid_x = (g_val + r_val) / 2
-    ax_a_ticks.text(mid_x, y_pos, lbl, ha="center", va="center", fontsize=6.5, fontweight="bold",
-                    color="#111111", bbox=dict(boxstyle="round,pad=0.15", facecolor="#FFF9C4", edgecolor="#FBC02D", lw=0.5, alpha=0.92))
+for g_val, r_val, lbl, y_pos, dx in key_tick_callouts:
+    mid_x = (g_val + r_val) / 2 + dx
+    ax_a_ticks.text(mid_x, y_pos, lbl, ha="center", va="center", fontsize=6.2, fontweight="bold",
+                    color="#111111", bbox=dict(boxstyle="round,pad=0.14", facecolor="#FFF9C4", edgecolor="#FBC02D", lw=0.5, alpha=0.92))
 
-ax_a_ticks.set_xlabel("Genomic Coordinate in Sarbecovirus Multiple Alignment (nt)", fontweight="bold")
+ax_a_ticks.set_xlabel("Genomic Coordinate in 83-Taxon Sarbecovirus Multiple Alignment (nt)", fontweight="bold")
 ax_a_ticks.set_xticks(np.arange(0, 32000, 5000))
 ax_a_ticks.set_xticklabels([f"{x:,}" for x in np.arange(0, 32000, 5000)])
 
@@ -293,19 +295,19 @@ for y, (taxon_name, segments) in enumerate(taxa_tracks):
 
 ax_b_mosaic.axvspan(GENES["Spike_NTD"]["aln_start"], GENES["Spike_NTD"]["aln_end"], color="#E69F00", alpha=0.08)
 ax_b_mosaic.axvspan(GENES["Spike_RBD"]["aln_start"], GENES["Spike_RBD"]["aln_end"], color="#D55E00", alpha=0.10)
-ax_b_mosaic.axvline(23618, color="#D55E00", ls="--", lw=1.2)
+ax_b_mosaic.axvline(23932, color="#D55E00", ls="--", lw=1.2)
 
 ax_b_mosaic.set_xlim(21000, 26000)
 ax_b_mosaic.set_ylim(-0.8, len(taxa_tracks) + 0.6)
 ax_b_mosaic.set_yticks(y_pos)
 ax_b_mosaic.set_yticklabels([t[0] for t in taxa_tracks], fontsize=7.2, fontweight="bold")
-ax_b_mosaic.set_xlabel("Spike Glycoprotein Coordinate in Multiple Alignment (nt)", fontweight="bold")
+ax_b_mosaic.set_xlabel("Spike Glycoprotein Coordinate in 83-Taxon Multiple Alignment (nt)", fontweight="bold")
 ax_b_mosaic.set_title("B   Spike Reticulate Mosaic Architecture Across Wildlife Progenitors and SARS-CoV-2",
                       loc="left", fontweight="bold", pad=28)
 
 ax_b_mosaic.text(22000, len(taxa_tracks) + 0.10, "NTD", ha="center", fontsize=7.5, fontweight="bold", color="#D55E00")
-ax_b_mosaic.text(23300, len(taxa_tracks) + 0.10, "RBD", ha="center", fontsize=7.5, fontweight="bold", color="#D55E00")
-ax_b_mosaic.text(23618, -0.65, "S1/S2 (23,618)", ha="center", fontsize=6.8, fontweight="bold", color="#D55E00")
+ax_b_mosaic.text(23150, len(taxa_tracks) + 0.10, "RBD", ha="center", fontsize=7.5, fontweight="bold", color="#D55E00")
+ax_b_mosaic.text(23932, -0.65, "S1/S2 (MSA 23,932 | Ref 23,618)", ha="center", fontsize=6.5, fontweight="bold", color="#D55E00")
 
 # Callout on BANAL-247 micro-conversions in full width
 ax_b_mosaic.annotate("RacCS203 NTD\nmicro-conversions\n(Z=155.3, 113.1)",

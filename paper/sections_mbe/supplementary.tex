@@ -323,12 +323,14 @@ Unmatched inferred events were penalized as false alarms (reducing precision $\t
 \section{Empirical Genomic Cohorts and Annotations}
 \label{supp:empirical_cohorts}
 
-\paragraph{Sarbecovirus Whole-Genome Cohort.}
-We analyzed 83 complete viral genomes ($30{,}956$~bp multiple sequence alignment, 13,160 segregating sites) compiled from GISAID and GenBank \citep{lytras2022exploring}.
-The cohort spans SARS-CoV-1 (Tor2), SARS-CoV-2 (Wuhan-Hu-1), close bat relatives (Yunnan bat RaTG13, Laotian bats BANAL-52, BANAL-103, BANAL-116, BANAL-236, and BANAL-247, and Thai bat RacCS203), and pangolin coronaviruses (Guangdong MP789 and Guangxi P1E).
-Gene coordinates follow Wuhan-Hu-1 (NC\_045512.2) across the replicase and structural regions.
-The 5' region spans ORF1ab (nt 266--21,555), the RdRp catalytic core (nt 13,468--16,236), and Spike glycoprotein (nt 21,563--25,384, covering NTD codons 1--313, RBD codons 314--540, the S1/S2 furin site at 23,618~bp, and the S2 subunit at nt 23,619--25,384).
-Downstream open reading frames span ORF3a (nt 25,393--26,220), Envelope (nt 26,245--26,472), Membrane (nt 26,523--27,191), ORF6 (nt 27,202--27,387), ORF7a (nt 27,394--27,759), ORF8 (nt 27,894--28,259), Nucleocapsid (nt 28,274--29,533), and ORF10 (nt 29,558--29,674).
+\paragraph{Sarbecovirus Whole-Genome Cohort and Coordinate Frame Conversion.}
+We analyzed two nested whole-genome alignments compiled from GISAID and GenBank.
+The primary 78-taxon sarbecovirus alignment of \citet{lytras2022exploring} spans 30,956~bp in multiple sequence alignment (MSA) coordinates with 13,550 total polymorphic columns and 13,160 gap-filtered segregating sites.
+An expanded 83-taxon alignment (30,965~bp MSA, 13,260 gap-filtered sites) incorporates the five Laotian \textit{Rhinolophus} bat sarbecoviruses (BANAL-20-52, BANAL-20-103, BANAL-20-116, BANAL-20-236, and BANAL-20-247) reported by \citet{temmam2022bat}.
+The five Laotian BANAL genomes introduce a 9~nt insertion in the Spike N-terminal domain around 78-MSA position $22{,}050$, which shifts all downstream alignment coordinates by $+9$~nt relative to the 78-taxon MSA.
+In their primary study, \citet{lytras2022exploring} reported open reading frame annotations and the 21 consensus GARD breakpoints (derived from a 22-virus subset) in both ungapped SARS-CoV-2 Wuhan-Hu-1 reference coordinates (NC\_045512.2, $29{,}903$~nt, columns \texttt{SC2\_start}/\texttt{SC2\_end} in their Supplementary Table~S3) and 78-taxon MSA coordinates (columns \texttt{al\_start}/\texttt{al\_end}).
+To prevent cross-frame coordinate discrepancies, Table~\ref{tab:supp_sarbeco_coord_conversion} provides the exact bijective conversion across all three coordinate systems: Wuhan-Hu-1 reference ($1\text{--}29{,}903$~nt), 78-taxon MSA ($1\text{--}30{,}956$~nt), and 83-taxon MSA ($1\text{--}30{,}965$~nt).
+It maps all sarbecovirus open reading frames, functional domains, recombination hotspots/coldspots, and all 21 published GARD breakpoints alongside the closest \RhizAeon continuous changepoints evaluated within each matching frame.
 
 \paragraph{\textit{Streptococcus pneumoniae} PMEN1 Whole Chromosome.}
 We analyzed the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 / PMEN1 lineage of \textit{S.~pneumoniae} (ATCC 700669, 11 representative global isolates spanning 1984--2008, \citealt{croucher2011rapid}).
@@ -339,6 +341,73 @@ Annotations follow ATCC 700669 (FM211187.1) across resistance and virulence loci
 We analyzed $N = 379$ classical MHC Class~I alleles ($1{,}128$~bp coding alignment across human, chimpanzee, gorilla, and orangutan, \citealt{maccari2017ipd}).
 Alleles were retrieved from the IPD-IMGT/HLA and IPD-MHC databases, comprising 150 \textit{HLA-A}, 150 \textit{HLA-B}, and 50 \textit{HLA-C} human alleles alongside 15 chimpanzee (\textit{Patr}), 8 gorilla (\textit{Gogo}), and 6 orangutan (\textit{Popy}) alleles.
 Exon annotations follow canonical classical HLA Class~I structure: Exon 1 (Leader peptide, nt 1--72), Exon 2 ($\alpha_1$ domain, nt 73--342), Exon 3 ($\alpha_2$ domain, nt 343--618), Exon 4 ($\alpha_3$ domain, nt 619--894), Exon 5 (Transmembrane anchor, nt 895--1,011), and Exons 6--7 (Cytoplasmic tail, nt 1,012--1,128).
+
+\clearpage
+
+\begin{table}[!ht]
+\centering
+\scriptsize
+\caption{Bijective coordinate conversion across SARS-CoV-2 Wuhan-Hu-1 reference coordinates (NC\_045512.2, $1\text{--}29{,}903$~nt), the 78-taxon multiple sequence alignment of \citet{lytras2022exploring} ($1\text{--}30{,}956$~nt), and the expanded 83-taxon multiple sequence alignment incorporating the five Laotian BANAL isolates of \citet{temmam2022bat} ($1\text{--}30{,}965$~nt).
+Part A lists major open reading frames, Spike functional domains, coldspots, hotspots, and BANAL-247 micro-conversion tracts.
+Part B lists all 21 consensus GARD breakpoints from \citet{lytras2022exploring} (Supplementary Table~S3) alongside the closest \RhizAeon changepoints and spatial deviations ($|\Delta|$, nt) evaluated strictly within the matching coordinate frame (83-taxon MSA frame vs.\ Wuhan-Hu-1 reference frame).}
+\label{tab:supp_sarbeco_coord_conversion}
+{\setlength{\tabcolsep}{2.8pt}
+\renewcommand{\arraystretch}{0.96}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rrr rrr@{}}
+\toprule
+& \multicolumn{3}{c}{Genomic Coordinate Frame (nt)} & \multicolumn{3}{c}{\RhizAeon Concordance (83-Taxon Cohort)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Genomic Feature / Breakpoint & \shortstack{Wuhan-Hu-1 Ref\\(NC\_045512.2)} & \shortstack{78-Taxon MSA\\(\citealt{lytras2022exploring})} & \shortstack{83-Taxon MSA\\(+5 Laos BANAL)} & \shortstack{\RhizAeon\\(83-MSA nt)} & \shortstack{\RhizAeon\\(Ref nt)} & \shortstack{Deviation $|\Delta|$\\(MSA / Ref nt)} \\
+\midrule
+\multicolumn{7}{l}{\textit{A. Open Reading Frames, Functional Domains, and Recombination Landmarks}} \\
+ORF1ab replicase polyprotein & 266--21,555 & 318--21,788 & 318--21,788 & --- & --- & --- \\
+RdRp catalytic core (nsp12 coldspot) & 13,442--16,236 & 13,674--16,468 & 13,674--16,468 & --- & --- & --- \\
+Spike glycoprotein (S) & 21,563--25,384 & 21,796--25,692 & 21,796--25,701 & --- & --- & --- \\
+\quad Spike $5'$ NTD hotspot peak & 21,566 & 21,825 & 21,825 & 21,825 & 21,566 & --- \\
+\quad Spike NTD (codons 13--304) & 21,599--22,474 & 21,858--22,761 & 21,858--22,770 & --- & --- & --- \\
+\quad BANAL-247 NTD micro-conversion 1 & 21,647--21,749 & 21,907--22,009 & 21,909--22,011 & 21,909--22,011 & 21,647--21,749 & --- \\
+\quad BANAL-247 NTD micro-conversion 2 & 21,791--21,983 & 22,052--22,243 & 22,054--22,251 & 22,054--22,251 & 21,791--21,983 & --- \\
+\quad BANAL-247 NTD micro-conversion 3 & 22,044--22,297 & 22,310--22,584 & 22,318--22,592 & 22,318--22,592 & 22,044--22,297 & --- \\
+\quad Spike codon 313 NTD/RBD hinge & 22,468 & 22,755 & 22,764 & 22,764 & 22,468 & --- \\
+\quad Spike RBD (codons 319--541) & 22,517--23,185 & 22,804--23,481 & 22,813--23,490 & --- & --- & --- \\
+\quad Spike RBD $3'$ exit hotspot & 23,324 & 23,620 & 23,629 & 23,629 & 23,324 & --- \\
+\quad Spike S1/S2 furin cleavage site (codon 685) & 23,618 & 23,923 & 23,932 & --- & --- & --- \\
+\quad Spike S2 fusion core coldspot & 24,283--25,283 & 24,591--25,591 & 24,600--25,600 & --- & --- & --- \\
+ORF3a accessory protein & 25,393--26,220 & 25,701--26,535 & 25,710--26,544 & --- & --- & --- \\
+Envelope (E) / Membrane (M) & 26,245--27,191 & 26,560--27,518 & 26,569--27,527 & --- & --- & --- \\
+ORF6 / ORF7a / ORF7b & 27,202--27,887 & 27,529--28,788 & 27,538--28,797 & --- & --- & --- \\
+ORF8 accessory protein & 27,894--28,259 & 28,795--29,182 & 28,804--29,191 & --- & --- & --- \\
+\quad ORF8 / Nucleocapsid junction hotspot & 27,900 & 28,801 & 28,810 & 28,810 & 27,900 & --- \\
+Nucleocapsid (N) & 28,274--29,533 & 29,197--30,468 & 29,206--30,477 & --- & --- & --- \\
+\midrule
+\multicolumn{7}{l}{\textit{B. Published GARD Consensus Breakpoints (\citealt{lytras2022exploring}, 22-Virus Subset) vs.\ \RhizAeon Changepoints}} \\
+GARD BP 1 (nsp2) & 1,680 & 1,732 & 1,732 & 1,775 & 1,723 & 43 / 43 \\
+GARD BP 2 (nsp3 $5'$) & 3,093 & 3,154 & 3,154 & 3,203 & 3,142 & 49 / 49 \\
+GARD BP 3 (nsp3 macrodomain) & 3,649 & 3,761 & 3,761 & 3,807 & 3,695 & 46 / 46 \\
+GARD BP 4 (nsp3 PLpro) & 4,973 & 5,193 & 5,193 & 4,868 & 4,651 & 325 / 322 \\
+GARD BP 5 (nsp3 $3'$) & 8,208 & 8,431 & 8,431 & 8,483 & 8,260 & 52 / 52 \\
+GARD BP 6 (nsp6) & 11,445 & 11,671 & 11,671 & 11,030 & 10,804 & 641 / 641 \\
+GARD BP 7 (RdRp $5'$ entry) & 12,622 & 12,854 & 12,854 & 13,001 & 12,769 & 147 / 147 \\
+GARD BP 8 (RdRp internal 1) & 14,401 & 14,633 & 14,633 & 14,807 & 14,575 & 174 / 174 \\
+GARD BP 9 (RdRp internal 2) & 15,954 & 16,186 & 16,186 & 14,807 & 14,575 & 1,379 / 1,379 \\
+GARD BP 10 (nsp13 helicase) & 16,923 & 17,155 & 17,155 & 18,299 & 18,067 & 1,144 / 1,144 \\
+GARD BP 11 (nsp15 endoribonuclease) & 19,965 & 20,197 & 20,197 & 19,850 & 19,618 & 347 / 347 \\
+GARD BP 12 (nsp15/nsp16) & 20,518 & 20,750 & 20,750 & 20,651 & 20,419 & 99 / 99 \\
+GARD BP 13 (nsp16 $3'$) & 21,198 & 21,430 & 21,430 & 21,539 & 21,307 & 109 / 109 \\
+GARD BP 14 (Spike $5'$ upstream) & 21,411 & 21,643 & 21,643 & 21,621 & 21,389 & 22 / 22 \\
+GARD BP 15 (Spike NTD/RBD hinge) & 22,460 & 22,747 & 22,756 & 22,649 & 22,353 & 107 / 107 \\
+GARD BP 16 (Spike RBD $3'$ exit) & 23,396 & 23,692 & 23,701 & 23,629 & 23,324 & 72 / 72 \\
+GARD BP 17 (Spike S2 upstream) & 24,144 & 24,452 & 24,461 & 24,484 & 24,167 & 23 / 23 \\
+GARD BP 18 (Spike S2 fusion exit) & 24,843 & 25,151 & 25,160 & 25,183 & 24,866 & 23 / 23 \\
+GARD BP 19 (Envelope / Membrane) & 26,323 & 26,638 & 26,647 & 26,953 & 26,604 & 306 / 281 \\
+GARD BP 20 (ORF7a / ORF7b)\textsuperscript{a} & 27,388 & 28,165 & 28,174 & 27,718 & 27,369 & 456 / 19 \\
+GARD BP 21 (ORF7b / ORF8) & 27,685 & 28,571 & 28,580 & 28,670 & 27,775 & 90 / 90 \\
+\midrule
+\textit{Summary Concordance ($\le 150$~nt)} & --- & --- & --- & \textit{13 / 21 (61.9\%)} & \textit{14 / 21 (66.7\%)} & \textit{Median: 107.0 / 99.0} \\
+\bottomrule
+\multicolumn{7}{l}{\parbox{\textwidth}{\vspace{2pt}\tiny \textsuperscript{a}Between 83-MSA positions $27{,}718$ (Ref $27{,}369$) and $28{,}174$ (Ref $27{,}388$), SARS-CoV-2 Wuhan-Hu-1 contains a 437-nt deletion relative to bat sarbecovirus accessory ORF7a/ORF7b sequences, so the two breakpoints are separated by $19$~nt in ungapped Wuhan-Hu-1 reference coordinates versus $456$~nt in gapped MSA coordinates.}}
+\end{tabular*}}
+\end{table}
 
 \clearpage
 
