@@ -4,42 +4,43 @@
 \begin{figure*}[t!]
 \centering
 \includegraphics[width=\linewidth,keepaspectratio]{figures/fig_posada_crandall_benchmark.pdf}
-\caption{\textbf{Head-to-head performance of \RhizAeon versus 3SEQ across the 3,200-trial Posada \& Crandall benchmark ($N = 10$, $L = 1{,}000$ nt).}
-\textbf{A.} Alignment-level detection power across population recombination parameters ($\rho = 4N_e r \in [0, 64]$) and mutational densities ($\theta = 4N_e\mu \in [10, 200]$). Both methods achieve identical power trajectories, reaching $98.0\%$ at $\theta = 200$.
-\textbf{B.} Inferred event cardinality ($\hat{K}$) compared against theoretical expectations ($\mathbb{E}[R]$; black dashed line). Triplet scanning overcounts events up to 10-fold ($\hat{K} = 16.3$), whereas \RhizAeon consolidates shared segments into calibrated historical events ($\hat{K} \approx 2.1\text{--}4.6$).
-\textbf{C.} Empirical false positive rate (FPR, \%) across 1,200 non-recombinant alignments under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Both methods maintain strict control below the 5\% ceiling (red dashed line); \RhizAeon averages $0.58\%$ ($7 / 1{,}200$) and 3SEQ averages $0.17\%$ ($2 / 1{,}200$).}
+\caption{Head-to-head performance of \RhizAeon versus 3SEQ across the 3,200-trial Posada \& Crandall benchmark ($N = 10$, $L = 1{,}000$ nt).
+(A) Alignment-level detection power across population recombination parameters ($\rho = 4N_e r \in [0, 64]$) and mutational densities ($\theta = 4N_e\mu \in [10, 200]$). Both methods achieve identical power trajectories and reach $98.0\%$ at $\theta = 200$.
+(B) Inferred event cardinality ($\hat{K}$) compared against theoretical expectations ($\mathbb{E}[R]$, black dashed line). Triplet scanning overcounts events up to 10-fold ($\hat{K} = 16.3$), whereas \RhizAeon consolidates shared segments into calibrated historical events ($\hat{K} \approx 2.1\text{--}4.6$).
+(C) Empirical false positive rate (FPR, \%) across 1,200 non-recombinant alignments under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Both methods maintain strict control below the 5\% ceiling (red dashed line), where \RhizAeon averages $0.58\%$ ($7 / 1{,}200$) and 3SEQ averages $0.17\%$ ($2 / 1{,}200$).}
 \label{fig:posada_benchmark}
 \end{figure*}
 
 \subsection{Coalescent ARG Benchmark and Calibration Against Triplet Scanning}
 \label{subsec:posada_benchmark}
 
-To establish a baseline against standard pairwise and triplet methods, we evaluated \RhizAeon across the 3,200-trial coalescent benchmark of \citet{posada2001evaluation} ($N = 10$ taxa, $L = 1{,}000$~nt; Figure~\ref{fig:posada_benchmark}, Supplementary Table~\ref{tab:supp_posada_summary}).
+To establish a baseline against standard pairwise and triplet methods, we evaluated \RhizAeon across the 3,200-trial coalescent benchmark of \citet{posada2001evaluation} ($N = 10$ taxa, $L = 1{,}000$~nt, Figure~\ref{fig:posada_benchmark}, Supplementary Table~\ref{tab:supp_posada_summary}).
 Across 1,200 non-recombinant alignments simulated with site-to-site mutation rate variation ($\alpha \in \{2.0, 0.5, 0.05\}$), both algorithms maintained strict false positive control well below the nominal 5\% ceiling (Figure~\ref{fig:posada_benchmark}C).
-3SEQ exhibited a tighter false alarm rate on these small 10-taxon null alignments (0.17\%, 2 false alarms / 1,200 trials; 95\% Wilson score interval [0.05\%, 0.60\%]), whereas \RhizAeon yielded 0.58\% (7 false alarms / 1,200 trials; 95\% Wilson score interval [0.28\%, 1.20\%]).
-These occasional false alarms occurred primarily at high sequence divergence ($\theta = 200$, where 4 of the 7 false alarms occurred across $\alpha \in \{2.0, 0.05\}$) due to stochastic homoplasy across the 1,000~nt locus, rather than concentrating exclusively at extreme heterotachy.
-Under severe rate variation ($\alpha = 0.05$), private mutations on a single lineage lack directional affinity toward candidate donors, routing harmlessly into the root sink.
+3SEQ exhibited a lower false alarm rate on these small 10-taxon null alignments (0.17\%, 2 false alarms / 1,200 trials, 95\% Wilson score interval [0.05\%, 0.60\%]), whereas \RhizAeon yielded 0.58\% (7 false alarms / 1,200 trials, 95\% Wilson score interval [0.28\%, 1.20\%]).
+Occasional false alarms occurred primarily at high sequence divergence ($\theta = 200$, where 4 of the 7 false alarms occurred across $\alpha \in \{2.0, 0.05\}$) due to stochastic homoplasy across the 1,000~nt locus, rather than concentrating at extreme heterotachy.
+Under severe rate variation ($\alpha = 0.05$), private mutations on a single lineage lack directional affinity toward candidate donors and route harmlessly into the root sink.
 
 Across the 1,600 recombinant alignments, detection power depended on mutational availability (Figure~\ref{fig:posada_benchmark}A).
 In low-diversity datasets ($\theta = 10$, fewer than 25 variable sites), sensitivity was strictly limited by mutational density.
-Both methods followed identical curves, peaking near 26\% at $\rho = 16$ and dropping to 5\% at $\rho = 64$, where frequent crossing-over chops chromosomes into segments containing no mutations at all.
-At realistic diversity ($\theta \ge 50$), sensitivity climbed rapidly, reaching 88\% at $\rho = 16$ and 98\% at $\rho = 64$ ($\theta = 200$), matching 3SEQ while scanning each alignment in 15--26 milliseconds without testing triplets individually.
+Both methods followed identical curves and peaked near 26\% at $\rho = 16$ before dropping to 5\% at $\rho = 64$, where frequent crossing-over chops chromosomes into segments containing no mutations at all.
+At realistic diversity ($\theta \ge 50$), sensitivity climbed rapidly to reach 88\% at $\rho = 16$ and 98\% at $\rho = 64$ ($\theta = 200$).
+Trajectory deconvolution matched 3SEQ power while scanning each alignment in 15--26 milliseconds without testing triplets individually.
 
 The fundamental difference between the two approaches lies in event counting (Figure~\ref{fig:posada_benchmark}B).
 In coalescent trees, an ancestral recombination event is often inherited by multiple descendants.
-Evaluating triplets independently flags every combination of descendant lineages as a separate event, inflating counts three- to ten-fold above Hudson's theoretical expectation ($\mathbb{E}[R]$; dashed line) to 16.3 reported events per alignment at $\theta = 200, \rho = 64$.
-\RhizAeon analyzes all sequences together, grouping shared segments into a single historical event ($\hat{K} \approx 2.1\text{--}4.6$).
-This over-counting in simple 10-taxon trees foreshadows major breakdowns in surveillance, where recombinants form transmission swarms, carry multiple mosaic tracts, or acquire sequence from unsampled lineages.
+Evaluating triplets independently flags every combination of descendant lineages as a separate event and inflates counts three- to ten-fold above Hudson's theoretical expectation ($\mathbb{E}[R]$, dashed line) to 16.3 reported events per alignment at $\theta = 200, \rho = 64$.
+\RhizAeon analyzes all sequences together and groups shared segments into a single historical event ($\hat{K} \approx 2.1\text{--}4.6$).
+Combinatorial overcounting in simple 10-taxon trees foreshadows major breakdowns in genomic surveillance, where recombinants form transmission swarms, carry multiple mosaic tracts, or acquire sequence from unsampled lineages.
 
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_specialized_scenarios.pdf}
-\caption{\textbf{Operational performance across specialized genomic and epidemiological regimes.}
+\caption{Operational performance across specialized genomic and epidemiological regimes.
 Each row depicts the simulation topology (Col.~1), primary diagnostic metric (Col.~2), boundary precision (Col.~3), and inferred cardinality ($\hat{K}$) across descendant swarm sizes ($K$, Col.~4).
-\textbf{(A)}~Epidemic Clonal Expansion: An ancestral reticulation ($P_1, P_2 \to R_{\mathrm{anc}}$) generates a 1.5~kb cassette in $K \in \{2\text{--}15\}$ isolates. While 3SEQ inflates events ($\hat{K} = 9.5\text{--}55.0$) and scales linearly, \RhizAeon collapses swarms into a single event ($\hat{K} = 1.00$) with $99.9\%$ precision in flat runtime ($491\text{--}826$~ms).
-\textbf{(B)}~Multi-Way Mosaic Swarms: Dual Cassette, Nested Doll, and Triple Crossover architectures ($K_{\mathrm{donor}} = 2.0$). \RhizAeon resolves both parental donors ($1.97/2.00$) with high boundary overlap ($J = 0.86\text{--}0.98$), whereas closed-world triplet scanning misses secondary donors and inflates events up to $\hat{K} = 46.5$.
-\textbf{(C)}~Ghost Donor Introgression: Incomplete taxon sampling across Surrogate Sister, Pure Ghost, and Deep Reservoir regimes. 3SEQ misidentifies background parent $P_2$ as donor in $100\%$ of trials. \RhizAeon maintains $\le 6\%$ false framing and attributes $98.3\%$ of surrogate donors correctly.
-\textbf{(D)}~Bacterial Micro-Conversions: Short replacement tracts ($L_{\mathrm{tract}} \in [50, 800]$~nt). Continuous dyadic wavelets achieve $40.3\%$ power at 50~nt ($d = 0.10$, vs.~3SEQ $5.2\%$) and $89.0\%$ at 100~nt, with $0.00\%$ background false alarms.
+(A)~Epidemic Clonal Expansion: An ancestral reticulation ($P_1, P_2 \to R_{\mathrm{anc}}$) generates a 1.5~kb cassette in $K \in \{2\text{--}15\}$ isolates. While 3SEQ inflates events ($\hat{K} = 9.5\text{--}55.0$) and scales linearly, \RhizAeon collapses swarms into a single event ($\hat{K} = 1.00$) with $99.9\%$ precision in flat runtime ($491\text{--}826$~ms).
+(B)~Multi-Way Mosaic Swarms: Dual Cassette, Nested Doll, and Triple Crossover architectures ($K_{\mathrm{donor}} = 2.0$). Trajectory deconvolution recovers both parental donors ($1.97/2.00$) with high boundary overlap ($J = 0.86\text{--}0.98$), whereas closed-world triplet scanning misses secondary donors and inflates events up to $\hat{K} = 46.5$.
+(C)~Ghost Donor Introgression: Incomplete taxon sampling across Surrogate Sister, Pure Ghost, and Deep Reservoir regimes. 3SEQ misidentifies background parent $P_2$ as donor in $100\%$ of trials. \RhizAeon maintains $\le 6\%$ false framing and attributes $98.3\%$ of surrogate donors correctly.
+(D)~Bacterial Micro-Conversions: Short replacement tracts ($L_{\mathrm{tract}} \in [50, 800]$~nt). Continuous dyadic wavelets achieve $40.3\%$ power at 50~nt ($d = 0.10$, vs.~3SEQ $5.2\%$) and $89.0\%$ at 100~nt, with $0.00\%$ background false alarms.
 }
 \label{fig:specialized_scenarios}
 \end{figure*}
@@ -52,81 +53,86 @@ In natural populations and disease outbreaks, however, recombination violates th
 We evaluated \RhizAeon and 3SEQ across four specialized simulation experiments designed to probe these operational challenges.
 
 \paragraph{Epidemic Clonal Expansion}
-During viral outbreaks and bacterial epidemics, such as SARS-CoV-2, HIV-1, or mpox, recombinant lineages rarely circulate as solitary variants; instead, an ancestral crossover is transmitted across multiple hosts, expanding into a clonal swarm of sampled descendant isolates (Figure~\ref{fig:specialized_scenarios}A).
-\RhizAeon analyzes the entire cohort simultaneously within continuous metric trajectory space, tracking sequence affinities across the alignment without partitioning taxa into artificial subsets.
+During viral outbreaks and bacterial epidemics, such as SARS-CoV-2, HIV-1, or mpox, recombinant lineages rarely circulate as solitary variants.
+Instead, an ancestral crossover transmits across multiple hosts and expands into a clonal swarm of sampled descendant isolates (Figure~\ref{fig:specialized_scenarios}A).
+\RhizAeon analyzes the entire cohort simultaneously within continuous metric trajectory space and tracks sequence affinities across the alignment without partitioning taxa into artificial subsets.
 Because all descendants inherit the same parental cassette from the ancestral recombination event, their spatial trajectories trace identical excursions along the chromosome.
-\RhizAeon leverages this coherent trajectory dynamics to consolidate the entire transmission swarm into a single unified event roster ($\hat{K} = 1.00$ across all descendant swarm sizes $K \in \{2, 5, 8, 10, 15\}$; Figure~\ref{fig:specialized_scenarios}A).
+Coherent trajectory dynamics consolidates the entire transmission swarm into a single unified event roster ($\hat{K} = 1.00$ across all descendant swarm sizes $K \in \{2, 5, 8, 10, 15\}$, Figure~\ref{fig:specialized_scenarios}A).
 Across 300 simulated outbreak cohorts ($N = 42\text{--}55$ taxa, $L = 5{,}000$~nt), \RhizAeon recovered recombinant descendants with 99.0\% recall and 99.9\% precision.
 It localized the 1.5~kb cassette boundaries accurately (mean Jaccard overlap $J = 0.96\text{--}0.99$).
-Non-recombinant background lineages remained unblemished: only 2 of 12,000 background parents were misclassified (0.017\% false alarm rate) in flat, constant runtime (491--826~ms).
+Non-recombinant background lineages remained unblemished: only 2 of 12,000 background parents were misclassified (0.017\% false alarm rate) in flat runtime (491--826~ms).
 By contrast, triplet scanning (3SEQ) tests every triplet independently.
 Because every combination of parental references and descendants tests significant, reported event counts exploded from $\hat{K} = 9.5\text{--}30.5$ to $36.8\text{--}55.0$---a 55-fold overcounting for a single biological event.
-Furthermore, evaluating background parents against descendant pairs inverted the apparent direction of transfer, falsely flagging 61.4\%--100\% of background parents as recombinant children ($d_{\mathrm{parent}} \ge 0.05$) and collapsing isolate precision to 5.8\%--28.1\% while runtimes scaled linearly up to 4.3~seconds.
+Furthermore, evaluating background parents against descendant pairs inverted the apparent direction of transfer.
+Triplet scans falsely flagged 61.4\%--100\% of background parents as recombinant children ($d_{\mathrm{parent}} \ge 0.05$) and collapsed isolate precision to 5.8\%--28.1\% while runtimes scaled linearly up to 4.3~seconds.
 
 \paragraph{Multi-Way Mosaic Swarms}
-Natural viral recombinants and mosaic bacterial chromosomes frequently acquire genetic material from more than one parental donor, producing complex multi-way reticulate topologies including dual cassette insertions, nested transfers, and serial crossover cascades (Figure~\ref{fig:specialized_scenarios}B).
-\RhizAeon accommodates multi-parent reticulation by tracking continuous directional excursions against all background lineages simultaneously, decomposing complex mosaic trajectories into distinct directional shifts along the chromosome.
-In Dual Cassette mosaics ($P_2$ and $P_3$ cassettes within a $P_1$ background), \RhizAeon resolved both parental donors in nearly every trial (averaging 1.97 of 2.00 expected donors; 2.00 across all swarms at $d_{\mathrm{parent}} \ge 0.05$; Figure~\ref{fig:specialized_scenarios}B).
-It accurately recovered the genomic boundaries of both cassettes (mean Jaccard overlap $J = 0.86\text{--}0.98$ at $d_{\mathrm{parent}} \ge 0.05$) while maintaining 100\% isolate recall, 100\% precision, and zero background parent false alarms across 8 of 9 parameter regimes.
-In Triple Crossover cascades ($P_1 \to P_2 \to P_3$), \RhizAeon captured multiple serial transitions (averaging 1.63 resolved donors) with 100\% isolate recall and 91.3\%--100\% precision, processing each 6,000~nt alignment in 0.66--2.20~seconds.
-Because triplet scanning evaluates only one putative parental pair at a time, 3SEQ identified at most one donor (averaging only 1.02 of 2.00 expected donors), missing the second cassette entirely.
-Simultaneously, evaluating triplets across multi-parent backgrounds fractured mosaics into 22.2--46.5 reported events per alignment ($d_{\mathrm{parent}} \ge 0.05$), falsely accused 47.1\%--81.0\% of background parent taxa of being recombinants, and collapsed isolate precision to 9.1\%--25.2\%.
-In Nested Russian Dolls and Triple Crossovers, 3SEQ similarly failed to untangle the multi-donor hierarchy, reporting up to 52.9 spurious events and falsely classifying up to 95.3\% of background parents as recombinants while requiring up to 7.4~seconds per alignment.
+Natural viral recombinants and mosaic bacterial chromosomes frequently acquire genetic material from more than one parental donor to produce complex multi-way reticulate topologies, including dual cassette insertions, nested transfers, and serial crossover cascades (Figure~\ref{fig:specialized_scenarios}B).
+\RhizAeon accommodates multi-parent reticulation by tracking continuous directional excursions against all background lineages simultaneously and decomposes complex mosaic trajectories into distinct directional shifts along the chromosome.
+In Dual Cassette mosaics ($P_2$ and $P_3$ cassettes within a $P_1$ background), trajectory deconvolution recovered both parental donors in nearly every trial (averaging 1.97 of 2.00 expected donors, and 2.00 across all swarms at $d_{\mathrm{parent}} \ge 0.05$, Figure~\ref{fig:specialized_scenarios}B).
+It recovered the genomic boundaries of both cassettes (mean Jaccard overlap $J = 0.86\text{--}0.98$ at $d_{\mathrm{parent}} \ge 0.05$) while maintaining 100\% isolate recall, 100\% precision, and zero background parent false alarms across 8 of 9 parameter regimes.
+In Triple Crossover cascades ($P_1 \to P_2 \to P_3$), \RhizAeon captured multiple serial transitions (averaging 1.63 resolved donors) with 100\% isolate recall and 91.3\%--100\% precision, and processed each 6,000~nt alignment in 0.66--2.20~seconds.
+Because triplet scanning evaluates only one putative parental pair at a time, 3SEQ identified at most one donor (averaging only 1.02 of 2.00 expected donors) and missed the second cassette entirely.
+Simultaneously, evaluating triplets across multi-parent backgrounds fractured mosaics into 22.2--46.5 reported events per alignment ($d_{\mathrm{parent}} \ge 0.05$), misclassified 47.1\%--81.0\% of background parent taxa as recombinants, and collapsed isolate precision to 9.1\%--25.2\%.
+In Nested Russian Dolls and Triple Crossovers, 3SEQ similarly failed to untangle the multi-donor hierarchy and reported up to 52.9 spurious events while misclassifying up to 95.3\% of background parents in runtimes up to 7.4~seconds per alignment.
 
 \paragraph{Ghost Donor Introgression}
-In natural populations, recombination and horizontal gene transfer frequently involve donor lineages that are absent from the contemporary sample, including unsampled zoonotic reservoirs, extinct ancestral variants, or unsequenced strains (Figure~\ref{fig:specialized_scenarios}C).
-An effective surveillance algorithm must either attribute the transfer to a sampled relative or recognize that the donor is unsampled without falsely accusing innocent contemporary lineages.
-\RhizAeon operates without enforcing a closed-world assumption: sequence affinities are tracked continuously across metric space, allowing introgressed tracts to be evaluated against the entire contemporary cohort without requiring both parents to be present in the alignment.
-When a sister lineage to the introgressing donor is sampled (Surrogate Sister regime), \RhizAeon achieves 91.2\% tract recall and correctly attributes the donor tract to the surrogate sister clade in 98.3\% of trials (100.0\% across all swarms at $d_{\mathrm{parent}} \ge 0.05$; Figure~\ref{fig:specialized_scenarios}C), recovering the 1.5~kb cassette with high spatial precision ($J = 0.94\text{--}0.99$) and keeping false alarms on innocent background parents down to 2.2\%.
-In sharp contrast, when the introgressing donor is completely unrepresented in the sample (Pure Ghost and Deep Reservoir regimes), \RhizAeon's directional consistency constraints result in principled abstention: tract recall is 0.000 (0 / 360 replicates), because the algorithm refuses to forge an ungrounded reticulation link to an unrelated contemporary leaf.
+In natural populations, recombination and horizontal gene transfer frequently involve donor lineages absent from the contemporary sample, including unsampled zoonotic reservoirs, extinct ancestral variants, or unsequenced strains (Figure~\ref{fig:specialized_scenarios}C).
+An effective surveillance algorithm must either attribute the transfer to a sampled relative or abstain when the donor is unsampled without misclassifying unadmixed contemporary lineages.
+\RhizAeon operates without enforcing a closed-world assumption: sequence affinities are tracked continuously across metric space so introgressed tracts are evaluated against the entire contemporary cohort without requiring both parents in the alignment.
+When a sister lineage to the introgressing donor is sampled (Surrogate Sister regime), \RhizAeon achieves 91.2\% tract recall and attributes the donor tract to the surrogate sister clade in 98.3\% of trials (100.0\% across all swarms at $d_{\mathrm{parent}} \ge 0.05$, Figure~\ref{fig:specialized_scenarios}C).
+The algorithm recovers the 1.5~kb cassette with high spatial precision ($J = 0.94\text{--}0.99$) while limiting false alarms on background parents to 2.2\%.
+In sharp contrast, when the introgressing donor is completely unrepresented in the sample (Pure Ghost and Deep Reservoir regimes), directional consistency constraints enforce principled abstention.
+Tract recall drops to 0.000 (0 / 360 replicates) because the statistical audit rejects ungrounded reticulation links to unrelated contemporary leaves.
 By abstaining in the absence of a sampled donor or surrogate sister, \RhizAeon maintains a 0.0\% false parent alarm rate in Pure Ghost cohorts and $\le 6.1\%$ in Deep Reservoir cohorts ($0.0\%$ at $d_{\mathrm{parent}} \ge 0.05$).
-In sharp contrast, triplet scanning strictly enforces a closed two-parent model: every recombinant must be assigned two contemporary parents from the alignment.
-While 3SEQ flags the recombinant tract in 88.1\%--88.7\% of trials, it universally misattributes the foreign introgression: absent the true donor, 3SEQ falsely framed innocent background parent $P_2$ as the donor in 100\% of trials across all ghost regimes (Figure~\ref{fig:specialized_scenarios}C).
-In Surrogate Sister cohorts, 3SEQ donor accuracy fell to 9.3\%--39.3\% while falsely accusing 37.5\%--56.4\% of background parent taxa.
-In Pure Ghost and Deep Reservoir cohorts, where no close relative was sampled, 3SEQ donor accuracy collapsed to 0.0\%, manufacturing false donor attributions across every single detected trial.
+Conversely, triplet scanning enforces a closed two-parent model in which every recombinant must be assigned two contemporary parents from the alignment.
+While 3SEQ flags the recombinant tract in 88.1\%--88.7\% of trials, it universally misattributes the foreign introgression: absent the true donor, 3SEQ framed background parent $P_2$ as the donor in 100\% of trials across all ghost regimes (Figure~\ref{fig:specialized_scenarios}C).
+In Surrogate Sister cohorts, 3SEQ donor accuracy fell to 9.3\%--39.3\% while misclassifying 37.5\%--56.4\% of background parent taxa.
+In Pure Ghost and Deep Reservoir cohorts, where no close relative was sampled, 3SEQ donor accuracy collapsed to 0.0\% and manufactured false donor attributions across every detected trial.
 
 \paragraph{Bacterial Micro-Conversions}
 In bacterial transformation (e.g., \emph{Streptococcus pneumoniae}, \emph{Helicobacter pylori}) and eukaryotic gene conversion, homologous exchange frequently occurs via micro-conversions: short non-reciprocal replacement tracts spanning tens to hundreds of base pairs (Figure~\ref{fig:specialized_scenarios}D).
 Detecting micro-conversions is statistically demanding because short tracts carry very few informative polymorphisms between parental backgrounds: at $L_{\mathrm{tract}} = 50$~nt, simulated tracts contained an expected average of only 1.0 ($d_{\mathrm{parent}} = 0.02$), 2.5 ($d_{\mathrm{parent}} = 0.05$), and 5.0 ($d_{\mathrm{parent}} = 0.10$) distinguishing mutations.
-\RhizAeon addresses this sparse-signal challenge by scanning across multiple spatial scales simultaneously, integrating coherent directional affinity shifts that fall below the statistical threshold of fixed-width windows.
+\RhizAeon addresses this sparse-signal challenge by scanning across multiple spatial scales simultaneously and integrates coherent directional affinity shifts that fall below the threshold of fixed-width windows.
 At $L_{\mathrm{tract}} = 50$~nt ($d_{\mathrm{parent}} = 0.10$), \RhizAeon achieved 40.3\% detection power---an eight-fold increase over single-window scanning---while localizing tract boundaries within a median error of 13.0~nt and generating zero background false alarms (Figure~\ref{fig:specialized_scenarios}D).
 At $L_{\mathrm{tract}} = 100$~nt, sensitivity climbed to 89.0\% at $d_{\mathrm{parent}} = 0.10$ and 44.8\% at $d_{\mathrm{parent}} = 0.05$, with median breakpoint error under 19.0~nt.
 As tract lengths expanded ($L_{\mathrm{tract}} \ge 200$~nt), \RhizAeon saturated to 88.7\%--100.0\% power across moderate and high divergence.
-It reported exactly 1.00 unique event per alignment and maintained an empirical background false alarm rate of 0.00\% across all 900 trials.
-Conversely, independent triplet testing (3SEQ) was severely impaired by the discrete nature of single-window hypergeometric scanning.
-At $L_{\mathrm{tract}} = 50$~nt, 3SEQ was virtually blind to micro-conversions, achieving only 0.0\% power at $d_{\mathrm{parent}} = 0.02$, 3.3\% at $d_{\mathrm{parent}} = 0.05$, and 5.2\% at $d_{\mathrm{parent}} = 0.10$ (Figure~\ref{fig:specialized_scenarios}D).
+It reported 1.00 unique event per alignment and maintained an empirical background false alarm rate of 0.00\% across all 900 trials.
+Conversely, independent triplet testing (3SEQ) was impaired by the discrete nature of single-window hypergeometric scanning.
+At $L_{\mathrm{tract}} = 50$~nt, 3SEQ was virtually blind to micro-conversions and achieved only 0.0\% power at $d_{\mathrm{parent}} = 0.02$, 3.3\% at $d_{\mathrm{parent}} = 0.05$, and 5.2\% at $d_{\mathrm{parent}} = 0.10$ (Figure~\ref{fig:specialized_scenarios}D).
 At $L_{\mathrm{tract}} = 100$~nt, power remained low at 0.0\%--33.3\%.
 At longer tract lengths ($L_{\mathrm{tract}} \ge 200$~nt), triplet testing suffered severe combinatorial false alarms.
-At $L_{\mathrm{tract}} = 200$~nt ($d_{\mathrm{parent}} = 0.10$), 3SEQ generated an average of 12.8 alerts per alignment, falsely flagging 23.6\% of background parent taxa.
-At $L_{\mathrm{tract}} = 800$~nt, reported alerts exploded to 33.3 per alignment, falsely accusing 92.2\% of non-recombinant background parent taxa of being recombinants.
+At $L_{\mathrm{tract}} = 200$~nt ($d_{\mathrm{parent}} = 0.10$), 3SEQ generated an average of 12.8 alerts per alignment and falsely flagged 23.6\% of background parent taxa.
+At $L_{\mathrm{tract}} = 800$~nt, reported alerts exploded to 33.3 per alignment and misclassified 92.2\% of non-recombinant background parent taxa as recombinants.
 
 \subsection{The Continuous Operational Phase Envelope of Reticulation Deconvolution}
 \label{subsec:grand_sweep_envelope}
 In aeronautical engineering, an aircraft operating envelope defines certified boundaries of stable flight across airspeed, altitude, stall limits, and atmospheric turbulence.
 Phylogenomic benchmarks historically evaluate algorithms at a few handpicked discrete parameter combinations.
-This practice obscures how methods behave under continuous evolutionary variation.
-To establish the operational envelope of \RhizAeon, we conducted a grand continuous parameter sweep across 1,000,000 independent continuous simulation trials.
-Simulations varied continuously across chromosome length ($L \in [300, 30{,}000]$~nt), cohort depth ($N \in [4, 250]$~taxa), parental divergence ($d_{\mathrm{parent}} \in [0.005, 0.35]$~subs/site), and continuous Gamma rate heterogeneity ($\alpha \in [0.2, 5.0]$) alongside strict molecular clock controls ($\alpha \ge 50$; Table~\ref{tab:grand_sweep_1m_envelope}).
+Evaluating sparse parameter grids obscures how methods behave under continuous evolutionary variation.
+To establish the operational envelope of \RhizAeon, we conducted a grand continuous parameter sweep across 1,000,000 independent simulation trials.
+Simulations varied continuously across chromosome length ($L \in [300, 30{,}000]$~nt), cohort depth ($N \in [4, 250]$~taxa), parental divergence ($d_{\mathrm{parent}} \in [0.005, 0.35]$~subs/site), and continuous Gamma rate heterogeneity ($\alpha \in [0.2, 5.0]$) alongside strict molecular clock controls ($\alpha \ge 50$, Table~\ref{tab:grand_sweep_1m_envelope}).
 The benchmark cohort comprised 333,334 non-recombinant null alignments and 666,666 recombinant alignments spanning terminal crossovers, intercalary conversion cassettes, and multi-donor / multi-event mosaicism ($K \in \{1, 2, 3, 4\}$).
 
 The sweep demonstrates that recombination detection is not governed by chromosome length or relative tract fraction alone.
-The fundamental governing physical quantity is the count of informative mutations distinguishing donor from recipient within the transferred tract ($M_{\mathrm{tract}} \approx L_{\mathrm{tract}} \times d_{\mathrm{parent}}$).
+The governing physical quantity is the count of informative mutations distinguishing donor from recipient within the transferred tract ($M_{\mathrm{tract}} \approx L_{\mathrm{tract}} \times d_{\mathrm{parent}}$).
 Below three informative mutations ($M_{\mathrm{tract}} \le 2$), detection power is 0.5\% (402 detections out of 85,564 trials).
 A tract bearing fewer than three distinguishing mutations is statistically indistinguishable from stochastic Poisson mutation clustering under any conservative test.
-Power lifts to 6.8\% at $M_{\mathrm{tract}} \in [3, 5]$ (4,678 / 68,609), accelerates to 29.2\% at $M_{\mathrm{tract}} \in [6, 10]$ (22,646 / 77,568), reaches 52.4\% at $M_{\mathrm{tract}} \in [11, 15]$ (27,587 / 52,607), 71.5\% at $M_{\mathrm{tract}} \in [16, 25]$ (51,096 / 71,427), 85.5\% at $M_{\mathrm{tract}} \in [26, 50]$ (82,714 / 96,694), 91.2\% at $M_{\mathrm{tract}} \in [51, 100]$ (77,213 / 84,676), and plateaus at 95.5\% when $M_{\mathrm{tract}} > 100$ (123,692 / 129,521).
+Power lifts to 6.8\% at $M_{\mathrm{tract}} \in [3, 5]$ (4,678 / 68,609), accelerates to 29.2\% at $M_{\mathrm{tract}} \in [6, 10]$ (22,646 / 77,568), and reaches 52.4\% at $M_{\mathrm{tract}} \in [11, 15]$ (27,587 / 52,607).
+Across denser tracts, sensitivity climbs to 71.5\% at $M_{\mathrm{tract}} \in [16, 25]$ (51,096 / 71,427), 85.5\% at $M_{\mathrm{tract}} \in [26, 50]$ (82,714 / 96,694), 91.2\% at $M_{\mathrm{tract}} \in [51, 100]$ (77,213 / 84,676), and plateaus at 95.5\% when $M_{\mathrm{tract}} > 100$ (123,692 / 129,521).
 The operational stall boundary forms a clean hyperbola in parameter space: certified detection requires $L_{\mathrm{tract}} \times d_{\mathrm{parent}} \ge 6\text{--}10$~informative SNPs (Supplementary Figure~\ref{fig:grand_sweep_1m_phase_diagram}).
 
 Across 333,334 non-recombinant null alignments, \RhizAeon maintained an overall alignment-level false positive rate of 0.3570\% (1,190 false alerts), well below the nominal 5\% ceiling (Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}A).
 Under a strict molecular clock ($\alpha \ge 50$), the false positive rate was 0.3253\% (271 out of 83,311 trials).
 Under continuous Gamma heterotachy ($\alpha \in [0.2, 5.0]$), the rate remained strictly controlled at 0.3676\% (919 out of 250,023 trials).
-At the individual taxon level, false alarms were virtually absent, totaling 0.01166\% (2,651 false taxa across 22,744,905 evaluated leaves; $>99.988\%$ per-taxon specificity).
-The unpolarized ancestral root token functions as a passive aerodynamic damper, absorbing private autapomorphic bursts into node zero without destabilizing trajectory tracking.
+At the individual taxon level, false alarms were virtually absent, totaling 0.01166\% (2,651 false taxa across 22,744,905 evaluated leaves, $>99.988\%$ per-taxon specificity).
+The unpolarized ancestral root token functions as a passive aerodynamic damper and absorbs private autapomorphic bursts into node zero without destabilizing trajectory tracking.
 
 Spatial breakpoint resolution landed within sub-gene margins (Supplementary Figure~\ref{fig:grand_sweep_1m_phase_diagram}C).
-Median absolute error was 15.0~nt for single events ($K=1$) and 14.0~nt for dual events ($K=2$), sharpening to 9.0~nt for tracts carrying $>100$ informative SNPs.
-Across multi-event architectures ($K_{\mathrm{true}} \ge 2$), bipartite event precision remained above 97\% ($97.3\%$ for dual events, $98.5\%$ for triple events, and $99.0\%$ for quad events; Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}B).
-Multi-donor mosaics ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$) were resolved with 59.7\% power and 0.416 event $F_1$ score, matching single-donor hybrids without mutual dipole interference (Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}D).
-Terminal crossovers exhibited higher sensitivity (71.4\% power across $N = 239{,}767$ trials) than intercalary conversion cassettes (51.3\% power across $N = 426{,}899$ trials; Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}C).
-Across 512 distributed CPU cores on cluster infrastructure, sustained throughput reached $\approx 380$ genomes per second, completing the entire 1,000,000-trial suite in under 45 minutes.
+Median absolute error was 15.0~nt for single events ($K=1$) and 14.0~nt for dual events ($K=2$), and sharpened to 9.0~nt for tracts carrying $>100$ informative SNPs.
+Across multi-event architectures ($K_{\mathrm{true}} \ge 2$), bipartite event precision remained above 97\% ($97.3\%$ for dual events, $98.5\%$ for triple events, and $99.0\%$ for quad events, Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}B).
+Multi-donor mosaics ($P_1 \leftarrow P_2 + P_3$, $N = 179{,}233$) were resolved with 59.7\% power and 0.416 event $F_1$ score, which matched single-donor hybrids without mutual dipole interference (Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}D).
+Terminal crossovers exhibited higher sensitivity (71.4\% power across $N = 239{,}767$ trials) than intercalary conversion cassettes (51.3\% power across $N = 426{,}899$ trials, Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}C).
+Across 512 distributed CPU cores on cluster infrastructure, sustained throughput reached $\approx 380$ genomes per second and completed the entire 1,000,000-trial suite in under 45 minutes.
 For genomic surveillance, defining this operational envelope provides actionable interpretability: outside the three-SNP stall limit, negative results are biologically informative.
 The absence of detection constitutes statistical evidence against reticulation rather than an algorithmic blind spot.
