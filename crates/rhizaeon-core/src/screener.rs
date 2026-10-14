@@ -7,6 +7,7 @@ pub struct LocalFluxScreener {
     pub variance_multiplier: f64,
     pub alpha: f64,
     pub epsilon: f64,
+    pub tier2_stringency: f64,
 }
 
 impl Default for LocalFluxScreener {
@@ -18,6 +19,7 @@ impl Default for LocalFluxScreener {
             variance_multiplier: 1.80,
             alpha: 0.05,
             epsilon: 1e-12,
+            tier2_stringency: 1.0,
         }
     }
 }
@@ -25,6 +27,11 @@ impl Default for LocalFluxScreener {
 impl LocalFluxScreener {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn with_tier2_stringency(mut self, tier2_stringency: f64) -> Self {
+        self.tier2_stringency = tier2_stringency;
+        self
     }
 
     /// Evaluates spatial coherence of the Root flux stream
@@ -304,7 +311,8 @@ impl LocalFluxScreener {
         };
 
         // Robust baseline scaling from uncontaminated lower quartile (75% breakdown point against recombinant swarms):
-        let z_crit_cand = 2.0f64;
+        let s2 = self.tier2_stringency.max(0.1);
+        let z_crit_cand = 2.0f64 * s2;
 
         let floor_v = (med_low_v / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
         let floor_pulse = (med_low_pulse / (l as f64).sqrt()).max(1.0 / (l as f64).sqrt());
@@ -312,12 +320,12 @@ impl LocalFluxScreener {
         let scale_v = (1.4826 * mad_v).max(floor_v);
         let scale_pulse = (1.4826 * mad_pulse).max(floor_pulse);
 
-        let thresh_v = (med_low_v + z_crit_cand * scale_v).max(med_v + 1.5 * scale_v);
-        let thresh_pulse = (med_low_pulse + z_crit_cand * scale_pulse).max(med_pulse + 1.5 * scale_pulse);
+        let thresh_v = (med_low_v + z_crit_cand * scale_v).max(med_v + 1.5 * s2 * scale_v);
+        let thresh_pulse = (med_low_pulse + z_crit_cand * scale_pulse).max(med_pulse + 1.5 * s2 * scale_pulse);
 
         let mut candidate_mask = vec![false; n];
         for &i in &pool_indices {
-            if v_cont[i] > thresh_v || cont_pulse[i] > thresh_pulse || is_ghost_candidate[i] {
+            if s2 <= 0.65 || v_cont[i] > thresh_v || cont_pulse[i] > thresh_pulse || is_ghost_candidate[i] {
                 candidate_mask[i] = true;
             }
         }

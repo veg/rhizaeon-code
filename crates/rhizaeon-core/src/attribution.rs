@@ -18,17 +18,26 @@ pub struct TrajectoryParentalPair {
 
 pub struct TrajectoryParentalResolver {
     pub min_root_swing: f64,
+    pub stringency: f64,
 }
 
 impl Default for TrajectoryParentalResolver {
     fn default() -> Self {
-        Self { min_root_swing: 3.0 }
+        Self {
+            min_root_swing: 3.0,
+            stringency: 1.0,
+        }
     }
 }
 
 impl TrajectoryParentalResolver {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn with_stringency(mut self, stringency: f64) -> Self {
+        self.stringency = stringency;
+        self
     }
 
     /// Resolves active reticulation dipole (P_Home, P_Donor) for candidate R (backward-compatible)
@@ -259,9 +268,10 @@ impl TrajectoryParentalResolver {
 
             // Donor selection criterion:
             // Needs meaningful contrast with Home and non-trivial attention/swing
-            if score_d >= 0.05 * best_score.max(1e-6)
-                && (mean_a[d] >= 0.5 * uniform_share || z_swings[d] >= 1.0)
-                && (z_swings[d] >= k_crit_att || swings[d] >= 0.25)
+            let s2 = self.stringency.max(0.1);
+            if score_d >= 0.05 * s2 * best_score.max(1e-6)
+                && (mean_a[d] >= 0.5 * s2 * uniform_share || z_swings[d] >= 1.0 * s2)
+                && (z_swings[d] >= k_crit_att * s2 || swings[d] >= 0.25 * s2)
             {
                 candidate_donors.push(CandidateDonor {
                     channel: d,
@@ -285,11 +295,12 @@ impl TrajectoryParentalResolver {
         let attention_support_0 = max_mean_0 / (max_mean_0 + km_channel);
         let score_0 = diff_var_0 * opposition_0 * attention_support_0;
 
+        let s2 = self.stringency.max(0.1);
         let allow_ghost = ghost_candidate_indices.contains(&candidate_idx);
         if allow_ghost
-            && score_0 >= 0.05 * best_score.max(1e-6)
-            && (mean_a[0] >= 0.5 * uniform_share || z_swings[0] >= 1.0)
-            && (z_swings[0] >= k_crit_att || swings[0] >= 0.25)
+            && score_0 >= 0.05 * s2 * best_score.max(1e-6)
+            && (mean_a[0] >= 0.5 * s2 * uniform_share || z_swings[0] >= 1.0 * s2)
+            && (z_swings[0] >= k_crit_att * s2 || swings[0] >= 0.25 * s2)
         {
             candidate_donors.push(CandidateDonor {
                 channel: 0,

@@ -21,6 +21,8 @@ pub struct RhizAeonEngine {
     pub root_sink_factor: f64,
     pub poisson_floor: usize,
     pub alpha: f64,
+    pub tier2_stringency: f64,
+    pub tier3_stringency: f64,
     /// Informative SNP compression mode:
     /// None = Auto-trigger (L > 50,000 bp OR (L > 10,000 bp AND M_inf / L < 0.10))
     /// Some(true) = Force SNP compression
@@ -38,6 +40,8 @@ impl Default for RhizAeonEngine {
             root_sink_factor: 1.0,
             poisson_floor: 3,
             alpha: 0.05,
+            tier2_stringency: 1.0,
+            tier3_stringency: 1.0,
             compress_snps: None,
         }
     }
@@ -73,6 +77,16 @@ impl RhizAeonEngine {
         self
     }
 
+    pub fn with_tier2_stringency(mut self, stringency: f64) -> Self {
+        self.tier2_stringency = stringency;
+        self
+    }
+
+    pub fn with_tier3_stringency(mut self, stringency: f64) -> Self {
+        self.tier3_stringency = stringency;
+        self
+    }
+
     /// Scans an alignment for mosaic recombination events using the full PA-FF v2.1 pipeline
     pub fn scan(&self, raw_aln: &Alignment) -> ScanResult {
         let (aln_trimmed, u_offset) = trim_coverage_envelope(raw_aln);
@@ -80,7 +94,12 @@ impl RhizAeonEngine {
         let l_chromosomal = raw_aln.length;
 
         let m_inf = count_parsimony_informative_sites(&aln_trimmed);
-        let m_min = compute_min_informative_sites(n);
+        let base_m_min = compute_min_informative_sites(n);
+        let m_min = if (self.tier3_stringency - 1.0).abs() < 1e-9 {
+            base_m_min
+        } else {
+            ((base_m_min as f64 * self.tier3_stringency.min(1.0)).round() as usize).max(2)
+        };
 
         // Early exit: non-recombinant H0 if informative sites below admission floor
         if m_inf < m_min {
@@ -125,7 +144,11 @@ impl RhizAeonEngine {
 
 
         // 1. Landmark Selection on Delta^K with adaptive scaling for large cohorts
-        let effective_k = self.target_landmarks.max(n / 2).min(32).min(n);
+        let effective_k = if self.target_landmarks == 16 {
+            self.target_landmarks.max(n / 2).min(32).min(n)
+        } else {
+            self.target_landmarks.max(2).min(n)
+        };
         let landmarks = select_landmarks(&aln, effective_k);
 
         // 2. Tree-RoPE & Prior
@@ -149,7 +172,7 @@ impl RhizAeonEngine {
         );
 
         // 5. Pass 1 Screener
-        let screener = LocalFluxScreener::new();
+        let screener = LocalFluxScreener::new().with_tier2_stringency(self.tier2_stringency);
         let screening = screener.screen(&f_tensor, &c_tensor, &aln, &landmarks);
 
         if screening.is_non_recombinant_h0 {
@@ -171,9 +194,10 @@ impl RhizAeonEngine {
         let (landmarks, a_tensor, c_tensor, num_channels) = (landmarks, a_tensor, c_tensor, k_init);
 
         // 6. Pass 2 Polishing & Pass 3 Due Diligence on candidates
-        let resolver = TrajectoryParentalResolver::new();
-        let polisher = CumulativeTrajectoryPolisher::new();
-        let due_diligence = SequenceDueDiligence::new(self.poisson_floor, self.alpha, 100_000);
+        let resolver = TrajectoryParentalResolver::new().with_stringency(self.tier2_stringency);
+        let polisher = CumulativeTrajectoryPolisher::new().with_stringency(self.tier2_stringency);
+        let due_diligence = SequenceDueDiligence::new(self.poisson_floor, self.alpha, 100_000)
+            .with_stringency(self.tier3_stringency);
 
         let mut verified_events = Vec::new();
 
@@ -945,6 +969,64 @@ mod tests {
         assert_eq!(grouped[0].u2, 500);
         assert_eq!(grouped[0].p_fisher, 1e-15, "Strongest p-value should be preserved");
         assert_eq!(grouped[0].z_phys, 9.0, "Highest z-score should be preserved");
+    }
+
+    #[test]
+    fn test_tier2_and_tier3_stringency_controls() {
+        let l = 2000;
+        let taxa = vec!["R".into(), "P1".into(), "P2".into(), "P3".into(), "O".into()];
+        let n = taxa.len();
+        let mut data = vec![1u8; n * l];
+
+        for u in 0..l {
+            if u % 6 == 0 {
+                data[2 * l + u] = 2; // P2
+            }
+            if u % 6 == 3 {
+                data[3 * l + u] = 3; // P3
+            }
+            if u % 4 == 0 {
+                data[4 * l + u] = 4; // O
+            }
+        }
+        // R has a primary 400 bp tract from P2 [400..800] and a moderate 90 bp tract from P3 [1200..1290]
+        for u in 0..l {
+            if u >= 400 && u < 800 {
+                data[0 * l + u] = data[2 * l + u];
+            } else if u >= 1200 && u < 1290 {
+                data[0 * l + u] = data[3 * l + u];
+            } else {
+                data[0 * l + u] = data[1 * l + u];
+            }
+        }
+        let aln = Alignment::new(taxa, l, data);
+
+        let res_relaxed = RhizAeonEngine::new()
+            .with_tier2_stringency(0.40)
+            .with_tier3_stringency(0.40)
+            .scan(&aln);
+
+        let res_default = RhizAeonEngine::new().scan(&aln);
+
+        let res_strict = RhizAeonEngine::new()
+            .with_tier2_stringency(2.50)
+            .with_tier3_stringency(2.50)
+            .scan(&aln);
+
+        assert!(
+            res_relaxed.events.len() >= res_default.events.len()
+                && res_default.events.len() >= res_strict.events.len(),
+            "Event count must be non-increasing with stringency: relaxed={}, default={}, strict={}",
+            res_relaxed.events.len(),
+            res_default.events.len(),
+            res_strict.events.len()
+        );
+        assert!(
+            res_relaxed.events.len() > res_strict.events.len(),
+            "Relaxed stringency must retain more tracts than high stringency (relaxed={}, strict={})",
+            res_relaxed.events.len(),
+            res_strict.events.len()
+        );
     }
 }
 

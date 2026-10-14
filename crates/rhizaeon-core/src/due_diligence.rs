@@ -4,6 +4,7 @@ use crate::types::{Alignment, LandmarkSet, PhysicalTract, RecombinationEvent};
 pub struct SequenceDueDiligence {
     pub poisson_floor: usize,
     pub alpha: f64,
+    pub stringency: f64,
     log_factorials: Vec<f64>,
 }
 
@@ -25,8 +26,14 @@ impl SequenceDueDiligence {
         Self {
             poisson_floor,
             alpha,
+            stringency: 1.0,
             log_factorials: log_facts,
         }
+    }
+
+    pub fn with_stringency(mut self, stringency: f64) -> Self {
+        self.stringency = stringency;
+        self
     }
 
     #[inline(always)]
@@ -88,6 +95,7 @@ impl SequenceDueDiligence {
         rate_burst_indices: &[usize],
         candidate_indices: &[usize],
     ) -> Option<RecombinationEvent> {
+        let s3 = self.stringency.max(0.1);
         let cand_idx = parental.candidate_idx;
         let cand_name = aln.taxa[cand_idx].clone();
         let l = aln.length;
@@ -96,7 +104,12 @@ impl SequenceDueDiligence {
         let u2 = tract.u2_discrete;
         let tract_len = if u2 >= u1 { u2 - u1 + 1 } else { 0 };
 
-        if tract_len < 20 || !tract.is_physically_significant {
+        let min_len = if (s3 - 1.0).abs() < 1e-9 {
+            20
+        } else {
+            ((20.0 * s3).round() as usize).clamp(8, 150)
+        };
+        if tract_len < min_len || !tract.is_physically_significant {
             return None;
         }
 
@@ -204,7 +217,12 @@ impl SequenceDueDiligence {
         }
 
         // Informative site floor check
-        if s_donor < self.poisson_floor {
+        let eff_poisson_floor = if (s3 - 1.0).abs() < 1e-9 {
+            self.poisson_floor
+        } else {
+            ((self.poisson_floor as f64 * s3).round() as usize).max(1)
+        };
+        if s_donor < eff_poisson_floor {
             return None;
         }
 
@@ -434,7 +452,14 @@ impl SequenceDueDiligence {
 
         // Bonferroni critical threshold over candidate triplets in alignment: alpha / binom(N, 3)
         let num_triplets = (((aln.num_taxa * aln.num_taxa.saturating_sub(1) * aln.num_taxa.saturating_sub(2)) / 6).max(1)) as f64;
-        let p_crit = self.alpha / num_triplets;
+        let base_p_crit = self.alpha / num_triplets;
+        let p_crit = if (s3 - 1.0).abs() < 1e-9 {
+            base_p_crit
+        } else if s3 < 1.0 {
+            (base_p_crit * 10.0_f64.powf(4.0 * (1.0 - s3))).min(0.25)
+        } else {
+            base_p_crit * 10.0_f64.powf(-6.0 * (s3 - 1.0))
+        };
 
         let d_tract_donor = if valid_tract > 0 { (mismatch_tract_donor as f64) / (valid_tract as f64) } else { 0.0 };
         let d_tract_home = if valid_tract > 0 { (mismatch_tract_home as f64) / (valid_tract as f64) } else { 0.0 };
@@ -456,10 +481,11 @@ impl SequenceDueDiligence {
             let se_recoil = ((d_tract_donor * (1.0 - d_tract_donor) / n_tr)
                 + (d_flank_donor * (1.0 - d_flank_donor) / n_fl))
                 .sqrt();
-            let z_crit_recoil = crate::screener::normal_ppf(1.0 - self.alpha);
+            let z_crit_recoil_base = crate::screener::normal_ppf(1.0 - self.alpha);
+            let z_crit_recoil = z_crit_recoil_base * s3;
 
             // In genuine mosaicism, candidate departs from home parent in tract
-            if delta_home_recoil < -(z_crit_recoil * se_recoil).max(0.0) {
+            if delta_home_recoil < -(z_crit_recoil_base * se_recoil / s3).max(0.0) {
                 return None;
             }
 
@@ -560,7 +586,7 @@ impl SequenceDueDiligence {
                         let s2_fl = d_flank_donor + fl_oh;
                         let s3_fl = fl_ro + fl_hd;
 
-                        let z_crit_q = crate::screener::normal_ppf(1.0 - self.alpha);
+                        let z_crit_q_base = crate::screener::normal_ppf(1.0 - self.alpha);
 
                         // Standard error of quartet split differences under neutral binomial sampling
                         let se_fl = ((d_flank_home * (1.0 - d_flank_home) / (v_fl_o as f64))
@@ -579,7 +605,7 @@ impl SequenceDueDiligence {
                         let mut sums_fl = [(s1_fl, 0i32), (s2_fl, 1i32), (s3_fl, 2i32)];
                         sums_fl.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
                         let delta_s_fl = sums_fl[1].0 - sums_fl[0].0;
-                        let topo_fl = if delta_s_fl > z_crit_q * se_fl {
+                        let topo_fl = if delta_s_fl > z_crit_q_base * se_fl {
                             sums_fl[0].1
                         } else {
                             -1 // Unresolved polytomy / star tree
@@ -589,7 +615,7 @@ impl SequenceDueDiligence {
                         let mut sums_tr = [(s1_tr, 0i32), (s2_tr, 1i32), (s3_tr, 2i32)];
                         sums_tr.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
                         let delta_s_tr = sums_tr[1].0 - sums_tr[0].0;
-                        let topo_tr = if delta_s_tr > z_crit_q * se_tr {
+                        let topo_tr = if delta_s_tr > z_crit_q_base * se_tr {
                             sums_tr[0].1
                         } else {
                             -1 // Unresolved polytomy / star tree
@@ -614,7 +640,7 @@ impl SequenceDueDiligence {
                         let delta_q_diff = delta_q_tract - delta_q_flank;
 
                         // Under terminal heterotachy / rate burst, delta_q_diff >= 0.0
-                        if delta_q_diff > (z_crit_q * se_tr).max(0.0) {
+                        if delta_q_diff > (z_crit_q_base * se_tr / s3).max(0.0) {
                             return None;
                         }
 
@@ -626,8 +652,8 @@ impl SequenceDueDiligence {
                         let se_topo = ((d_tract_home * (1.0 - d_tract_home) / (v_tr_o as f64))
                             + (d_flank_home * (1.0 - d_flank_home) / (v_fl_o as f64)))
                             .sqrt();
-                        let resolution_floor = 1.0 / ((v_tr_o.min(v_fl_o)) as f64);
-                        let z_crit_topo = crate::screener::normal_ppf(1.0 - self.alpha);
+                        let resolution_floor = (1.0 / ((v_tr_o.min(v_fl_o)) as f64)) * s3;
+                        let z_crit_topo = crate::screener::normal_ppf(1.0 - self.alpha) * s3;
                         let thresh = (z_crit_topo * se_topo).max(resolution_floor);
 
                         if delta_topo < thresh {
@@ -644,7 +670,7 @@ impl SequenceDueDiligence {
         }
 
 
-        let is_verified = p_fisher <= p_crit && s_donor >= self.poisson_floor;
+        let is_verified = p_fisher <= p_crit && s_donor >= eff_poisson_floor;
 
         Some(RecombinationEvent {
             event_id: 0,

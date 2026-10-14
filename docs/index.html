@@ -788,13 +788,45 @@
 
           <!-- Instrument Tuning -->
           <div class="controls-group">
-            <div class="slider-row" style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-hairline);">
-              <span class="slider-label">Metric Landmarks (K)</span>
-              <div class="slider-control">
-                <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value">
-                <span class="slider-num" id="kVal">16</span>
+            <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-hairline);">
+              <div style="font-size: 9.5px; color: var(--text-tertiary); line-height: 1.45; margin-bottom: 6px;">
+                <strong>&larr; Left (fewer landmarks):</strong> faster scans with coarser clade resolution. <strong>Right (more landmarks) &rarr;:</strong> finer clade and donor resolution across diverse cohorts at slightly higher compute cost.
+              </div>
+              <div class="slider-row">
+                <span class="slider-label">Metric Landmarks (K)</span>
+                <div class="slider-control">
+                  <input type="range" id="landmarksK" min="8" max="32" step="4" value="16" oninput="document.getElementById('kVal').innerText = this.value" onchange="if (window.latestScanResult) runScanner()">
+                  <span class="slider-num" id="kVal">16</span>
+                </div>
               </div>
             </div>
+
+            <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-hairline);">
+              <div style="font-size: 9.5px; color: var(--text-tertiary); line-height: 1.45; margin-bottom: 6px;">
+                <strong>&larr; Left (lower stringency):</strong> relaxes continuous attention-trajectory excursion and velocity-reversal thresholds to detect weaker or shorter tracts. <strong>Right (higher stringency) &rarr;:</strong> restricts candidate breakpoints to high-amplitude trajectory shifts.
+              </div>
+              <div class="slider-row">
+                <span class="slider-label">Tier 2 Filter Stringency</span>
+                <div class="slider-control">
+                  <input type="range" id="tier2Stringency" min="0.25" max="2.50" step="0.05" value="1.00" oninput="document.getElementById('t2Val').innerText = parseFloat(this.value).toFixed(2) + 'x'" onchange="if (window.latestScanResult) runScanner()">
+                  <span class="slider-num" id="t2Val" style="min-width: 38px;">1.00x</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-hairline);">
+              <div style="font-size: 9.5px; color: var(--text-tertiary); line-height: 1.45; margin-bottom: 6px;">
+                <strong>&larr; Left (lower stringency):</strong> relaxes Fisher's exact test, informative-SNP floor, and quartet Buneman split thresholds to retain subtle mosaic tracts. <strong>Right (higher stringency) &rarr;:</strong> enforces stricter sequence and topological verification to suppress borderline calls.
+              </div>
+              <div class="slider-row">
+                <span class="slider-label">Tier 3 Filter Stringency</span>
+                <div class="slider-control">
+                  <input type="range" id="tier3Stringency" min="0.25" max="2.50" step="0.05" value="1.00" oninput="document.getElementById('t3Val').innerText = parseFloat(this.value).toFixed(2) + 'x'" onchange="if (window.latestScanResult) runScanner()">
+                  <span class="slider-num" id="t3Val" style="min-width: 38px;">1.00x</span>
+                </div>
+              </div>
+            </div>
+
             <div class="slider-row">
               <div>
                 <div class="slider-label">SNP Compression</div>
@@ -1053,6 +1085,8 @@
       }
 
       const k = parseInt(document.getElementById('landmarksK').value, 10) || 16;
+      const tier2Stringency = parseFloat(document.getElementById('tier2Stringency').value) || 1.0;
+      const tier3Stringency = parseFloat(document.getElementById('tier3Stringency').value) || 1.0;
       const scanBtn = document.getElementById('scanBtn');
       const btnIcon = document.getElementById('btnIcon');
       const btnText = document.getElementById('btnText');
@@ -1072,11 +1106,12 @@
       try {
         const t0 = performance.now();
         const compressArg = snpCompressionMode === 'auto' ? undefined : (snpCompressionMode === 'on');
-        const res = scan_fasta(fasta, k, compressArg);
-        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg);
+        const res = scan_fasta(fasta, k, compressArg, tier2Stringency, tier3Stringency);
+        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
         const elapsed = performance.now() - t0;
 
         latestScanResult = res;
+        window.latestScanResult = res;
         latestHtmlReport = htmlDoc;
 
         renderOutput(res, elapsed, htmlDoc);
