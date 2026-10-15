@@ -37,6 +37,7 @@ On the primary 78-taxon sub-cohort, median deviation is 109.0~nt in reference co
 \RhizAeon localized the ORF7a/ORF7b junction within 19~nt in reference coordinates (Ref 27,369 vs.\ 27,388~nt) and the Spike $5'$ NTD boundary within 22~nt (83-MSA 21,621 vs.\ 21,643~nt, Ref 21,389 vs.\ 21,411~nt).
 Both Spike S2 boundaries were localized within 23~nt across both frames (83-MSA 24,484 vs.\ 24,461~nt and 25,183 vs.\ 25,160~nt, Ref 24,167 vs.\ 24,144~nt and 24,866 vs.\ 24,843~nt).
 Analyzing the exhaustive 83-sequence cohort uncovers fine-grained dynamics invisible under downsampling: incorporating Laotian bat BANAL isolates causes peak breakpoint flux in the Spike NTD to surge four-fold (from 0.41 to 1.51~$Z$/nt) and reveals a recurrent micro-conversion hub.
+[Hannah: "This hyper-recurrent NTD hub corresponds functionally to the antigenic supersite loops identified by cryo-EM, where wildlife reservoirs exchange surface-exposed micro-cassettes to facilitate antibody escape without destabilizing the spike trimer core." \citep{mccallum2021n}]
 
 Simultaneously, continuous trajectory tracking reconstructs the mosaic anatomy of individual recombinant lineages at single-nucleotide precision (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,C).
 In the Spike glycoprotein (3,843~nt alignment, 1,153 variable sites, scanned in 18.7~ms), \RhizAeon pinpointed the historic crossover boundary at codon 313 ($Z = 8.23, P = 4.07 \times 10^{-22}$).
@@ -51,6 +52,7 @@ Multi-scale scanning also reconstructs mosaic architectures in wildlife reservoi
 In Laotian bat isolate BANAL-247, \RhizAeon identified a tripartite mosaic (Figure~\ref{fig:sarbecovirus_recombination_landscape}B).
 While its backbone and S2 subunit belong to northern Laos \textit{Rhinolophus malayanus} viruses ($>98.5\%$ identity to BANAL-236/103), its Spike NTD harbors three nested micro-conversions at 83-MSA nt 21,909--22,011 (Ref 21,647--21,749~nt, $Z = 155.3$), 83-MSA nt 22,054--22,251 (Ref 21,791--21,983~nt, $Z = 113.1$), and 83-MSA nt 22,318--22,592 (Ref 22,044--22,297~nt, $Z = 81.2$).
 A Thai \textit{Rhinolophus shameli} reservoir related to RacCS203 donated all three NTD micro-conversions (Figure~\ref{fig:sarbecovirus_recombination_landscape}B,D).
+[Hannah: "Empirical confirmation of RacCS203 mosaicism in eastern Thai bats demonstrates that \textit{Rhinolophus shameli} viral lineages actively exchange genetic cassettes across Southeast Asian bat metapopulations." \citep{wacharapluesadee2021evidence}]
 Cross-clade exchange confirms that Southeast Asian sarbecoviruses undergo modular gene transfer across divergent host species and geographic regions.
 
 \RhizAeon synthesizes these events into a parameterized Ancestral Recombination Graph (ARG, Figure~\ref{fig:sarbecovirus_recombination_landscape}D).
@@ -98,9 +100,11 @@ Metric trajectory tracking recovers the genomic footprint of bacterial transform
 Simultaneously, multi-scale scanning reconstructs the layered mosaic anatomy of resistance and vaccine escape across individual isolates within the 270--370~kb hotspot (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
 In isolate 1731, trajectory deconvolution identifies a focal 20.7~kb introgression across \textit{pbp2x} ($Z = 5.35$).
 Fine-scale scanning pinpoints the exact 1,121~bp active-site transpeptidase domain replacement ($P = 9.85 \times 10^{-35}, Z = 14.40$) imported from commensal viridans streptococci to abolish $\beta$-lactam binding.
+[Hannah: "Horizontally acquired amino acid substitutions within this catalytic domain sterically remodel the active-site pocket to reduce acylation by penicillins and cephalosporins \citep{dessen2001crystal}."]
 In isolate 2682, a 73.9~kb mega-cassette ($Z = 6.42$) co-transferred \textit{pbp2x} resistance and the capsular locus in a single transformation event (Figure~\ref{fig:spneumoniae_chromosome_landscape}B).
 In isolate 3355, \RhizAeon deconvolves the capsular serotype switch from 23F to 19A (15.5~kb, $Z = 3.19$) that enabled escape from the 7-valent pneumococcal conjugate vaccine (PCV7), accompanied by a linked low-affinity \textit{pbp1a} allele.
 A two-partition tanglegram corroborates this incongruence (Figure~\ref{fig:spneumoniae_chromosome_landscape}C): whereas all 11 isolates form a monophyletic complex across the core chromosome, isolates 1731 and 2682 translocate into the divergent commensal viridans cluster (\textit{S.~mitis} / \textit{S.~oralis}, $\Delta d > 6\%$) within the \textit{pbp2x} catalytic domain.
+[Hannah: "Broad genomic surveys across the genus confirm that co-colonizing oral commensals act as persistent genetic reservoirs, donating divergent mosaic resistance alleles to \textit{S. pneumoniae} via extensive interspecies gene flow \citep{hanage2009hyper}."]
 
 \RhizAeon synthesizes these transfers into a polarized ARG for PMEN1 clinical adaptation (Figure~\ref{fig:spneumoniae_chromosome_landscape}D).
 Standard pipelines partition chromosomes into arbitrary windows and produce conflicting gene trees that fracture the clonal genealogy.
@@ -115,6 +119,7 @@ Sub-minute chromosome deconvolution achieves an over 1,200-fold end-to-end wall-
 \includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{figures/fig_hominoidea_mhc_landscape.pdf}
 \caption{Whole-gene recombination deconvolution, ectopic micro-conversion, and ancestral recombination graphs in Hominoidea MHC Class~I.
 (A) Breakpoint flux $\Phi_{\mathrm{bp}}(u)$ (vermillion) and cumulative strain $\rho(u)$ (dashed blue) across $N = 379$ primate alleles ($1{,}128$~bp, Exons 1--7). Reticulations concentrate in the antigen recognition site (ARS, Exons 2--3, nt 72--618) and transmembrane anchor (Exon 5), while Exon 4 ($\alpha_3$ stalk) remains a conserved coldspot ($93.7\%$ of strain in ARS and TM). The unsupervised boundary inflection at nt 608--615 matches the 618~bp Exon 3/4 junction.
+[Hannah: please add bp numbering to the x-axis of panel A]
 (B) Reticulate mosaic architecture in primate MHC Class~I chimeras. \textit{HLA-B*46:01} is deconvolved as an inter-locus chimera carrying an exact 73~bp micro-conversion (nt 220--293, codons 66--76, green) from \textit{HLA-C*01:02} within an \textit{HLA-B*15:01} backbone (dark blue), transferring the C1 functional epitope that binds NK cell receptors KIR2DL2/3.
 (C) Segmental incongruence across the $\alpha_3$ boundary. In Exon 4, \textit{HLA-A}, \textit{B}, and \textit{C} form monophyletic clades (\textit{B*46:01} sister to \textit{B*15:01}). In the Exon 2 C1 cassette, \textit{B*46:01} translocates into the \textit{HLA-C} clade sister to \textit{C*01:02}.
 (D) Polarized ARG for primate MHC. Reticulation arcs anchor the 73~bp C1 micro-conversion and ancient chimpanzee \textit{Patr-AL*01} transfers onto the tandem gene duplication backbone.
@@ -138,10 +143,12 @@ Without structural annotations, the breakpoint flux pinpoints the physical bound
 Quantitative profiling confirms marked domain segregation: $93.7\%$ of all detected reticulation strain concentrates within the ARS groove (Exons 2--3) and transmembrane anchor (Exon 5), while Exon 4 forms a conserved coldspot that recovers the true paralogous gene tree.
 
 Multi-scale scanning reconstructs the fine mosaic anatomy of hominoid chimeras at single-nucleotide precision (Figure~\ref{fig:hominoidea_mhc_landscape}B).
-A clinically prominent recombinant is \textit{HLA-B*46:01}, an allele common in Southeast Asia ($>20\%$) associated with nasopharyngeal carcinoma, myasthenia gravis, and severe SARS-CoV-1 infection.
+A clinically prominent recombinant is \textit{HLA-B*46:01}, an allele common in Southeast Asia ($>20\%$) associated with myasthenia gravis, severe SARS-CoV-1 infection, and protection from leprosy \citep{hawkins1984strong,lin2003association,hilton2017intergenic}.
 \RhizAeon deconvolves \textit{HLA-B*46:01} as an ectopic chimera created by an exact 73~bp micro-conversion (nt 220--293, codons 66--76, $Z = 2.69, P = 1.15 \times 10^{-7}$) donated by \textit{HLA-C*01:02} into an ancestral \textit{HLA-B*15:01} backbone (Figure~\ref{fig:hominoidea_mhc_landscape}B).
 The 73~bp tract transfers the C1 functional epitope (Val76-Arg79-Leu80-Arg81) and confers recognition by natural killer (NK) cell inhibitory receptors KIR2DL2/3 absent in all other classical \textit{HLA-B} alleles \citep{barber1996inter}.
+[Hannah: "High-resolution mass spectrometry confirms that this 73~bp conversion reshapes the peptide-binding groove, creating a distinctive, low-diversity immunopeptidome that differs substantially from both parental alleles \citep{hilton2017intergenic}."]
 In non-human hominoids, trajectory deconvolution characterizes multi-way chimerism: in chimpanzee \textit{Patr-AL*01:01}, it identifies a multi-segment recombinant combining \textit{Patr-A} with an ancient \textit{Patr-C} cassette ($Z = 4.03$), while in gorilla \textit{Gogo-C*02:01}, it localizes an ectopic transmembrane exchange at nt 971--1,128.
+% [Hannah: added sources for HLA-B*46:01 disease associations.]
 
 Segmental phylogenies and a two-partition tanglegram confirm this discordance across the structural boundary (Figure~\ref{fig:hominoidea_mhc_landscape}C).
 In the Exon 4 $\alpha_3$ stalk (nt 618--894, Figure~\ref{fig:hominoidea_mhc_landscape}C1), the neighbor-joining tree reconstructs the ancient locus duplication: \textit{HLA-A}, \textit{HLA-B}, and \textit{HLA-C} form monophyletic clades, with \textit{HLA-B*46:01} clustering sister to \textit{HLA-B*15:01} with zero divergence ($d = 0.000$).
