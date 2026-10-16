@@ -57,11 +57,11 @@ In addition to binary sequence-level classification (`detected`, `is_recombinant
 ## 3. Step-by-Step Reproduction Guide
 
 ### Prerequisites: Build the Native Simulation Binary
-From the repository root:
+The sweep engine lives in the HyphAeon monorepo (`rust/rhizaeon/crates/rhizaeon-tools`):
 ```bash
-cargo build --release --bin grand_sweep
+cargo build -p rhizaeon-tools --release   # run inside rust/ of a HyphAeon checkout
 ```
-The compiled binary will be placed at `target/release/grand_sweep`.
+Then either put `grand_sweep` on PATH or set `HYPHAEON_ROOT` to the checkout — `run_local_sweep.py` resolves both.
 
 ### Option A: Running a Local Sweep (e.g., 1,000–10,000 Trials)
 To run a local sweep on your multi-core workstation:
