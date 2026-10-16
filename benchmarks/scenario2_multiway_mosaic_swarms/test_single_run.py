@@ -134,7 +134,7 @@ def test_topology(topology: str, d_parent: float = 0.05, K: int = 5):
             tmp_fa.write(f">{name}\n{s_str}\n".encode())
         tmp_name = tmp_fa.name
         
-    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+    rhiz_bin = "rhizaeon"
     out_json = tmp_name + ".json"
     
     # 1. Run RhizAeon

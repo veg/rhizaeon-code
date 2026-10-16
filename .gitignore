@@ -2,6 +2,9 @@
 /target/
 **/*.rs.bk
 
+# wasm-pack bundle fetched at deploy time (see scripts/fetch_wasm.sh)
+docs/pkg/
+
 # OS & Editor artifacts
 .DS_Store
 .idea/

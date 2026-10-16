@@ -56,26 +56,30 @@ Run RhizAeon directly in your web browser with zero installation:
 
 ---
 
-## Installation & Build
+## Installation
 
-### 1. Build Native Rust CLI (Release Mode)
-Ensure you have the Rust toolchain installed ([rustup.rs](https://rustup.rs/)):
+The RhizAeon engine (Rust core, CLI, and WebAssembly bindings) is developed and released in the **[HyphAeon monorepo](https://github.com/veg/HyphAeon)**. This repository holds the GitHub Pages application, empirical benchmark datasets, and research/manuscript artifacts — and consumes published, versioned artifacts:
 
-```bash
-git clone https://github.com/veg/rhizaeon-code.git
-cd rhizaeon-code
-cargo build --release
-```
-The optimized binary will be placed at `target/release/rhizaeon`.
+| Component | Published artifact |
+| :--- | :--- |
+| `rhizaeon` CLI | `pip install rhizaeon` (compiled Rust extension in the wheel) |
+| Browser engine | `rhizaeon-wasm-<version>-pkg.tar.gz` on [HyphAeon releases](https://github.com/veg/HyphAeon/releases), fetched into `docs/pkg/` |
+| Engine source | `rust/rhizaeon/crates/` and `rhizaeon/` in [veg/HyphAeon](https://github.com/veg/HyphAeon) |
 
-### 2. Build WebAssembly (WASM) Module
-Ensure you have `wasm-pack` installed (`cargo install wasm-pack`):
+### 1. Install the CLI
 
 ```bash
-cd crates/rhizaeon-wasm
-wasm-pack build --target web
+pip install rhizaeon
 ```
-The client-side browser library is written to `crates/rhizaeon-wasm/pkg/`.
+The wheel bundles the compiled Rust extension — no Rust toolchain needed. To build from source instead, clone [veg/HyphAeon](https://github.com/veg/HyphAeon) and run `maturin develop` in `rhizaeon/`.
+
+### 2. WebAssembly bundle provenance
+
+`docs/pkg/` is not committed. It is fetched at deploy time from the pinned HyphAeon release — see `scripts/fetch_wasm.sh` (single source of truth for the engine version). For local preview:
+
+```bash
+bash scripts/fetch_wasm.sh   # populates docs/pkg/
+```
 
 ---
 
@@ -99,10 +103,10 @@ rhizaeon [OPTIONS] --input <INPUT_FASTA>
 
 ```bash
 # 1. Quick command-line scan with stdout summary table
-./target/release/rhizaeon -i tests/empirical/data/hiv1_kal153_crf02_ag.fasta
+rhizaeon -i tests/empirical/data/hiv1_kal153_crf02_ag.fasta
 
 # 2. Complete analysis writing summary JSON and interactive HTML report
-./target/release/rhizaeon \
+rhizaeon \
   -i tests/empirical/data/hiv1_kal153_crf02_ag.fasta \
   -o kal153_summary.json \
   --html kal153_report.html \
@@ -230,26 +234,22 @@ RhizAeon was benchmarked side-by-side against 3SEQ across 11 representative regi
 
 ```
 rhizaeon-code/
-├── Cargo.toml                    # Workspace Cargo configuration
 ├── README.md                     # Human-oriented overview & user guide
 ├── AGENT.md                      # Machine-readable specification for AI agents
 ├── LICENSE                       # MIT License
-├── crates/
-│   ├── rhizaeon-core/            # Core PA-FF v2.1 algorithmic kernel
-│   │   ├── src/
-│   │   │   ├── engine.rs         # Scanner pipeline & candidate coordination
-│   │   │   ├── attention.rs      # Continuous Tree-RoPE cross-attention
-│   │   │   ├── screener.rs       # High-throughput candidate screener
-│   │   │   ├── attribution.rs    # Dual-flank Hookean parental attribution
-│   │   │   ├── polishing.rs      # Profile likelihood breakpoint polisher
-│   │   │   ├── due_diligence.rs  # Fisher's test & cycle adjudication
-│   │   │   ├── fasta.rs          # Fast alignment parser & IUPAC validator
-│   │   │   └── visualization.rs  # Interactive HTML & dossier generator
-│   │   └── tests/
-│   │       ├── empirical_benchmarks.rs
-│   │       └── simulated_scenarios.rs
-│   ├── rhizaeon-cli/             # Standalone CLI binary source
-│   └── rhizaeon-wasm/            # WebAssembly bindings & web package
+├── docs/                         # GitHub Pages web application
+│   ├── index.html                # Client-side WASM dashboard
+│   ├── assets/                   # Images & branding
+│   ├── examples/                 # Bundled example alignments
+│   └── pkg/                      # WASM bundle — fetched at deploy, NOT committed
+├── scripts/
+│   ├── fetch_wasm.sh             # Pinned HyphAeon release fetch (version of record)
+│   └── simulations/              # Parameter sweep & plotting utilities
+├── benchmarks/                   # Posada-Crandall & scenario benchmark harnesses
+├── empirical_datasets/           # Published reanalysis datasets
+├── empirical_showcase/           # Showcase analyses (PBP2X, XBB, MHC, Heliconius)
+├── paper/                        # Manuscript sources
+├── tools/                        # History-validation utilities
 └── tests/
     ├── empirical/                # Real-world benchmark alignments
     │   ├── data/                 # HIV-1 CRF02_AG, SARS-2 XBB, Human mtDNA
@@ -259,18 +259,21 @@ rhizaeon-code/
         └── test_simulated_scenarios.py
 ```
 
+> The Rust engine workspace (`crates/rhizaeon-core`, `rhizaeon-cli`, `rhizaeon-wasm`) now lives in the HyphAeon monorepo at `rust/rhizaeon/`; the CLI ships to PyPI as `rhizaeon`.
+
 ---
 
 ## Running the Automated Test Battery
 
-```bash
-# 1. Run all Rust unit and integration tests
-cargo test --workspace
+The Rust unit/integration and WebAssembly suites run in the **[HyphAeon monorepo](https://github.com/veg/HyphAeon)** (`rust/` workspace). This repository's Python harnesses exercise the published `rhizaeon` CLI:
 
-# 2. Run empirical benchmark tests (KAL-153, SARS-CoV-2 XBB, mtDNA)
+```bash
+pip install rhizaeon
+
+# 1. Empirical benchmark tests (KAL-153, SARS-CoV-2 XBB, mtDNA)
 python3 tests/empirical/test_empirical_benchmarks.py
 
-# 3. Run simulated benchmark tests (Crossover, Cassette, Heterotachy Null)
+# 2. Simulated benchmark tests (Crossover, Cassette, Heterotachy Null)
 python3 tests/simulated/test_simulated_scenarios.py
 ```
 

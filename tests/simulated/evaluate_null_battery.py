@@ -40,7 +40,7 @@ from scenario_registry import get_scenario_for_index, MultiDimScenario
 from fast_tree_simulator import FastTreeSimulator
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-RUST_BIN = REPO_ROOT / "target" / "release" / "rhizaeon"
+RUST_BIN = "rhizaeon"
 EMPIRICAL_MTDNA = REPO_ROOT / "tests" / "empirical" / "data" / "human_mtdna.fasta"
 DARREN_PVY = Path("/Users/sergei/Projects/RhizAeon/darren-tests/Example 1 - PVY.fas")
 

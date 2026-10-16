@@ -84,7 +84,7 @@ def test_single(regime, d_parent, K, seed=123):
             s_str = "".join(NT_CHARS[c] for c in s)
             tf.write(f">{t}\n{s_str}\n".encode())
             
-    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+    rhiz_bin = "rhizaeon"
     out_json = fa_path + ".json"
     r = subprocess.run([rhiz_bin, "-i", fa_path, "-o", out_json], capture_output=True, text=True)
     events = []

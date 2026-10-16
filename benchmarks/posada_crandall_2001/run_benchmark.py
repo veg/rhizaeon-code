@@ -39,7 +39,7 @@ from scipy.optimize import linear_sum_assignment
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
-RHIZAEON_BIN = str(PROJECT_ROOT / "target" / "release" / "rhizaeon")
+RHIZAEON_BIN = "rhizaeon"
 MASTER_SEED = 20011120  # Posada & Crandall PNAS publication date
 
 NT_CHARS = ["A", "C", "G", "T"]
