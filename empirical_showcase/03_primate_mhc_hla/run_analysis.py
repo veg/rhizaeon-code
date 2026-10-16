@@ -26,7 +26,7 @@ FASTA_PATH = os.path.join(BASE_DIR, "hla_class1_aligned.fasta")
 OUTPUT_JSON = os.path.join(BASE_DIR, "hla_class1_result.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "hla_class1_dashboard.html")
 LOG_PATH = os.path.join(BASE_DIR, "hla_execution.log")
-RHIZAEON_BIN = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+RHIZAEON_BIN = "rhizaeon"
 
 def verify_micro_conversion():
     """Verify the fine-scale 31-bp micro-conversion in Exon 2 (codons 66-76)."""

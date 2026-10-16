@@ -103,7 +103,7 @@ def main():
             s_str = "".join(NT_CHARS[c] for c in s)
             tf.write(f">{t}\n{s_str}\n".encode())
             
-    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+    rhiz_bin = "rhizaeon"
     three_bin = "/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq"
     out_json = fa_path + ".json"
     

@@ -26,7 +26,7 @@ OUTPUT_JSON = os.path.join(BASE_DIR, "heliconius_optix_result.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "heliconius_optix_dashboard.html")
 LOG_PATH = os.path.join(BASE_DIR, "heliconius_execution.log")
 PARTITIONS_PATH = os.path.join(BASE_DIR, "heliconius_partitions.json")
-RHIZAEON_BIN = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+RHIZAEON_BIN = "rhizaeon"
 
 def main():
     print("================================================================================")

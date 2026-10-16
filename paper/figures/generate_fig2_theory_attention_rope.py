@@ -7,7 +7,8 @@ Generates Figure 2 for Section 2 of the RhizAeon manuscript:
 CRITICAL SCIENTIFIC INTEGRITY MANDATE:
 - All data, coordinates, rotary factors, prior distributions, attention tensors, and cumulative bridges
   are loaded directly from the authentic outputs of the native Rust RhizAeon engine
-  (`crates/rhizaeon-cli/src/bin/export_figure2_data.rs` / `fig2_rhizaeon_authentic_data.json`).
+  (HyphAeon `rust/rhizaeon/crates/rhizaeon-tools` bin `export_figure2_data` /
+  `fig2_rhizaeon_authentic_data.json`).
 - ZERO synthetic placeholders or parametric mockups.
 
 BioVis-Expert Guidelines Implemented:

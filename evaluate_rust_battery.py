@@ -33,7 +33,7 @@ if str(GRAND_100K_DIR) not in sys.path:
 from scenario_registry import get_scenario_for_index, MultiDimScenario
 from fast_tree_simulator import FastTreeSimulator
 
-RUST_BIN = "/data/users/sergei/Projects/RhizAeon/rhizaeon-rust/target/release/rhizaeon"
+RUST_BIN = "rhizaeon"
 
 REGIME_SLICES = [
     ("clock_null", 0, 7000, True),

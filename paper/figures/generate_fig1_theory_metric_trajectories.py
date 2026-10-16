@@ -7,7 +7,8 @@ Generates Figure 1 for Section 2 of the RhizAeon manuscript:
 CRITICAL SCIENTIFIC INTEGRITY MANDATE:
 - All data, coordinates, trajectories, corridors, breakpoints, and tangent flow vectors
   are loaded directly from the authentic outputs of the native Rust RhizAeon engine
-  (`crates/rhizaeon-cli/src/bin/export_figure1_data.rs` / `fig1_rhizaeon_authentic_data.json`).
+  (HyphAeon `rust/rhizaeon/crates/rhizaeon-tools` bin `export_figure1_data` /
+  `fig1_rhizaeon_authentic_data.json`).
 - ZERO ad-hoc sliding-window re-implementations.
 - ZERO synthetic placeholders or parametric mockups.
 

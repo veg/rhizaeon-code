@@ -38,7 +38,7 @@ Here, RhizAeon applies continuous metric manifold tracking to:
 ## 3. Algorithmic Execution & Reproduction
 
 ### Step 1: Execute Native Scan
-Ensure the native RhizAeon binary is compiled (`cargo build --release` in repository root). Then run:
+Ensure the RhizAeon CLI is on PATH (`pip install rhizaeon`, or a `rhizaeon` binary built in the HyphAeon monorepo). Then run:
 
 ```bash
 python3 run_sarbecovirus_reanalysis.py

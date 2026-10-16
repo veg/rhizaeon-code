@@ -102,7 +102,7 @@ def main():
         tmp_fa.write(f">{name}\n{s_str}\n".encode())
     tmp_fa.close()
     
-    rhizaeon_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+    rhizaeon_bin = "rhizaeon"
     out_json = tmp_fa.name + ".json"
     t0 = time.perf_counter()
     subprocess.run([rhizaeon_bin, "--input", tmp_fa.name, "--output", out_json], check=True, stdout=subprocess.DEVNULL)

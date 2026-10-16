@@ -4,7 +4,7 @@ This directory contains the complete simulation execution scripts, cluster submi
 
 > [!NOTE]
 > **Data Policy & Reproducibility:**
-> In accordance with the repository data policy, large simulation result files (`grand_sweep_1m.csv`, $\approx 85$ MB) are excluded from version control. Instead, all simulation generation code (implemented in native Rust in `crates/rhizaeon-cli/src/bin/grand_sweep.rs`), Slurm job array scripts, merger harnesses, and analysis pipelines are included for complete, deterministic reproduction.
+> In accordance with the repository data policy, large simulation result files (`grand_sweep_1m.csv`, $\approx 85$ MB) are excluded from version control. Instead, all simulation generation code (implemented in native Rust in the HyphAeon monorepo at `rust/rhizaeon/crates/rhizaeon-tools/src/bin/grand_sweep.rs`), Slurm job array scripts, merger harnesses, and analysis pipelines are included for complete, deterministic reproduction.
 
 ---
 
@@ -57,11 +57,11 @@ In addition to binary sequence-level classification (`detected`, `is_recombinant
 ## 3. Step-by-Step Reproduction Guide
 
 ### Prerequisites: Build the Native Simulation Binary
-From the repository root:
+The sweep engine lives in the HyphAeon monorepo (`rust/rhizaeon/crates/rhizaeon-tools`):
 ```bash
-cargo build --release --bin grand_sweep
+cargo build -p rhizaeon-tools --release   # run inside rust/ of a HyphAeon checkout
 ```
-The compiled binary will be placed at `target/release/grand_sweep`.
+Then either put `grand_sweep` on PATH or set `HYPHAEON_ROOT` to the checkout — `run_local_sweep.py` resolves both.
 
 ### Option A: Running a Local Sweep (e.g., 1,000–10,000 Trials)
 To run a local sweep on your multi-core workstation:

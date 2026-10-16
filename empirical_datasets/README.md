@@ -72,8 +72,8 @@ python3 generate_figure.py
 ### 2. Rerunning Scans from Raw Alignments
 To execute the complete physical field scan from raw FASTA sequences:
 ```bash
-# Compile native release binary
-cargo build --release
+# Install the RhizAeon engine (PyPI wheel with native extension)
+pip install rhizaeon
 
 # Sarbecovirus scan (~1.5 seconds)
 cd empirical_datasets/01_sarbecovirus_origins_lytras2022

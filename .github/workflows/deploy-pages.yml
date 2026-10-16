@@ -27,6 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # docs/pkg/ is NOT committed — it is fetched from the pinned
+      # HyphAeon monorepo release (tag is set in scripts/fetch_wasm.sh).
+      - name: Fetch pinned rhizaeon-wasm bundle
+        run: bash scripts/fetch_wasm.sh
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

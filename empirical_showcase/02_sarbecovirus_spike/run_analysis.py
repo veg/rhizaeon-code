@@ -22,7 +22,7 @@ FASTA_PATH = os.path.join(BASE_DIR, "sarbecovirus_spike_aligned.fasta")
 OUTPUT_JSON = os.path.join(BASE_DIR, "sarbecovirus_spike_result.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "sarbecovirus_spike_dashboard.html")
 LOG_PATH = os.path.join(BASE_DIR, "sarbecovirus_execution.log")
-RHIZAEON_BIN = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+RHIZAEON_BIN = "rhizaeon"
 
 def main():
     print("================================================================================")
