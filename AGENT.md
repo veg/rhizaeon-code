@@ -137,11 +137,13 @@ HyphAeon/rust/rhizaeon/
     │   └── tests/
     │       ├── empirical_benchmarks.rs                     # Integration test on KAL-153 & mtDNA
     │       └── simulated_scenarios.rs                      # Synthetic crossover, cassette, nulls
+    ├── rhizaeon-tools/        # unpublished manuscript/benchmark bins (cargo run -p rhizaeon-tools --bin <name>)
+    │   └── src/bin/           # export_figure1_data, export_figure2_data, grand_sweep
     └── rhizaeon-wasm/         # WebAssembly client-side library
         └── src/lib.rs         # wasm-bindgen bindings: scan_alignment, generate_dashboard
 
-HyphAeon/rhizaeon/             # PyPI package (maturin; console scripts rhizaeon, export_figure1_data)
-└── native/src/                # cli.rs (clap), fig1.rs, lib.rs PyO3 module
+HyphAeon/rhizaeon/             # PyPI package (maturin; console script rhizaeon only)
+└── native/src/                # cli.rs (clap), lib.rs PyO3 module
 
 rhizaeon-code/tests/           # THIS repository — harnesses call the installed `rhizaeon` CLI
 ├── empirical/                 # Real-world benchmark alignments & validation runner
