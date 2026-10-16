@@ -31,7 +31,7 @@ from scenario_registry import get_scenario_for_index
 from fast_tree_simulator import FastTreeSimulator
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-RUST_BIN = REPO_ROOT / "target" / "release" / "rhizaeon"
+RUST_BIN = "rhizaeon"
 
 LARGE_TAXA_COUNTS = [24, 32, 48, 64, 96, 128]
 NULL_BASE_INDICES = {

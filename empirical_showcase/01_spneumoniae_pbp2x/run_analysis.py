@@ -22,7 +22,7 @@ FASTA_PATH = os.path.join(BASE_DIR, "spneumoniae_pbp2x_20kb.fasta")
 OUTPUT_JSON = os.path.join(BASE_DIR, "pbp2x_rhizaeon_result.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "pbp2x_rhizaeon_dashboard.html")
 LOG_PATH = os.path.join(BASE_DIR, "pbp2x_execution.log")
-RHIZAEON_BIN = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+RHIZAEON_BIN = "rhizaeon"
 
 def main():
     print("================================================================================")

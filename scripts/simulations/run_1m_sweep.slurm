@@ -34,14 +34,17 @@ echo "Output CSV:       ${OUT_CSV}"
 echo "Start Time:       $(date)"
 echo "================================================================================"
 
-# Locate grand_sweep binary (assumes repo root is parent directory or installed)
-SWEEP_BIN="../../target/release/grand_sweep"
-if [ ! -f "${SWEEP_BIN}" ]; then
-    SWEEP_BIN="$(which grand_sweep 2>/dev/null)"
+# Locate grand_sweep binary: PATH first, then a HyphAeon monorepo checkout.
+# Build with: cargo run -p rhizaeon-tools --release --bin grand_sweep
+SWEEP_BIN="$(which grand_sweep 2>/dev/null)"
+if [ -z "${SWEEP_BIN}" ] && [ -n "${HYPHAEON_ROOT:-}" ]; then
+    SWEEP_BIN="${HYPHAEON_ROOT}/rust/target/release/grand_sweep"
 fi
 
 if [ -z "${SWEEP_BIN}" ] || [ ! -x "${SWEEP_BIN}" ]; then
-    echo "ERROR: grand_sweep binary not found! Run 'cargo build --release --bin grand_sweep' first."
+    echo "ERROR: grand_sweep binary not found."
+    echo "  Build it in the HyphAeon monorepo: cargo build -p rhizaeon-tools --release"
+    echo "  then put grand_sweep on PATH or set HYPHAEON_ROOT to the checkout."
     exit 1
 fi
 

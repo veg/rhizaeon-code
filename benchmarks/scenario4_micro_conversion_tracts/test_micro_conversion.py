@@ -93,7 +93,7 @@ def compute_jaccard(true_u1: int, true_u2: int, pred_u1: int, pred_u2: int) -> f
     return inter / union if union > 0 else 0.0
 
 def test_evaluation():
-    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+    rhiz_bin = "rhizaeon"
     three_bin = "/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq"
     
     for tract_len in [100, 200, 400, 800]:

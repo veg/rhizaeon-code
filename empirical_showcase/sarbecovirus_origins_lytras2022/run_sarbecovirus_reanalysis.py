@@ -40,7 +40,7 @@ OUT_HTML_78 = os.path.join(DATA_DIR, "78sarbeco_dashboard.html")
 OUT_JSON_83 = os.path.join(DATA_DIR, "83sarbeco_result.json")
 OUT_HTML_83 = os.path.join(DATA_DIR, "83sarbeco_dashboard.html")
 
-RHIZAEON_BIN = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
+RHIZAEON_BIN = "rhizaeon"
 
 def run_rhizaeon(fasta_path, out_json, out_html, title, force=False):
     if not force and os.path.exists(out_json) and os.path.getsize(out_json) > 100:

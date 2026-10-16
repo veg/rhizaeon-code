@@ -35,7 +35,7 @@ if str(BENCH_DIR) not in sys.path:
 from scenario_registry import get_scenario_for_index, MultiDimScenario
 from fast_tree_simulator import FastTreeSimulator
 
-RUST_BIN = "/Users/sergei/Projects/RhizAeon/rhizaeon-rust/target/release/rhizaeon"
+RUST_BIN = "rhizaeon"
 THREE_SEQ_BIN = "/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq"
 
 TRIALS = [

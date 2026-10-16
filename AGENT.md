@@ -109,36 +109,43 @@ To maintain $O(N \cdot K \cdot L)$ throughput, the screener applies strict zero-
 
 ## 3. Codebase Navigation & Architecture Map
 
+The engine source lives in the **[HyphAeon monorepo](https://github.com/veg/HyphAeon)** — the map below applies to `rust/rhizaeon/` there, not to this repository. This repository holds the GitHub Pages app, benchmark harnesses, empirical datasets, and manuscript artifacts, and consumes published artifacts (`pip install rhizaeon`; `rhizaeon-wasm-<version>-pkg.tar.gz` fetched into `docs/pkg/` by `scripts/fetch_wasm.sh`).
+
 ```
-crates/
-├── rhizaeon-core/             # High-performance algorithmic engine
-│   ├── src/
-│   │   ├── lib.rs             # Public API exports: RhizAeonEngine, Alignment, Event
-│   │   ├── engine.rs          # Main driver: pipeline orchestration & event deduplication
-│   │   ├── attention.rs       # Tree-RoPE cross-attention kernel & Softmax
-│   │   ├── tree_rope.rs       # Buneman metric MDS & rotary phase angles
-│   │   ├── prior.rs           # PhyloBias CTMC prior matrix
-│   │   ├── soft_root.rs       # [ROOT] sink token parameters
-│   │   ├── landmarks.rs       # Farthest-point landmark selection on Delta^K
-│   │   ├── jacobi.rs          # Pure analytical Jacobi rotation for eigendecomposition
-│   │   ├── screener.rs        # O(NKL) circular-buffer candidate outlier screener
-│   │   ├── attribution.rs     # Dual-flank Hookean parental attribution
-│   │   ├── polishing.rs       # Profile likelihood breakpoint polisher
-│   │   ├── due_diligence.rs   # Fisher exact test & reticulation cycle adjudication
-│   │   ├── fasta.rs           # Zero-copy FASTA parser with validation
-│   │   ├── types.rs           # Core Rust types & JSON serde schemas
-│   │   └── visualization.rs   # Visualization dossier & interactive HTML builder
-│   ├── assets/
-│   │   ├── dashboard_template.html                     # Embedded self-contained HTML/Canvas UI
-│   │   └── rhizaeon_visualization_dossier.schema.json  # JSON schema (draft 2020-12)
-│   └── tests/
-│       ├── empirical_benchmarks.rs                     # Integration test on KAL-153 & mtDNA
-│       └── simulated_scenarios.rs                      # Synthetic crossover, cassette, nulls
-├── rhizaeon-cli/              # CLI executable
-│   └── src/main.rs            # Clap-based CLI interface
-└── rhizaeon-wasm/             # WebAssembly client-side library
-    └── src/lib.rs             # wasm-bindgen bindings: scan_alignment, generate_dashboard
-tests/
+HyphAeon/rust/rhizaeon/
+└── crates/
+    ├── rhizaeon/              # High-performance algorithmic engine + CLI
+    │   ├── src/
+    │   │   ├── lib.rs         # Public API exports: RhizAeonEngine, Alignment, Event
+    │   │   ├── engine.rs      # Main driver: pipeline orchestration & event deduplication
+    │   │   ├── attention.rs   # Tree-RoPE cross-attention kernel & Softmax
+    │   │   ├── tree_rope.rs   # Buneman metric MDS & rotary phase angles
+    │   │   ├── prior.rs       # PhyloBias CTMC prior matrix
+    │   │   ├── soft_root.rs   # [ROOT] sink token parameters
+    │   │   ├── landmarks.rs   # Farthest-point landmark selection on Delta^K
+    │   │   ├── jacobi.rs      # Pure analytical Jacobi rotation for eigendecomposition
+    │   │   ├── screener.rs    # O(NKL) circular-buffer candidate outlier screener
+    │   │   ├── attribution.rs # Dual-flank Hookean parental attribution
+    │   │   ├── polishing.rs   # Profile likelihood breakpoint polisher
+    │   │   ├── due_diligence.rs # Fisher exact test & reticulation cycle adjudication
+    │   │   ├── fasta.rs       # Zero-copy FASTA parser with validation
+    │   │   ├── types.rs       # Core Rust types & JSON serde schemas
+    │   │   └── visualization.rs # Visualization dossier & interactive HTML builder
+    │   ├── assets/
+    │   │   ├── dashboard_template.html                     # Embedded self-contained HTML/Canvas UI
+    │   │   └── rhizaeon_visualization_dossier.schema.json  # JSON schema (draft 2020-12)
+    │   └── tests/
+    │       ├── empirical_benchmarks.rs                     # Integration test on KAL-153 & mtDNA
+    │       └── simulated_scenarios.rs                      # Synthetic crossover, cassette, nulls
+    ├── rhizaeon-tools/        # unpublished manuscript/benchmark bins (cargo run -p rhizaeon-tools --bin <name>)
+    │   └── src/bin/           # export_figure1_data, export_figure2_data, grand_sweep
+    └── rhizaeon-wasm/         # WebAssembly client-side library
+        └── src/lib.rs         # wasm-bindgen bindings: scan_alignment, generate_dashboard
+
+HyphAeon/rhizaeon/             # PyPI package (maturin; console script rhizaeon only)
+└── native/src/                # cli.rs (clap), lib.rs PyO3 module
+
+rhizaeon-code/tests/           # THIS repository — harnesses call the installed `rhizaeon` CLI
 ├── empirical/                 # Real-world benchmark alignments & validation runner
 │   ├── data/                  # KAL-153 CRF02_AG, SARS-CoV-2 XBB, Human mtDNA
 │   └── test_empirical_benchmarks.py
@@ -151,7 +158,7 @@ tests/
 
 ## 4. AST Rules & Invariants for Autonomous Modifications
 
-When editing or extending `crates/rhizaeon-core`:
+When editing or extending `rust/rhizaeon/crates/rhizaeon` in the HyphAeon monorepo:
 
 1. **Inner Loop Allocation Prohibition:**
    - Inner loops over genomic coordinates $u \in [0, L)$ must perform **zero heap allocations** (`Vec::new`, `String`, etc.). All buffers must be pre-allocated or circular (`[f64; 50]`).
@@ -169,15 +176,15 @@ When editing or extending `crates/rhizaeon-core`:
 Before committing any modification, agents MUST verify that the full test battery passes:
 
 ```bash
-# 1. Rust Workspace Test Suite
-cargo test --workspace
+# 1. Rust Workspace Test Suite — run in the HyphAeon monorepo
+cd HyphAeon && cargo test --workspace
 
-# 2. WebAssembly Build Validation
-cd crates/rhizaeon-wasm && wasm-pack build --target web && cd ../..
+# 2. WebAssembly Build Validation — run in the HyphAeon monorepo
+cd HyphAeon/rust/rhizaeon/crates/rhizaeon-wasm && wasm-pack build --target web
 
-# 3. Python Empirical Benchmark Runner
+# 3. Python Empirical Benchmark Runner (this repo; requires `pip install rhizaeon`)
 python3 tests/empirical/test_empirical_benchmarks.py
 
-# 4. Python Simulated Scenario Runner
+# 4. Python Simulated Scenario Runner (this repo; requires `pip install rhizaeon`)
 python3 tests/simulated/test_simulated_scenarios.py
 ```

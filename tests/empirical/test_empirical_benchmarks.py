@@ -12,18 +12,18 @@ Evaluates real-world viral and human genomic alignments:
 import sys
 import os
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-RUST_BIN = REPO_ROOT / "target" / "release" / "rhizaeon"
+RUST_BIN = "rhizaeon"  # pip install rhizaeon — engine ships on PyPI via HyphAeon
 EMPIRICAL_DATA = REPO_ROOT / "tests" / "empirical" / "data"
 
 def run_rhizaeon(fasta_path: Path) -> dict:
-    if not RUST_BIN.exists():
-        # Build release binary if not present
-        subprocess.run(["cargo", "build", "--release", "-p", "rhizaeon-cli"], cwd=REPO_ROOT, check=True)
-        
+    if not shutil.which(RUST_BIN):
+        raise RuntimeError("rhizaeon CLI not on PATH — install with: pip install rhizaeon")
+
     out_json = fasta_path.with_suffix(".rhiz.json")
     cmd = [str(RUST_BIN), "-i", str(fasta_path), "-o", str(out_json)]
     res = subprocess.run(cmd, capture_output=True, text=True)

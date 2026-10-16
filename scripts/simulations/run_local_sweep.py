@@ -16,16 +16,16 @@ def find_binary():
     b = shutil.which("grand_sweep")
     if b:
         return b
-    
-    # 2. In target/release or target/debug relative to script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
-    for candidate in [
-        os.path.join(repo_root, "target", "release", "grand_sweep"),
-        os.path.join(repo_root, "target", "debug", "grand_sweep"),
-    ]:
-        if os.path.exists(candidate):
-            return candidate
+
+    # 2. Built binary inside a HyphAeon monorepo checkout (HYPHAEON_ROOT)
+    hypha = os.environ.get("HYPHAEON_ROOT")
+    if hypha:
+        for candidate in [
+            os.path.join(hypha, "rust", "target", "release", "grand_sweep"),
+            os.path.join(hypha, "rust", "target", "debug", "grand_sweep"),
+        ]:
+            if os.path.exists(candidate):
+                return candidate
     return None
 
 def main():
@@ -39,8 +39,9 @@ def main():
 
     bin_path = find_binary()
     if not bin_path:
-        print("ERROR: grand_sweep binary not found! Please build it first with:")
-        print("  cargo build --release --bin grand_sweep")
+        print("ERROR: grand_sweep binary not found! Build it in the HyphAeon monorepo with:")
+        print("  cargo build -p rhizaeon-tools --release")
+        print("  (then put grand_sweep on PATH or set HYPHAEON_ROOT to the checkout)")
         sys.exit(1)
 
     print("=" * 70)
