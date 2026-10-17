@@ -28,7 +28,7 @@ Gower interpolation solves $\min_{\mathbf{z} \in \mathbb{R}^d} \sum_{j=1}^N (\|\
 \label{eq:methods_gower}
 \end{equation}
 where $\bar{\mathbf{d}}^2 = \frac{1}{N} \mathbf{D}^{(2)} \mathbf{1}_N$.
-Evaluating \eqref{eq:methods_gower} across chromosome coordinates builds the trajectory tensor $\mathbf{Z} \in \mathbb{R}^{M \times U \times d}$ while preserving rigid metric geometry without Procrustes alignments.
+Evaluating \eqref{eq:methods_gower} across sequence coordinates builds the trajectory tensor $\mathbf{Z} \in \mathbb{R}^{M \times U \times d}$ while preserving rigid metric geometry without Procrustes alignments.
 
 \subsection{Continuous Phylogenetic Cross-Attention and the Unpolarized Root Sink}
 \label{subsec:methods_attention_root}
@@ -46,15 +46,15 @@ S_u(i, j) = \frac{(\mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u))^T (\mathbf{R}(\bm{
 \label{eq:methods_logits}
 \end{equation}
 
-Lineage-specific rate variation challenges standard attention mechanisms because autapomorphic bursts lack contemporary donors.
-When private substitutions surge without homologous counterparts in other leaves, standard leaf-only softmax forces mutations to affiliate with whichever contemporary taxon exhibits the smallest random mismatch and triggers false positive recombination calls.
+Lineage-specific rate variation challenges standard attention mechanisms because clusters of private mutations along terminal tree branches lack contemporary donors.
+When private substitutions surge without homologous counterparts in other leaves, standard leaf-only softmax forces mutations to affiliate with whichever contemporary taxon exhibits the smallest random mismatch: a behavior that could trigger false positive recombination calls.
 Reserving index zero for an unpolarized ancestral root token $\mathbf{x}_{\text{root}} = \mathbf{0} \in \mathbb{R}^d$ eliminates this vulnerability.
 The attention operator spans $N+1$ nodes and normalizes softmax across the ancestral root and all contemporary leaves:
 \begin{equation}
 A_u(i \to j) = \frac{\exp(S_u(i, j))}{\sum_{k=0}^N \exp(S_u(i, k))}, \quad \text{where} \quad A_u(i \to 0) + \sum_{j=1}^N A_u(i \to j) = 1.0.
 \label{eq:methods_root_softmax}
 \end{equation}
-At sites bearing private autapomorphic mutations, query-key matching against contemporary leaves is strongly depressed ($S_u(i, j) \ll 0$), whereas the unmutated root token maintains baseline neutral affinity.
+At sites bearing private terminal branch mutations, query-key matching against contemporary leaf sequences is strongly depressed ($S_u(i, j) \ll 0$), whereas the unmutated root token maintains baseline neutral affinity.
 Consequently, private mutational flux routes harmlessly into node zero ($\lim A_u(i \to 0) = 1.0$).
 Sinks absorb unshared noise.
 The unpolarized root sink protects trajectory tracking against episodic rate acceleration, APOBEC hypermutation, and biological heterotachy.
@@ -79,16 +79,16 @@ K_{\text{crit}} = \sqrt{-\frac{1}{2} \ln \left( \frac{\alpha}{M} \right)},
 \label{eq:methods_k_crit}
 \end{equation}
 derived from the asymptotic two-sided Kolmogorov extreme-value distribution \citep{kolmogorov1933sulla,donsker1951invariance}.
-In the primary whole-chromosome screening pass (\texttt{screener.rs}), $M = 2N$ controls for positive and negative excursions across all $N$ evaluated sequences.
+In the primary whole-sequence screening pass (\texttt{screener.rs}), $M = 2N$ controls for positive and negative excursions across all $N$ evaluated sequences.
 In candidate donor channel attribution (\texttt{attribution.rs}), $M = 2(K + 1)$ corrects for comparisons across the $K$ landmark reference channels and the root sink.
 In post-polishing changepoint certification (\texttt{polishing.rs}), $M = 4N$ bounds the two-sided trajectory verification across polished segment boundaries.
 Trajectories satisfying $\sup |B(u)| / (\sigma \sqrt{L}) \ge K_{\text{crit}}$ reject the unreticulated clonal null.
 
-For short conversion tracts ($< 200$~nt), global Brownian bridge tests can suffer signal dilution across megabase chromosomes.
+For short conversion tracts ($< 200$~nt), global Brownian bridge tests can suffer signal dilution across megabase long sequences.
 Convolving trajectory flux $\Delta Y(u)$ with a bank of zero-mean bipolar dyadic matched filters $h_\tau(s)$ across scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt isolates step transitions in scale space.
 Running drawdown $\text{DD}(u) = \max_{v \le u} Y(v) - Y(u)$ localizes coordinates where trajectory momentum collapses and marks tract exit boundaries.
 To separate single crossovers from intercalary cassette swaps, we evaluate the outer-to-inner energy density ratio $\mathcal{E}_{\text{ratio}}$ across flanking versus internal segments.
-Cassettes return cleanly to baseline on both flanks ($\mathcal{E}_{\text{ratio}} < 0.15$), whereas single crossovers maintain elevated offset energy across the chromosome ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
+Cassettes return cleanly to baseline on both flanks ($\mathcal{E}_{\text{ratio}} < 0.15$), whereas single crossovers maintain elevated offset energy across the sequence ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
 
 Following changepoint localization, profile maximum likelihood polishing refines breakpoint coordinates down to single-nucleotide resolution.
 Scanning coordinates $c \in [u_{\text{init}} - \delta, u_{\text{init}} + \delta]$ maximizes partitioned log-likelihood $\ln \mathcal{L}(c) = \sum_{u=1}^c \ln P(s_{\text{rec}}(u) \mid s_{\text{left}}(u)) + \sum_{u=c+1}^L \ln P(s_{\text{rec}}(u) \mid s_{\text{right}}(u))$.
@@ -97,14 +97,14 @@ Continuous gap bridging iteratively coalesces adjacent donor fragments separated
 
 \subsection{Attention Force Field Deconvolution and Multi-Channel Trajectory Resolution}
 \label{subsec:methods_force_field}
-To resolve multi-way mosaics without combinatorial heuristics, cross-attention dynamics is formalized as an empirical force field.
+To resolve  recombination mosaics with multiple different donors without combinatorial heuristics, cross-attention dynamics is formalized as an empirical force field.
 At each position $u$, the directed attention weight $A_u(i \to j)$ defines the instantaneous attraction pulling query sequence $i$ toward reference taxon $j$.
 Subtracting the sequence's genome-wide mean baseline affinity $\bar{A}(i \to j) = \frac{1}{L}\sum_{v=1}^L A_v(i \to j)$ produces the zero-drift attention force field:
 \begin{equation}
 F_u(i \to j) = A_u(i \to j) - \bar{A}(i \to j), \quad \text{where} \quad \sum_{u=1}^L F_u(i \to j) = 0.
 \label{eq:methods_force_field}
 \end{equation}
-Integrating this directed force across chromosome coordinates yields the cumulative momentum trajectory $C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} F_v(i \to j)$ for each reference clade $\mathcal{B}_m$.
+Integrating this directed force across sequence coordinates yields the cumulative momentum trajectory $C_{i, m}(u) = \sum_{v=1}^u \sum_{j \in \mathcal{B}_m} F_v(i \to j)$ for each reference clade $\mathcal{B}_m$.
 Under clonal evolution, instantaneous forces fluctuate around zero as balanced thermal noise, and the cumulative momentum behaves as a centered random walk bounded within Kolmogorov confidence intervals.
 When a recombination event incorporates an introgressed segment, persistent directional affinity toward the donor exerts a continuous force that imparts positive momentum to $C_{i, \text{donor}}(u)$ while depressing home momentum.
 
@@ -115,17 +115,16 @@ Y_{i, k}(u) = C_{i, k}(u) - C_{i, \text{home}}(u).
 \end{equation}
 Dyadic wavelet matched filters and running drawdown $\text{DD}_k(u) = \max_{v \le u} Y_{i, k}(v) - Y_{i, k}(u)$ extract crossover and cassette changepoints whose excursions exceed $K_{\text{crit}}$.
 Evaluating channel contrast resolves overlapping candidate alerts without threshold tuning: for any candidate tract $[u_1, u_2]$, the authentic donor channel maximizes the mean in-tract attention flux while maintaining negative or baseline flux in flanking regions.
-Merging concordant intervals deduplicates candidate events across channels and yields a unified non-redundant inventory of reticulations across the chromosome.
+Merging concordant intervals deduplicates candidate events across channels and yields a unified non-redundant inventory of recombination events across the sequence.
 
 \subsection{Reticulation Graph Adjudication and Ancestral Event Grouping}
 \label{subsec:methods_adjudication}
-In reciprocal triplet scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ frequently triggers reciprocal false alarms ($D$ recombinant between $C$ and $H$).
+In reciprocal triplet scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ frequently triggers misidentification of a donor sequence as a recombinant ($D$ recombinant between $C$ and $H$).
 Reciprocal scanning artifacts create mutual two-cycles in candidate reticulation graphs ($C \leftrightarrow D$).
 Cycle adjudication resolves orientation by evaluating transition contrast $\Delta_{\text{trans}} = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$, where $\Delta d_{\text{home}} = \max(0, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank}))$.
 Authentic recombinant children leave their home background within the tract ($\Delta d_{\text{home}} \gg 0$), whereas stationary clonal parents remain within their home background across the alignment ($\Delta d_{\text{home}} \approx 0$).
-Comparing transition contrast purges reciprocal parent false alarms.
 
-In expanding epidemic outbreaks, multiple descendant isolates inherit identical mosaic tracts from a common recombinant ancestor.
+In expanding epidemic outbreaks, multiple descendant isolates can inherit identical mosaic tracts from a common recombinant ancestor.
 Reporting each isolate as an independent recombination event inflates event counts and misrepresents evolutionary history.
 Graph adjudication clusters candidate events into shared ancestral recombination events using a bidirectional interval overlap criterion.
 Events sharing concordant resolved Home and Donor lineages in either direct ($\text{Home}_1 = \text{Home}_2, \text{Donor}_1 = \text{Donor}_2$) or inverted ($\text{Home}_1 = \text{Donor}_2, \text{Donor}_1 = \text{Home}_2$) polarity whose breakpoint intervals overlap by $\ge 50\%$ of the shorter tract (or share a complementary crossover junction within $100$~nt under inverted polarity):
@@ -133,8 +132,8 @@ Events sharing concordant resolved Home and Donor lineages in either direct ($\t
 \frac{\min(u_2^{(1)}, u_2^{(2)}) - \max(u_1^{(1)}, u_1^{(2)}) + 1}{\min(u_2^{(1)} - u_1^{(1)} + 1, \, u_2^{(2)} - u_1^{(2)} + 1)} \ge 0.50,
 \label{eq:methods_ancestral_overlap}
 \end{equation}
-collapse into a single ancestral event that aggregates the complete roster of co-recombinant isolates ($\mathcal{I} = \{s_1, \dots, s_k\}$).
-Consensus breakpoints span the outer envelope $[\min_k u_{1, k}, \max_k u_{2, k}]$ while retaining maximal statistical significance across member isolates.
+collapse into a single ancestral event that aggregates the complete roster of co-recombinant sequences ($\mathcal{I} = \{s_1, \dots, s_k\}$).
+Consensus breakpoints span the outer envelope $[\min_k u_{1, k}, \max_k u_{2, k}]$ while retaining maximal statistical significance across member sequences.
 Each unique event receives a persistent sequential identifier ($1, 2, \dots$) to report both unique evolutionary events and total recombinant isolates across the alignment inventory.
 
 \subsection{Coalescent Simulation Suites and Bipartite Hungarian Evaluation}
