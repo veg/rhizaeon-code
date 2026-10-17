@@ -1,16 +1,16 @@
 {
   "alignment": {
-    "path": "/Users/sergei/Projects/rhizaeon-code/empirical_showcase/spneumoniae_pmen1_croucher2011/data/PMEN1.aln",
+    "path": "/Users/sergei/Projects/rhizaeon-code/empirical_datasets/02_spneumoniae_pmen1_croucher2011/PMEN1.aln.gz",
     "num_taxa": 11,
     "length_bp": 2221315,
     "informative_snps": 1516,
     "compression_ratio": 1465.2
   },
   "performance": {
-    "load_time_sec": 0.03,
-    "snp_extract_sec": 2.366,
-    "scan_time_sec": 0.114,
-    "total_runtime_sec": 2.51
+    "load_time_sec": 0.115,
+    "snp_extract_sec": 2.227,
+    "scan_time_sec": 0.104,
+    "total_runtime_sec": 2.446
   },
   "background_stats": {
     "mean_residual": 0.0702,

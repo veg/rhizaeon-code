@@ -62,7 +62,7 @@ ax1_0 = fig.add_subplot(gs[0, 0])
 ax1_0.set_xlim(0, 1)
 ax1_0.set_ylim(0, 1)
 ax1_0.axis('off')
-ax1_0.text(0.0, 1.22, 'A  Epidemic Clonal Swarms', fontsize=9.5, fontweight='bold', va='top')
+ax1_0.text(0.0, 1.22, 'A  Epidemic Clonal Clusters', fontsize=9.5, fontweight='bold', va='top')
 
 # P1 Home Clade (Top)
 ax1_0.plot([0.05, 0.16], [0.84, 0.84], color=C_P1, lw=1.6)
@@ -114,7 +114,7 @@ ax1_0.text(0.95, bar_y - 0.038, '5.0 kb', fontsize=5.5, ha='right', va='top', co
 
 # --- Row 1, Col 2: Isolate Precision (%) with IQR ---
 ax1_1 = fig.add_subplot(gs[0, 1])
-clean_axis(ax1_1, 'Isolate Precision (%)', r'Descendant Swarm Size ($K$)', 'Precision (%)', ylim=(-3, 105))
+clean_axis(ax1_1, 'Isolate Precision (%)', r'Descendant Cluster Size ($K$)', 'Precision (%)', ylim=(-3, 105))
 ax1_1.axhline(100.0, color='#222222', linestyle='--', linewidth=1.1, zorder=2)
 ks_1 = [2, 5, 8, 10, 15]
 ax1_1.set_xticks(ks_1)
@@ -122,21 +122,24 @@ ax1_1.set_xticks(ks_1)
 for d in [0.02, 0.05, 0.10]:
     c = colors_div[d]
     sub_r = df1_sum[(df1_sum['tool'] == 'RhizAeon') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
+    sub_3c = df1_sum[(df1_sum['tool'] == '3SEQ (Consolidated)') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     sub_3 = df1_sum[(df1_sum['tool'] == '3SEQ') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     
     raw_3 = df1_raw[(df1_raw['tool'] == '3SEQ') & (np.isclose(df1_raw['d_parent'], d))]
     q25 = raw_3.groupby('K')['precision'].quantile(0.25) * 100
     q75 = raw_3.groupby('K')['precision'].quantile(0.75) * 100
-    ax1_1.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.15, zorder=2)
+    ax1_1.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.12, zorder=2)
     
-    ax1_1.plot(sub_3['K'], sub_3['precision_mean'] * 100.0, marker='s', mfc='none', mec=c, mew=1.3,
-               ms=4.8, ls=':', lw=1.2, color=c, zorder=3)
+    ax1_1.plot(sub_3['K'], sub_3['precision_mean'] * 100.0, marker='s', mfc='none', mec=c, mew=1.2,
+               ms=4.4, ls=':', lw=1.1, color=c, zorder=3)
+    ax1_1.plot(sub_3c['K'], sub_3c['precision_mean'] * 100.0, marker='^', mfc='white', mec=c, mew=1.2,
+               ms=4.6, ls='--', lw=1.3, color=c, zorder=4)
     ax1_1.plot(sub_r['K'], sub_r['precision_mean'] * 100.0, marker='o', mfc=c, mec='white', mew=0.5,
-               ms=5.0, ls='-', lw=1.6, color=c, zorder=4)
+               ms=4.8, ls='-', lw=1.6, color=c, zorder=5)
 
 # --- Row 1, Col 3: Runtime Scalability (ms) ---
 ax1_2 = fig.add_subplot(gs[0, 2])
-clean_axis(ax1_2, 'Runtime Scalability', r'Descendant Swarm Size ($K$)', 'Execution Time (ms)', ylim=(0, 4800))
+clean_axis(ax1_2, 'Runtime Scalability', r'Descendant Cluster Size ($K$)', 'Execution Time (ms)', ylim=(0, 11500))
 ax1_2.set_xticks(ks_1)
 
 for d in [0.02, 0.05, 0.10]:
@@ -144,35 +147,38 @@ for d in [0.02, 0.05, 0.10]:
     sub_r = df1_sum[(df1_sum['tool'] == 'RhizAeon') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     sub_3 = df1_sum[(df1_sum['tool'] == '3SEQ') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     
-    ax1_2.plot(sub_3['K'], sub_3['time_ms_mean'], marker='s', mfc='none', mec=c, mew=1.3,
-               ms=4.8, ls=':', lw=1.2, color=c, zorder=3)
+    ax1_2.plot(sub_3['K'], sub_3['time_ms_mean'], marker='s', mfc='none', mec=c, mew=1.2,
+               ms=4.4, ls=':', lw=1.2, color=c, zorder=3)
     ax1_2.plot(sub_r['K'], sub_r['time_ms_mean'], marker='o', mfc=c, mec='white', mew=0.5,
-               ms=5.0, ls='-', lw=1.6, color=c, zorder=4)
+               ms=4.8, ls='-', lw=1.6, color=c, zorder=4)
 
 # --- Row 1, Col 4: Inferred Events (\hat{K}) vs K with IQR ---
 ax1_3 = fig.add_subplot(gs[0, 3])
-clean_axis(ax1_3, r'Inferred Events ($\hat{K}$)', r'Descendant Swarm Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-2, 60))
+clean_axis(ax1_3, r'Inferred Events ($\hat{K}$)', r'Descendant Cluster Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-2, 60))
 ax1_3.axhline(1.0, color='#222222', linestyle='-', linewidth=1.4, zorder=2)
 ax1_3.set_xticks(ks_1)
 
 for d in [0.02, 0.05, 0.10]:
     c = colors_div[d]
     sub_r = df1_sum[(df1_sum['tool'] == 'RhizAeon') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
+    sub_3c = df1_sum[(df1_sum['tool'] == '3SEQ (Consolidated)') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     sub_3 = df1_sum[(df1_sum['tool'] == '3SEQ') & (np.isclose(df1_sum['d_parent'], d))].sort_values('K')
     
     raw_3 = df1_raw[(df1_raw['tool'] == '3SEQ') & (np.isclose(df1_raw['d_parent'], d))]
     q25 = raw_3.groupby('K')['unique_events'].quantile(0.25)
     q75 = raw_3.groupby('K')['unique_events'].quantile(0.75)
-    ax1_3.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.15, zorder=2)
+    ax1_3.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.12, zorder=2)
     
-    ax1_3.plot(sub_3['K'], sub_3['unique_events_mean'], marker='s', mfc='none', mec=c, mew=1.3,
-               ms=4.8, ls=':', lw=1.2, color=c, zorder=3)
+    ax1_3.plot(sub_3['K'], sub_3['unique_events_mean'], marker='s', mfc='none', mec=c, mew=1.2,
+               ms=4.4, ls=':', lw=1.1, color=c, zorder=3)
+    ax1_3.plot(sub_3c['K'], sub_3c['unique_events_mean'], marker='^', mfc='white', mec=c, mew=1.2,
+               ms=4.6, ls='--', lw=1.3, color=c, zorder=4)
     ax1_3.plot(sub_r['K'], sub_r['unique_events_mean'], marker='o', mfc=c, mec='white', mew=0.5,
-               ms=5.0, ls='-', lw=1.6, color=c, zorder=4)
+               ms=4.8, ls='-', lw=1.6, color=c, zorder=5)
 
 
 # ==============================================================================
-# ROW 2 (B): SCENARIO 1.2 MULTI-WAY MOSAIC SWARMS
+# ROW 2 (B): SCENARIO 1.2 MULTI-WAY MOSAIC CLUSTERS
 # ==============================================================================
 df2_raw = pd.read_csv('/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario2_multiway_mosaic_swarms/multiway_raw_results.csv')
 df2_sum = pd.read_csv('/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario2_multiway_mosaic_swarms/multiway_summary.csv')
@@ -181,7 +187,7 @@ ax2_0 = fig.add_subplot(gs[1, 0])
 ax2_0.set_xlim(0, 1)
 ax2_0.set_ylim(0, 1)
 ax2_0.axis('off')
-ax2_0.text(0.0, 1.22, 'B  Multi-Way Mosaic Swarms', fontsize=9.5, fontweight='bold', va='top')
+ax2_0.text(0.0, 1.22, 'B  Multi-Way Mosaic Clusters', fontsize=9.5, fontweight='bold', va='top')
 
 # Lineage branches
 ax2_0.plot([0.04, 0.16], [0.92, 0.92], color=C_P1, lw=1.6)
@@ -265,20 +271,25 @@ ax2_1 = fig.add_subplot(gs[1, 1])
 topos = ['dual_cassette', 'nested_russian_doll', 'triple_crossover']
 topo_names = ['Dual\nCassette', 'Nested\nDoll', 'Triple\nCrossover']
 x_t = np.arange(len(topos))
-bar_w = 0.35
+bar_w = 0.25
 
 ax2_1.axhline(2.0, color='#222222', linestyle='--', linewidth=1.1, zorder=2)
-r_donors_mean = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['donors_resolved'].mean() for t in topos]
-r_donors_std  = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['donors_resolved'].std() for t in topos]
-s_donors_mean = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['donors_resolved'].mean() for t in topos]
-s_donors_std  = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['donors_resolved'].std() for t in topos]
+r_donors_mean  = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['donors_resolved'].mean() for t in topos]
+r_donors_std   = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['donors_resolved'].std() for t in topos]
+sc_donors_mean = [df2_raw[(df2_raw['tool'] == '3SEQ (Consolidated)') & (df2_raw['topology'] == t)]['donors_resolved'].mean() for t in topos]
+sc_donors_std  = [df2_raw[(df2_raw['tool'] == '3SEQ (Consolidated)') & (df2_raw['topology'] == t)]['donors_resolved'].std() for t in topos]
+s_donors_mean  = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['donors_resolved'].mean() for t in topos]
+s_donors_std   = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['donors_resolved'].std() for t in topos]
 
-ax2_1.bar(x_t - bar_w/2, r_donors_mean, bar_w, yerr=r_donors_std, capsize=3,
-          color='#002b66', edgecolor='none', zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
-ax2_1.bar(x_t + bar_w/2, s_donors_mean, bar_w, yerr=s_donors_std, capsize=3,
-          color='#85b3d1', edgecolor='#002b66', lw=0.9, zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
+ax2_1.bar(x_t - bar_w, r_donors_mean, bar_w, yerr=r_donors_std, capsize=2.5,
+          color='#002b66', edgecolor='none', zorder=4,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax2_1.bar(x_t, sc_donors_mean, bar_w, yerr=sc_donors_std, capsize=2.5,
+          color='#1f77b4', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax2_1.bar(x_t + bar_w, s_donors_mean, bar_w, yerr=s_donors_std, capsize=2.5,
+          color='#85b3d1', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
 clean_axis(ax2_1, 'Donors Correctly Resolved', 'Mosaic Topology', 'Donors Resolved', ylim=(0, 2.45))
 ax2_1.set_xticks(x_t)
 ax2_1.set_xticklabels(topo_names, fontsize=6.8)
@@ -286,41 +297,49 @@ ax2_1.set_xticklabels(topo_names, fontsize=6.8)
 # --- Row 2, Col 3: Breakpoint Overlap Jaccard (J_SNP) ---
 ax2_2 = fig.add_subplot(gs[1, 2])
 ax2_2.axhline(1.0, color='#222222', linestyle='--', linewidth=1.1, zorder=2)
-r_jacc_mean = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['mean_jaccard'].mean() for t in topos]
-r_jacc_std  = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['mean_jaccard'].std() for t in topos]
-s_jacc_mean = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['mean_jaccard'].mean() for t in topos]
-s_jacc_std  = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['mean_jaccard'].std() for t in topos]
+r_jacc_mean  = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['mean_jaccard'].mean() for t in topos]
+r_jacc_std   = [df2_raw[(df2_raw['tool'] == 'RhizAeon') & (df2_raw['topology'] == t)]['mean_jaccard'].std() for t in topos]
+sc_jacc_mean = [df2_raw[(df2_raw['tool'] == '3SEQ (Consolidated)') & (df2_raw['topology'] == t)]['mean_jaccard'].mean() for t in topos]
+sc_jacc_std  = [df2_raw[(df2_raw['tool'] == '3SEQ (Consolidated)') & (df2_raw['topology'] == t)]['mean_jaccard'].std() for t in topos]
+s_jacc_mean  = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['mean_jaccard'].mean() for t in topos]
+s_jacc_std   = [df2_raw[(df2_raw['tool'] == '3SEQ') & (df2_raw['topology'] == t)]['mean_jaccard'].std() for t in topos]
 
-ax2_2.bar(x_t - bar_w/2, r_jacc_mean, bar_w, yerr=r_jacc_std, capsize=3,
-          color='#002b66', edgecolor='none', zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
-ax2_2.bar(x_t + bar_w/2, s_jacc_mean, bar_w, yerr=s_jacc_std, capsize=3,
-          color='#85b3d1', edgecolor='#002b66', lw=0.9, zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
+ax2_2.bar(x_t - bar_w, r_jacc_mean, bar_w, yerr=r_jacc_std, capsize=2.5,
+          color='#002b66', edgecolor='none', zorder=4,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax2_2.bar(x_t, sc_jacc_mean, bar_w, yerr=sc_jacc_std, capsize=2.5,
+          color='#1f77b4', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax2_2.bar(x_t + bar_w, s_jacc_mean, bar_w, yerr=s_jacc_std, capsize=2.5,
+          color='#85b3d1', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
 clean_axis(ax2_2, r'Breakpoint Overlap ($J_{\mathrm{SNP}}$)', 'Mosaic Topology', 'Jaccard Index', ylim=(0, 1.15))
 ax2_2.set_xticks(x_t)
 ax2_2.set_xticklabels(topo_names, fontsize=6.8)
 
 # --- Row 2, Col 4: Inferred Events (\hat{K}) vs K with IQR ---
 ax2_3 = fig.add_subplot(gs[1, 3])
-clean_axis(ax2_3, r'Inferred Events ($\hat{K}$)', r'Descendant Swarm Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-2, 60))
+clean_axis(ax2_3, r'Inferred Events ($\hat{K}$)', r'Descendant Cluster Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-2, 60))
 ax2_3.axhline(2.0, color='#222222', linestyle='-', linewidth=1.4, zorder=2)
 swarm_sizes_2 = [1, 5, 10]
 ax2_3.set_xticks(swarm_sizes_2)
 
 for d in [0.02, 0.05, 0.10]:
     c = colors_div[d]
-    sub_r = df2_sum[(df2_sum['tool'] == 'RhizAeon') & (np.isclose(df2_sum['d_parent'], d))].groupby('K')['mean_unique_events'].mean().reset_index()
-    sub_3 = df2_sum[(df2_sum['tool'] == '3SEQ') & (np.isclose(df2_sum['d_parent'], d))].groupby('K')['mean_unique_events'].mean().reset_index()
+    sub_r  = df2_sum[(df2_sum['tool'] == 'RhizAeon') & (np.isclose(df2_sum['d_parent'], d))].groupby('K')['mean_unique_events'].mean().reset_index()
+    sub_3c = df2_sum[(df2_sum['tool'] == '3SEQ (Consolidated)') & (np.isclose(df2_sum['d_parent'], d))].groupby('K')['mean_unique_events'].mean().reset_index()
+    sub_3  = df2_sum[(df2_sum['tool'] == '3SEQ') & (np.isclose(df2_sum['d_parent'], d))].groupby('K')['mean_unique_events'].mean().reset_index()
     
     raw_3 = df2_raw[(df2_raw['tool'] == '3SEQ') & (np.isclose(df2_raw['d_parent'], d))]
     q25 = raw_3.groupby('K')['unique_events'].quantile(0.25)
     q75 = raw_3.groupby('K')['unique_events'].quantile(0.75)
-    ax2_3.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.15, zorder=2)
-    ax2_3.plot(sub_3['K'], sub_3['mean_unique_events'], marker='s', mfc='none', mec=c, mew=1.3,
-               ms=4.8, ls=':', lw=1.2, color=c, zorder=3)
+    ax2_3.fill_between(sub_3['K'], q25, q75, color=c, alpha=0.12, zorder=2)
+    ax2_3.plot(sub_3['K'], sub_3['mean_unique_events'], marker='s', mfc='none', mec=c, mew=1.2,
+               ms=4.4, ls=':', lw=1.1, color=c, zorder=3)
+    ax2_3.plot(sub_3c['K'], sub_3c['mean_unique_events'], marker='^', mfc='white', mec=c, mew=1.2,
+               ms=4.6, ls='--', lw=1.3, color=c, zorder=4)
     ax2_3.plot(sub_r['K'], sub_r['mean_unique_events'], marker='o', mfc=c, mec='white', mew=0.5,
-               ms=5.0, ls='-', lw=1.6, color=c, zorder=4)
+               ms=4.8, ls='-', lw=1.6, color=c, zorder=5)
 
 
 # ==============================================================================
@@ -384,55 +403,65 @@ ax3_0.text(x_bar + 0.30 * w_bar, bar_y - 0.038, '1.5k', fontsize=5.5, ha='center
 ax3_0.text(x_bar + 0.60 * w_bar, bar_y - 0.038, '3.0k', fontsize=5.5, ha='center', va='top', color='#555555')
 ax3_0.text(x_bar + w_bar, bar_y - 0.038, '5.0 kb', fontsize=5.5, ha='right', va='top', color='#555555')
 
-# --- Row 3, Col 2: False Parent Framing (%) ---
+# --- Row 3, Col 2: Background Parent Misclassification (%) ---
 ax3_1 = fig.add_subplot(gs[2, 1])
-clean_axis(ax3_1, 'False Parent Framing (%)', 'Ghost Donor Regime', 'False Alarms (%)', ylim=(-3, 115))
+clean_axis(ax3_1, 'Background Parent FPR (%)', 'Ghost Donor Regime', 'False Alarms (%)', ylim=(-3, 115))
 ax3_1.axhline(0.0, color='#222222', linestyle='--', linewidth=1.1, zorder=2)
 
 regimes_3 = ['surrogate_sister', 'pure_ghost', 'deep_reservoir']
 reg_labels_3 = ['Surrogate\nSister', 'Pure\nGhost', 'Deep\nReservoir']
 x_r3 = np.arange(len(regimes_3))
-bar_w = 0.35
+bar_w = 0.25
 
-r_pfpr_mean = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == r)]['parent_fpr'].mean() * 100 for r in regimes_3]
-r_pfpr_std  = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == r)]['parent_fpr'].std() * 100 for r in regimes_3]
-s_pfpr_mean = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == r)]['parent_fpr'].mean() * 100 for r in regimes_3]
-s_pfpr_std  = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == r)]['parent_fpr'].std() * 100 for r in regimes_3]
+r_pfpr_mean  = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == r)]['parent_fpr'].mean() * 100 for r in regimes_3]
+r_pfpr_std   = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == r)]['parent_fpr'].std() * 100 for r in regimes_3]
+sc_pfpr_mean = [df3_raw[(df3_raw['tool'] == '3SEQ (Consolidated)') & (df3_raw['regime'] == r)]['parent_fpr'].mean() * 100 for r in regimes_3]
+sc_pfpr_std  = [df3_raw[(df3_raw['tool'] == '3SEQ (Consolidated)') & (df3_raw['regime'] == r)]['parent_fpr'].std() * 100 for r in regimes_3]
+s_pfpr_mean  = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == r)]['parent_fpr'].mean() * 100 for r in regimes_3]
+s_pfpr_std   = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == r)]['parent_fpr'].std() * 100 for r in regimes_3]
 
-ax3_1.bar(x_r3 - bar_w/2, r_pfpr_mean, bar_w, yerr=r_pfpr_std, capsize=3,
-          color='#002b66', edgecolor='none', zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
-ax3_1.bar(x_r3 + bar_w/2, s_pfpr_mean, bar_w, yerr=s_pfpr_std, capsize=3,
-          color='#85b3d1', edgecolor='#002b66', lw=0.9, zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
+ax3_1.bar(x_r3 - bar_w, r_pfpr_mean, bar_w, yerr=r_pfpr_std, capsize=2.5,
+          color='#002b66', edgecolor='none', zorder=4,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax3_1.bar(x_r3, sc_pfpr_mean, bar_w, yerr=sc_pfpr_std, capsize=2.5,
+          color='#1f77b4', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax3_1.bar(x_r3 + bar_w, s_pfpr_mean, bar_w, yerr=s_pfpr_std, capsize=2.5,
+          color='#85b3d1', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
 ax3_1.set_xticks(x_r3)
 ax3_1.set_xticklabels(reg_labels_3, fontsize=6.8)
 
 # --- Row 3, Col 3: Donor Attribution Accuracy (%) ---
 ax3_2 = fig.add_subplot(gs[2, 2])
-clean_axis(ax3_2, 'Donor Attribution Accuracy (%)', 'Parent Divergence (d)', 'Attribution Acc. (%)', ylim=(-3, 115))
+clean_axis(ax3_2, 'Surrogate Donor Acc. (%)', 'Parent Divergence (d)', 'Attribution Acc. (%)', ylim=(-3, 115))
 ax3_2.axhline(100.0, color='#222222', linestyle='--', linewidth=1.1, zorder=2)
 divs = [0.02, 0.05, 0.10]
 div_labels = ['0.02', '0.05', '0.10']
 x_d3 = np.arange(len(divs))
 
-r_dacc_mean = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].mean() * 100 for d in divs]
-r_dacc_std  = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].std() * 100 for d in divs]
-s_dacc_mean = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].mean() * 100 for d in divs]
-s_dacc_std  = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].std() * 100 for d in divs]
+r_dacc_mean  = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].mean() * 100 for d in divs]
+r_dacc_std   = [df3_raw[(df3_raw['tool'] == 'RhizAeon') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].std() * 100 for d in divs]
+sc_dacc_mean = [df3_raw[(df3_raw['tool'] == '3SEQ (Consolidated)') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].mean() * 100 for d in divs]
+sc_dacc_std  = [df3_raw[(df3_raw['tool'] == '3SEQ (Consolidated)') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].std() * 100 for d in divs]
+s_dacc_mean  = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].mean() * 100 for d in divs]
+s_dacc_std   = [df3_raw[(df3_raw['tool'] == '3SEQ') & (df3_raw['regime'] == 'surrogate_sister') & (np.isclose(df3_raw['d_parent'], d))]['donor_acc'].std() * 100 for d in divs]
 
-ax3_2.bar(x_d3 - bar_w/2, r_dacc_mean, bar_w, yerr=r_dacc_std, capsize=3,
-          color='#002b66', edgecolor='none', zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
-ax3_2.bar(x_d3 + bar_w/2, s_dacc_mean, bar_w, yerr=s_dacc_std, capsize=3,
-          color='#85b3d1', edgecolor='#002b66', lw=0.9, zorder=3,
-          error_kw=dict(lw=1.0, capthick=1.0, ecolor='#002b66'))
+ax3_2.bar(x_d3 - bar_w, r_dacc_mean, bar_w, yerr=r_dacc_std, capsize=2.5,
+          color='#002b66', edgecolor='none', zorder=4,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax3_2.bar(x_d3, sc_dacc_mean, bar_w, yerr=sc_dacc_std, capsize=2.5,
+          color='#1f77b4', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
+ax3_2.bar(x_d3 + bar_w, s_dacc_mean, bar_w, yerr=s_dacc_std, capsize=2.5,
+          color='#85b3d1', edgecolor='#002b66', lw=0.8, zorder=3,
+          error_kw=dict(lw=0.9, capthick=0.9, ecolor='#002b66'))
 ax3_2.set_xticks(x_d3)
 ax3_2.set_xticklabels(div_labels, fontsize=6.8)
 
 # --- Row 3, Col 4: Inferred Events (\hat{K}) vs K with IQR ---
 ax3_3 = fig.add_subplot(gs[2, 3])
-clean_axis(ax3_3, r'Inferred Events ($\hat{K}$)', r'Descendant Swarm Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-1.5, 45))
+clean_axis(ax3_3, r'Inferred Events ($\hat{K}$)', r'Descendant Cluster Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-1.5, 45))
 ax3_3.axhline(1.0, color='#222222', linestyle='-', linewidth=1.4, zorder=2)
 ks_3 = [2, 5, 10]
 ax3_3.set_xticks(ks_3)
@@ -444,15 +473,19 @@ for d in [0.02, 0.05, 0.10]:
     t_medians = [np.median(raw_3[raw_3['K'] == k]['unique_events'].values) for k in ks_3]
     t_q25 = [np.percentile(raw_3[raw_3['K'] == k]['unique_events'].values, 25) for k in ks_3]
     t_q75 = [np.percentile(raw_3[raw_3['K'] == k]['unique_events'].values, 75) for k in ks_3]
-    ax3_3.plot(ks_3, t_medians, 's:', color=c, lw=1.3, markersize=4.8, markerfacecolor='none', markeredgewidth=1.3, zorder=4)
-    ax3_3.fill_between(ks_3, t_q25, t_q75, color=c, alpha=0.15, zorder=2)
+    ax3_3.plot(ks_3, t_medians, 's:', color=c, lw=1.1, markersize=4.4, markerfacecolor='none', markeredgewidth=1.2, zorder=3)
+    ax3_3.fill_between(ks_3, t_q25, t_q75, color=c, alpha=0.12, zorder=2)
+
+    raw_3c = sub_surr_raw[(sub_surr_raw['tool'] == '3SEQ (Consolidated)') & (np.isclose(sub_surr_raw['d_parent'], d))]
+    tc_medians = [np.median(raw_3c[raw_3c['K'] == k]['unique_events'].values) for k in ks_3]
+    ax3_3.plot(ks_3, tc_medians, '^--', color=c, lw=1.3, markersize=4.6, markerfacecolor='white', markeredgewidth=1.2, zorder=4)
 
     raw_r = sub_surr_raw[(sub_surr_raw['tool'] == 'RhizAeon') & (np.isclose(sub_surr_raw['d_parent'], d))]
     r_medians = [np.median(raw_r[raw_r['K'] == k]['unique_events'].values) for k in ks_3]
     r_q25 = [np.percentile(raw_r[raw_r['K'] == k]['unique_events'].values, 25) for k in ks_3]
     r_q75 = [np.percentile(raw_r[raw_r['K'] == k]['unique_events'].values, 75) for k in ks_3]
-    ax3_3.plot(ks_3, r_medians, 'o-', color=c, lw=1.4, markersize=4.2, zorder=5)
-    ax3_3.fill_between(ks_3, r_q25, r_q75, color=c, alpha=0.20, zorder=3)
+    ax3_3.plot(ks_3, r_medians, 'o-', color=c, lw=1.5, markersize=4.4, zorder=5)
+    ax3_3.fill_between(ks_3, r_q25, r_q75, color=c, alpha=0.18, zorder=3)
 
 
 # ==============================================================================
@@ -528,10 +561,12 @@ ax4_1.set_xticklabels([str(t) for t in tract_lens], fontsize=6.8)
 for d in [0.02, 0.05, 0.10]:
     c = colors_div[d]
     sub = df4_sum[np.isclose(df4_sum['d_parent'], d)]
-    s_power = [sub[(sub['tool'] == '3SEQ') & (sub['tract_len'] == t)]['recall'].mean() * 100 for t in tract_lens]
-    ax4_1.plot(x_t4, s_power, 's:', color=c, lw=1.3, markersize=4.8, markerfacecolor='none', markeredgewidth=1.3, zorder=3)
-    r_power = [sub[(sub['tool'] == 'RhizAeon') & (sub['tract_len'] == t)]['recall'].mean() * 100 for t in tract_lens]
-    ax4_1.plot(x_t4, r_power, 'o-', color=c, lw=1.5, markersize=4.5, zorder=4)
+    s_power  = [sub[(sub['tool'] == '3SEQ') & (sub['tract_len'] == t)]['recall'].mean() * 100 for t in tract_lens]
+    sc_power = [sub[(sub['tool'] == '3SEQ (Consolidated)') & (sub['tract_len'] == t)]['recall'].mean() * 100 for t in tract_lens]
+    r_power  = [sub[(sub['tool'] == 'RhizAeon') & (sub['tract_len'] == t)]['recall'].mean() * 100 for t in tract_lens]
+    ax4_1.plot(x_t4, s_power, 's:', color=c, lw=1.1, markersize=4.4, markerfacecolor='none', markeredgewidth=1.2, zorder=3)
+    ax4_1.plot(x_t4, sc_power, '^--', color=c, lw=1.3, markersize=4.6, markerfacecolor='white', markeredgewidth=1.2, zorder=4)
+    ax4_1.plot(x_t4, r_power, 'o-', color=c, lw=1.5, markersize=4.5, zorder=5)
 
 # --- Row 4, Col 3: Background Taxon FPR (%) ---
 ax4_2 = fig.add_subplot(gs[3, 2])
@@ -543,14 +578,16 @@ ax4_2.set_xticklabels([str(t) for t in tract_lens], fontsize=6.8)
 for d in [0.02, 0.05, 0.10]:
     c = colors_div[d]
     sub = df4_sum[np.isclose(df4_sum['d_parent'], d)]
-    s_fpr = [sub[(sub['tool'] == '3SEQ') & (sub['tract_len'] == t)]['bg_fpr'].mean() * 100 for t in tract_lens]
-    ax4_2.plot(x_t4, s_fpr, 's:', color=c, lw=1.3, markersize=4.8, markerfacecolor='none', markeredgewidth=1.3, zorder=3)
-    r_fpr = [sub[(sub['tool'] == 'RhizAeon') & (sub['tract_len'] == t)]['bg_fpr'].mean() * 100 for t in tract_lens]
-    ax4_2.plot(x_t4, r_fpr, 'o-', color=c, lw=1.5, markersize=4.5, zorder=4)
+    s_fpr  = [sub[(sub['tool'] == '3SEQ') & (sub['tract_len'] == t)]['bg_fpr'].mean() * 100 for t in tract_lens]
+    sc_fpr = [sub[(sub['tool'] == '3SEQ (Consolidated)') & (sub['tract_len'] == t)]['bg_fpr'].mean() * 100 for t in tract_lens]
+    r_fpr  = [sub[(sub['tool'] == 'RhizAeon') & (sub['tract_len'] == t)]['bg_fpr'].mean() * 100 for t in tract_lens]
+    ax4_2.plot(x_t4, s_fpr, 's:', color=c, lw=1.1, markersize=4.4, markerfacecolor='none', markeredgewidth=1.2, zorder=3)
+    ax4_2.plot(x_t4, sc_fpr, '^--', color=c, lw=1.3, markersize=4.6, markerfacecolor='white', markeredgewidth=1.2, zorder=4)
+    ax4_2.plot(x_t4, r_fpr, 'o-', color=c, lw=1.5, markersize=4.5, zorder=5)
 
 # --- Row 4, Col 4: Inferred Events (\hat{K}) vs K with IQR ---
 ax4_3 = fig.add_subplot(gs[3, 3])
-clean_axis(ax4_3, r'Inferred Events ($\hat{K}$)', r'Descendant Swarm Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-1.5, 45))
+clean_axis(ax4_3, r'Inferred Events ($\hat{K}$)', r'Descendant Cluster Size ($K$)', r'Inferred Events ($\hat{K}$)', ylim=(-1.5, 45))
 ax4_3.axhline(1.0, color='#222222', linestyle='-', linewidth=1.4, zorder=2)
 ks_4 = [2, 5, 10]
 ax4_3.set_xticks(ks_4)
@@ -562,15 +599,19 @@ for d in [0.02, 0.05, 0.10]:
     t_medians = [np.median(raw_3[raw_3['K'] == k]['unique_events'].values) for k in ks_4]
     t_q25 = [np.percentile(raw_3[raw_3['K'] == k]['unique_events'].values, 25) for k in ks_4]
     t_q75 = [np.percentile(raw_3[raw_3['K'] == k]['unique_events'].values, 75) for k in ks_4]
-    ax4_3.plot(ks_4, t_medians, 's:', color=c, lw=1.3, markersize=4.8, markerfacecolor='none', markeredgewidth=1.3, zorder=4)
-    ax4_3.fill_between(ks_4, t_q25, t_q75, color=c, alpha=0.15, zorder=2)
+    ax4_3.plot(ks_4, t_medians, 's:', color=c, lw=1.1, markersize=4.4, markerfacecolor='none', markeredgewidth=1.2, zorder=3)
+    ax4_3.fill_between(ks_4, t_q25, t_q75, color=c, alpha=0.12, zorder=2)
+
+    raw_3c = sub_detectable[(sub_detectable['tool'] == '3SEQ (Consolidated)') & (np.isclose(sub_detectable['d_parent'], d))]
+    tc_medians = [np.median(raw_3c[raw_3c['K'] == k]['unique_events'].values) for k in ks_4]
+    ax4_3.plot(ks_4, tc_medians, '^--', color=c, lw=1.3, markersize=4.6, markerfacecolor='white', markeredgewidth=1.2, zorder=4)
 
     raw_r = sub_detectable[(sub_detectable['tool'] == 'RhizAeon') & (np.isclose(sub_detectable['d_parent'], d))]
     r_medians = [np.median(raw_r[raw_r['K'] == k]['unique_events'].values) for k in ks_4]
     r_q25 = [np.percentile(raw_r[raw_r['K'] == k]['unique_events'].values, 25) for k in ks_4]
     r_q75 = [np.percentile(raw_r[raw_r['K'] == k]['unique_events'].values, 75) for k in ks_4]
-    ax4_3.plot(ks_4, r_medians, 'o-', color=c, lw=1.4, markersize=4.2, zorder=5)
-    ax4_3.fill_between(ks_4, r_q25, r_q75, color=c, alpha=0.20, zorder=3)
+    ax4_3.plot(ks_4, r_medians, 'o-', color=c, lw=1.5, markersize=4.4, zorder=5)
+    ax4_3.fill_between(ks_4, r_q25, r_q75, color=c, alpha=0.18, zorder=3)
 
 
 # ==============================================================================
@@ -578,16 +619,18 @@ for d in [0.02, 0.05, 0.10]:
 # ==============================================================================
 legend_handles = [
     mlines.Line2D([], [], color='#002b66', marker='o', lw=1.5, markersize=4.5, label='RhizAeon'),
-    mlines.Line2D([], [], color='#002b66', marker='s', lw=1.3, linestyle=':', markersize=4.8,
-                  markerfacecolor='none', markeredgewidth=1.3, label='3SEQ'),
+    mlines.Line2D([], [], color='#002b66', marker='^', lw=1.3, linestyle='--', markersize=4.6,
+                  markerfacecolor='white', markeredgewidth=1.2, label='3SEQ (Consolidated)'),
+    mlines.Line2D([], [], color='#002b66', marker='s', lw=1.1, linestyle=':', markersize=4.4,
+                  markerfacecolor='none', markeredgewidth=1.2, label='3SEQ (Raw)'),
     mlines.Line2D([], [], color='#222222', linestyle='--', lw=1.2, label='Ground Truth'),
     patches.Patch(facecolor=colors_div[0.02], label=r'$d = 0.02$'),
     patches.Patch(facecolor=colors_div[0.05], label=r'$d = 0.05$'),
     patches.Patch(facecolor=colors_div[0.10], label=r'$d = 0.10$'),
 ]
 
-fig.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.58, 0.985),
-           ncol=6, frameon=False, fontsize=7.6, handletextpad=0.4, columnspacing=1.5)
+fig.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.56, 0.985),
+           ncol=7, frameon=False, fontsize=7.2, handletextpad=0.35, columnspacing=1.2)
 
 # Save master outputs to both directories
 out_master_png = '/Users/sergei/Projects/TOGA_MEME/recombination/viz/fig_specialized_scenarios.png'

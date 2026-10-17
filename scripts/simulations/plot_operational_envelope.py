@@ -161,7 +161,7 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
                     facecolor="#e74c3c", alpha=0.22, hatch="//", edgecolor="#c0392b", zorder=3)
     ax.plot(d_vals[valid_stall], stall_ratio[valid_stall], ls="--", color="#e74c3c", lw=1.8,
             label="Stall Horizon ($M < 3$ SNPs)", zorder=4)
-    ax.text(0.0065, 0.013, "Informational Stall\n($M < 3$ SNPs; $P < 1\\%$)",
+    ax.text(0.0065, 0.013, "Informational Stall\n($M < 3$ SNPs)",
             fontsize=7.5, color="#ffffff", fontweight="bold", zorder=5)
 
     # Biological Landmarks
@@ -189,11 +189,13 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
 
     # --- Panel B: Informational Observability Frontier ---
     ax = axes[1]
+    sat_power = recs[recs["mut_in_tract"] > 100]["detected"].mean() * 100.0
+    stall_pwr = recs[recs["mut_in_tract"] <= 2]["detected"].mean() * 100.0
     ax.plot(mut_power["m_mid"], mut_power["power"] * 100, marker="o", markersize=4.0,
             color="#1a5276", lw=2.2, label="Empirical Power", zorder=4)
     ax.axhline(50, color="#7f8c8d", ls="--", lw=1.2, alpha=0.85, label="50% Operational Boundary")
     ax.axhline(90, color="#d35400", ls="--", lw=1.2, alpha=0.85, label="90% Certified Threshold")
-    ax.axhline(99.51, color="#27ae60", ls="--", lw=1.4, alpha=0.90, label="99.5% Saturation Plateau ($M \\geq 500$)")
+    ax.axhline(sat_power, color="#27ae60", ls="--", lw=1.4, alpha=0.90, label=f"{sat_power:.1f}% Saturation Plateau ($M > 100$)")
 
     # Null FPR floor
     ax.axhspan(0, null_fpr * 100, color="#16a085", alpha=0.20, zorder=2)
@@ -202,7 +204,7 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
 
     # Highlight stall horizon
     ax.axvspan(1, 2.5, color="#e74c3c", alpha=0.08, zorder=1)
-    ax.text(1.15, 25, "Stall Horizon\n(Power < 1%)", fontsize=7.5, color="#c0392b", fontweight="bold")
+    ax.text(1.15, 25, f"Stall Horizon\n(Power $\\approx$ {stall_pwr:.1f}%)", fontsize=7.5, color="#c0392b", fontweight="bold")
 
     ax.set_xscale("log")
     ax.set_xlim(1.0, 1000)

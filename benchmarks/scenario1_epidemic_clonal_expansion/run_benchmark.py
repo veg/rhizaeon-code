@@ -129,6 +129,72 @@ def parse_3seq_bps(bp_str: str):
             return (int(m[0]), int(m[1]))
     return (0, 0)
 
+def consolidate_3seq_rows(rows, taxa, mat, bp_tol=200):
+    """
+    Standard downstream 3SEQ consolidation ("synthesis"):
+      1. Rank-orders significant triplet calls by ascending log10(p) / Dunn-Sidak p-value.
+      2. Prunes reciprocal parental mirror triplets where a lower-ranked row cites an
+         already-accepted recombinant clade as one of its parents over an overlapping region.
+      3. Clusters co-recombinant sister leaves sharing homologous parent clades and
+         overlapping breakpoint intervals into a single ancestral recombination event.
+    """
+    N, L = mat.shape
+    name_to_idx = {t: i for i, t in enumerate(taxa)}
+    dist_mat = np.zeros((N, N), dtype=np.float64)
+    for i in range(N):
+        dist_mat[i] = np.mean(mat[i] != mat, axis=1)
+    triu = dist_mat[np.triu_indices(N, k=1)]
+    clade_rad = max(0.01, 0.35 * float(np.median(triu))) if len(triu) > 0 else 0.01
+
+    def same_clade(a, b):
+        if a == b:
+            return True
+        ia, ib = name_to_idx.get(a), name_to_idx.get(b)
+        if ia is None or ib is None:
+            return False
+        return dist_mat[ia, ib] <= clade_rad
+
+    sorted_rows = sorted(rows, key=lambda r: (r["log10p"], r["dsp"]))
+    accepted = []
+    for r in sorted_rows:
+        is_mirror = False
+        for acc in accepted:
+            overlap = min(r["u2"], acc["u2"]) - max(r["u1"], acc["u1"])
+            shared_bp = abs(r["u1"] - acc["u1"]) <= bp_tol or abs(r["u2"] - acc["u2"]) <= bp_tol or overlap > 0
+            if shared_bp:
+                cites_acc_rec = any(same_clade(r["pa"], iso) or same_clade(r["pb"], iso) for iso in acc["isolates"])
+                child_is_acc_parent = same_clade(r["child"], acc["pa"]) or same_clade(r["child"], acc["pb"])
+                if cites_acc_rec and child_is_acc_parent:
+                    is_mirror = True
+                    break
+        if is_mirror:
+            continue
+
+        merged = False
+        for acc in accepted:
+            same_child_clade = any(same_clade(r["child"], iso) for iso in acc["isolates"])
+            same_parents = (same_clade(r["pa"], acc["pa"]) and same_clade(r["pb"], acc["pb"])) or (
+                same_clade(r["pa"], acc["pb"]) and same_clade(r["pb"], acc["pa"])
+            )
+            overlap = min(r["u2"], acc["u2"]) - max(r["u1"], acc["u1"])
+            min_len = max(1, min(r["u2"] - r["u1"] + 1, acc["u2"] - acc["u1"] + 1))
+            shared_bp = (overlap >= 0.5 * min_len) or (abs(r["u1"] - acc["u1"]) <= bp_tol and abs(r["u2"] - acc["u2"]) <= bp_tol)
+            if (same_child_clade or same_parents) and shared_bp:
+                acc["isolates"].add(r["child"])
+                merged = True
+                break
+        if not merged:
+            accepted.append({
+                "pa": r["pa"],
+                "pb": r["pb"],
+                "child": r["child"],
+                "u1": r["u1"],
+                "u2": r["u2"],
+                "log10p": r["log10p"],
+                "isolates": {r["child"]},
+            })
+    return accepted
+
 def run_single_trial(args):
     d_parent, K, rep, rhiz_bin, three_bin = args
     seed = 100000 + int(d_parent * 1000) * 1000 + K * 50 + rep
@@ -167,6 +233,7 @@ def run_single_trial(args):
     rhiz_recs_called = set()
     rhiz_bg_called = set()
     rhiz_jaccard = 0.0
+    rhiz_bp_err = float(L)
     
     if r_proc.returncode == 0 and os.path.exists(out_json):
         with open(out_json) as f:
@@ -174,7 +241,6 @@ def run_single_trial(args):
         events = r_res.get("events", [])
         rhiz_unique_events = len(events)
         
-        # In RhizAeon, each event has an isolates roster
         best_jaccard = 0.0
         for ev in events:
             rhiz_raw_alerts += len(ev.get("isolates", []))
@@ -183,9 +249,12 @@ def run_single_trial(args):
                     rhiz_recs_called.add(iso)
                 elif iso in bg_taxa:
                     rhiz_bg_called.add(iso)
-            jac = compute_jaccard(true_u1, true_u2, ev.get("u1", 0), ev.get("u2", 0))
+            u1_ev, u2_ev = ev.get("u1", 0), ev.get("u2", 0)
+            jac = compute_jaccard(true_u1, true_u2, u1_ev, u2_ev)
+            err = 0.5 * (abs(u1_ev - true_u1) + abs(u2_ev - true_u2))
             if jac > best_jaccard:
                 best_jaccard = jac
+                rhiz_bp_err = err
         rhiz_jaccard = best_jaccard
         if os.path.exists(out_json):
             os.remove(out_json)
@@ -212,10 +281,11 @@ def run_single_trial(args):
         "bg_fp_count": len(rhiz_bg_called),
         "bg_fpr": rhiz_bg_fpr,
         "jaccard": rhiz_jaccard,
+        "bp_error": rhiz_bp_err,
         "time_ms": t_rhiz_ms,
     })
     
-    # ---------------- 2. 3SEQ ----------------
+    # ---------------- 2. 3SEQ (Raw & Consolidated) ----------------
     run_id = f"3seq_{pid}_{d_parent}_{K}_{rep}"
     t0 = time.perf_counter()
     subprocess.run(
@@ -230,28 +300,43 @@ def run_single_trial(args):
     three_recs_called = set()
     three_bg_called = set()
     three_best_jaccard = 0.0
+    three_bp_err = float(L)
+    raw_rows = []
     
     if os.path.exists(rec_csv):
         with open(rec_csv) as f:
             for line in f:
                 parts = [p.strip() for p in line.split(",")]
-                if len(parts) >= 10:
+                if len(parts) >= 10 and parts[0] != "P_name":
                     try:
                         p_val = float(parts[9])
                         if p_val <= 0.05:
                             three_triplets += 1
                             child = parts[2]
+                            log10p = float(parts[8]) if parts[8] != "-inf" else -999.0
                             if child in true_recs:
                                 three_recs_called.add(child)
                             elif child in bg_taxa:
                                 three_bg_called.add(child)
+                            u1_3s, u2_3s = 0, 0
                             if len(parts) >= 13:
                                 bp_str = parts[12].strip()
                                 u1_3s, u2_3s = parse_3seq_bps(bp_str)
                                 if u1_3s > 0 and u2_3s > u1_3s:
                                     jac = compute_jaccard(true_u1, true_u2, u1_3s, u2_3s)
+                                    err = 0.5 * (abs(u1_3s - true_u1) + abs(u2_3s - true_u2))
                                     if jac > three_best_jaccard:
                                         three_best_jaccard = jac
+                                        three_bp_err = err
+                            raw_rows.append({
+                                "pa": parts[0],
+                                "pb": parts[1],
+                                "child": child,
+                                "log10p": log10p,
+                                "dsp": p_val,
+                                "u1": u1_3s,
+                                "u2": u2_3s,
+                            })
                     except Exception:
                         pass
                         
@@ -274,7 +359,7 @@ def run_single_trial(args):
         "K": K,
         "rep": rep,
         "total_taxa": len(taxa),
-        "unique_events": len(three_recs_called) + len(three_bg_called), # 3SEQ cannot collapse; each child is a separate event
+        "unique_events": len(three_recs_called) + len(three_bg_called),
         "raw_alerts": three_triplets,
         "unique_rec_taxa": len(three_recs_called),
         "recall": three_recall,
@@ -282,6 +367,52 @@ def run_single_trial(args):
         "bg_fp_count": len(three_bg_called),
         "bg_fpr": three_bg_fpr,
         "jaccard": three_best_jaccard,
+        "bp_error": three_bp_err,
+        "time_ms": t_3seq_ms,
+    })
+
+    # Consolidated 3SEQ ("Synthesis")
+    cons_events = consolidate_3seq_rows(raw_rows, taxa, mat) if raw_rows else []
+    cons_recs_called = set()
+    cons_bg_called = set()
+    cons_best_jaccard = 0.0
+    cons_bp_err = float(L)
+    for cev in cons_events:
+        for iso in cev["isolates"]:
+            if iso in true_recs:
+                cons_recs_called.add(iso)
+            elif iso in bg_taxa:
+                cons_bg_called.add(iso)
+        if cev["u1"] > 0 and cev["u2"] > cev["u1"]:
+            jac = compute_jaccard(true_u1, true_u2, cev["u1"], cev["u2"])
+            err = 0.5 * (abs(cev["u1"] - true_u1) + abs(cev["u2"] - true_u2))
+            if jac > cons_best_jaccard:
+                cons_best_jaccard = jac
+                cons_bp_err = err
+
+    cons_recall = len(cons_recs_called) / K
+    cons_precision = (
+        len(cons_recs_called) / (len(cons_recs_called) + len(cons_bg_called))
+        if (len(cons_recs_called) + len(cons_bg_called)) > 0
+        else 1.0
+    )
+    cons_bg_fpr = len(cons_bg_called) / len(bg_taxa)
+
+    results.append({
+        "tool": "3SEQ (Consolidated)",
+        "d_parent": d_parent,
+        "K": K,
+        "rep": rep,
+        "total_taxa": len(taxa),
+        "unique_events": len(cons_events),
+        "raw_alerts": len(cons_recs_called) + len(cons_bg_called),
+        "unique_rec_taxa": len(cons_recs_called),
+        "recall": cons_recall,
+        "precision": cons_precision,
+        "bg_fp_count": len(cons_bg_called),
+        "bg_fpr": cons_bg_fpr,
+        "jaccard": cons_best_jaccard,
+        "bp_error": cons_bp_err,
         "time_ms": t_3seq_ms,
     })
     
@@ -351,6 +482,7 @@ def main():
         bg_fp_mean=("bg_fp_count", "mean"),
         bg_fpr_mean=("bg_fpr", "mean"),
         jaccard_mean=("jaccard", "mean"),
+        bp_error_mean=("bp_error", "mean"),
         time_ms_mean=("time_ms", "mean"),
     ).reset_index()
     

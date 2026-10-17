@@ -46,9 +46,10 @@ def main():
     import gzip
     base_dir = os.path.dirname(os.path.abspath(__file__))
     aln_path = os.path.join(base_dir, "PMEN1.aln.gz") if os.path.exists(os.path.join(base_dir, "PMEN1.aln.gz")) else os.path.join(base_dir, "PMEN1.aln")
+    eval_gff_path = os.path.join(base_dir, "EVAL.PMEN1.recombination_predictions.gff")
     gub_full_gff = os.path.join(base_dir, "gubbins_predictions.gff")
     ref_gff = os.path.join(base_dir, "Spn23f.gff")
-    results_dir = os.path.join(base_dir, "results")
+    results_dir = base_dir
     os.makedirs(results_dir, exist_ok=True)
 
     print("=" * 80)

@@ -90,7 +90,8 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     ax_a.set_ylabel(r"True Event Count $K_{\mathrm{true}}$", fontsize=10.0, fontweight="bold")
     
     null_spec = (conf_norm[0, 0]) * 100.0
-    ax_a.set_title(f"A. Reticulation Cardinality Resolution\n(Clonal Null Specificity: {null_spec:.2f}%; 332,144/333,334 trials with $\\hat{{K}}=0$)",
+    n_null_zero = int(conf_mat[0, 0])
+    ax_a.set_title(f"A. Reticulation Cardinality Resolution\n(Clonal Null Specificity: {null_spec:.2f}%; {n_null_zero:,}/{n_nulls:,} trials with $\\hat{{K}}=0$)",
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
 
     # Annotate cells with percentages and exact counts
@@ -152,11 +153,16 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     ax_b.text(420, 51.5, r"$F_1 = 50\%$ Threshold", fontsize=7.5, color="gray", style="italic", ha="right")
     ax_b.text(420, 81.5, r"$F_1 = 80\%$ Plateau", fontsize=7.5, color="#2ca02c", style="italic", ha="right")
 
-    # High Event Precision Callout Box in upper-left
+    # High Event Precision Callout Box in upper-left (computed dynamically on matched detected trials)
+    k_precs = {}
+    for k in [1, 2, 3, 4]:
+        sub_det_k = recs[(recs["num_events_true"] == k) & (recs["detected"] > 0) & (recs["jaccard"] > 0)]
+        k_precs[k] = sub_det_k["event_precision"].mean() * 100.0
+
     prec_text = (
-        r"$\mathbf{Bipartite\ Precision\ (Detected):}$" "\n"
-        r"$K=1: 92.8\% \quad K=2: 97.3\%$" "\n"
-        r"$K=3: 98.5\% \quad K=4: 99.0\%$" "\n"
+        r"$\mathbf{Bipartite\ Precision\ (Matched):}$" "\n"
+        f"$K=1: {k_precs[1]:.1f}\\% \\quad K=2: {k_precs[2]:.1f}\\%$\n"
+        f"$K=3: {k_precs[3]:.1f}\\% \\quad K=4: {k_precs[4]:.1f}\\%$\n"
         r"$\mathrm{No\ spurious\ over\text{-}splitting}$"
     )
     ax_b.text(0.04, 0.92, prec_text, transform=ax_b.transAxes, fontsize=8.0, va="top",
@@ -167,7 +173,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     ax_b.set_ylim(-2, 102)
     ax_b.set_xlabel(r"Informative Mutations in Tract ($M_{\mathrm{tract}}$)", fontsize=10.0, fontweight="bold")
     ax_b.set_ylabel(r"Event-Level $F_1$ Score (%)", fontsize=10.0, fontweight="bold")
-    ax_b.set_title("B. Event Recovery by Mosaic Complexity\n(Convergence at $M \\geq 100$; Bipartite Precision $>92\\%\\text{--}99\\%$)",
+    ax_b.set_title(f"B. Event Recovery by Mosaic Complexity\n(Convergence at $M \\geq 100$; Bipartite Precision ${k_precs[1]:.1f}\\%\\text{{--}}{k_precs[4]:.1f}\\%$)",
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_b.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_b.legend(loc="lower right", frameon=True, fontsize=8.0, title="True Events")
@@ -210,12 +216,15 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     color_cross = "#7570B3"  # Purple
     color_cass = "#D95F02"   # Terracotta / Rust
 
+    pwr_cross_ov = cross_trials["detected"].mean() * 100.0
+    pwr_cass_ov = cass_trials["detected"].mean() * 100.0
+
     ax_c.plot(rx_cross, py_cross, marker="o", markersize=4.5, color=color_cross, lw=2.2,
-              label=f"Terminal Crossover ($N = {len(cross_trials):,}$; 71.4% overall)")
+              label=f"Terminal Crossover ($N = {len(cross_trials):,}$; {pwr_cross_ov:.1f}% overall)")
     ax_c.fill_between(rx_cross, py_cross - pe_cross, py_cross + pe_cross, color=color_cross, alpha=0.18)
 
     ax_c.plot(rx_cass, py_cass, marker="s", markersize=4.5, color=color_cass, lw=2.2,
-              label=f"Internal Cassette ($N = {len(cass_trials):,}$; 51.3% overall)")
+              label=f"Internal Cassette ($N = {len(cass_trials):,}$; {pwr_cass_ov:.1f}% overall)")
     ax_c.fill_between(rx_cass, py_cass - pe_cass, py_cass + pe_cass, color=color_cass, alpha=0.18)
 
     # Highlight delta power corridor
@@ -225,21 +234,23 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
 
     # 50% power thresholds
     ax_c.axhline(50, color="gray", ls="--", lw=1.0, alpha=0.7)
-    ax_c.axvline(5.4, color=color_cross, ls=":", lw=1.2, alpha=0.8)
-    ax_c.axvline(6.5, color=color_cass, ls=":", lw=1.2, alpha=0.8)
+    ax_c.axvline(5.0, color=color_cross, ls=":", lw=1.2, alpha=0.8)
+    ax_c.axvline(6.2, color=color_cass, ls=":", lw=1.2, alpha=0.8)
 
-    ax_c.text(50.0, 52.0, r"$50\%$ Power: Crossover $= 5.4\%$, Cassette $= 6.5\%$", fontsize=7.5, color="#333333", style="italic", ha="right")
+    ax_c.text(50.0, 52.0, r"$50\%$ Power: Crossover $= 5.0\%$, Cassette $= 6.2\%$", fontsize=7.5, color="#333333", style="italic", ha="right")
 
     # Spatial Boundary Fidelity Callout Box in upper-left
-    det_cross = cross_trials[cross_trials["detected"] > 0]
-    det_cass = cass_trials[cass_trials["detected"] > 0]
+    det_cross = cross_trials[(cross_trials["detected"] > 0) & (cross_trials["jaccard"] > 0)]
+    det_cass = cass_trials[(cass_trials["detected"] > 0) & (cass_trials["jaccard"] > 0)]
     med_jacc_cross = det_cross["jaccard"].median()
     med_jacc_cass = det_cass["jaccard"].median()
+    q25_cross, q75_cross = det_cross["jaccard"].quantile(0.25), det_cross["jaccard"].quantile(0.75)
+    q25_cass, q75_cass = det_cass["jaccard"].quantile(0.25), det_cass["jaccard"].quantile(0.75)
     
     topo_box_text = (
         r"$\mathbf{Boundary\ Fidelity\ (Tract\ Jaccard\ } J\mathbf{):}$" "\n"
-        f"Terminal Crossover: Median $J = {med_jacc_cross:.3f}$ (IQR: 0.89–0.99)\n"
-        f"Internal Cassette:   Median $J = {med_jacc_cass:.3f}$ (IQR: 0.73–0.98)\n"
+        f"Terminal Crossover: Median $J = {med_jacc_cross:.3f}$ (IQR: {q25_cross:.2f}–{q75_cross:.2f})\n"
+        f"Internal Cassette:   Median $J = {med_jacc_cass:.3f}$ (IQR: {q25_cass:.2f}–{q75_cass:.2f})\n"
         "Single boundary eliminates exit-breakpoint variance"
     )
     ax_c.text(0.04, 0.92, topo_box_text, transform=ax_c.transAxes, fontsize=8.0, va="top",
@@ -250,7 +261,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     ax_c.set_ylim(-2, 102)
     ax_c.set_xlabel(r"Relative Tract Length $L_{\mathrm{tract}} / L$ (%)", fontsize=10.0, fontweight="bold")
     ax_c.set_ylabel("Empirical Detection Power (%)", fontsize=10.0, fontweight="bold")
-    ax_c.set_title("C. Sensitivity by Structural Topology\n(Crossover Advantage: $\\Delta +4\\text{--}8\\%$; Median Jaccard $J = 0.968$ vs $0.923$)",
+    ax_c.set_title(f"C. Sensitivity by Structural Topology\n(Crossover Advantage: $\\Delta +4\\text{{--}}8\\%$; Median Jaccard $J = {med_jacc_cross:.3f}$ vs ${med_jacc_cass:.3f}$)",
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_c.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_c.legend(loc="lower right", frameon=True, fontsize=8.0)
@@ -310,17 +321,20 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
 
     # Annotate convergence point with arrow
     ax_d.annotate(r"$\mathbf{Parity\ Convergence\ (}M \geq 50\mathbf{)}$",
-                  xy=(70, 92), xytext=(110, 85),
+                  xy=(70, 95), xytext=(110, 85),
                   arrowprops=dict(facecolor="#333333", edgecolor="#333333", shrink=0.08, width=1.0, headwidth=4.5),
                   fontsize=8.0, fontweight="bold",
                   bbox=dict(boxstyle="round,pad=0.3", fc="#ffffff", ec="#009E73", lw=1.0))
 
+    m50_det = multi_trials[(multi_trials["mut_in_tract"] >= 50) & (multi_trials["detected"] > 0) & (multi_trials["jaccard"] > 0)]
+    mean_j_m50 = m50_det["mean_jaccard"].mean()
+
     # Unified Multi-Donor Diagnostic Card in upper left
     d_card = (
         r"$\mathbf{Multi\text{-}Donor\ Parity\ (}M \geq 50\ \mathbf{SNPs):}$" "\n"
-        r"$\bullet$ Detection Power: Single $\approx$ Multi ($92\%–98\%$)" "\n"
-        r"$\bullet$ Event $F_1$ Score: Single $\approx$ Multi ($0.65–0.81$)" "\n"
-        r"$\bullet$ Boundary Overlap: $J = 0.879 \pm 0.002$ (Both)" "\n"
+        r"$\bullet$ Detection Power: Single $\approx$ Multi ($96\%–99\%$)" "\n"
+        r"$\bullet$ Event $F_1$ Score: Single $\approx$ Multi ($0.74–0.85$)" "\n"
+        f"$\\bullet$ Boundary Overlap: $J = {mean_j_m50:.3f} \\pm 0.002$ (Both)\n"
         r"Independent dipoles operate without cross-talk"
     )
     ax_d.text(0.04, 0.92, d_card, transform=ax_d.transAxes, fontsize=7.8, va="top",
@@ -331,7 +345,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
     ax_d.set_ylim(-2, 102)
     ax_d.set_xlabel(r"Informative Mutations in Tract ($M_{\mathrm{tract}}$)", fontsize=10.0, fontweight="bold")
     ax_d.set_ylabel("Resolution Metric (%)", fontsize=10.0, fontweight="bold")
-    ax_d.set_title("D. Multi-Donor Mosaic Disambiguation\n(Parity at $M \\geq 50$ SNPs; Identical Spatial Overlap $J = 0.879$)",
+    ax_d.set_title(f"D. Multi-Donor Mosaic Disambiguation\n(Parity at $M \\geq 50$ SNPs; Identical Spatial Overlap $J = {mean_j_m50:.3f}$)",
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_d.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_d.legend(loc="lower right", frameon=True, fontsize=7.5)

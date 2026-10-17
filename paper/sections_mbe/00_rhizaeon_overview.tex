@@ -1,28 +1,35 @@
 \section{The RhizAeon Framework: Principles of Operation}
 \label{sec:principles_of_operation}
+\RhizAeon models recombination through continuous trajectory mechanics and zero-drift force field dynamics in linear time ($\mathcal{O}(N K L)$ for $N$ taxa, an alignment length $L$, and a set of $K$ dynamically determined reference sequences that we refer to here as "landmark" lineages).
+By measuring instantaneous sequence affinity against reference lineages and absorbing lineage-specific rate variation into an unpolarized ancestral root sink, \RhizAeon transforms recombination detection into a physical trajectory deconvolution problem.
+Clonal evolution produces balanced "thermal" fluctuations that cancel out as a centered Brownian bridge.
+Recombination breaks this physical equilibrium and imparts sustained directional momentum that pinpoints breakpoint sites while consolidating sets of recombination signals attributable to the "co-recombinant" descendants of ancestral recombinant sequences into single ancestral recombination events.
 
-Continuous trajectory tracking across sequence manifolds separates reticulate evolution from clonal divergence without discrete tree search.
+Continuous trajectory tracking across sequence manifolds differentiates recombination signals from signals of clonal divergence without a discrete tree search.
 Scanning along an alignment from 5\textquotesingle\ to 3\textquotesingle, a non-recombinant genome maintains a stable genetic identity: its closest relatives remain constant and trace parallel paths through sequence space.
-Recombination shatters this stability.
-A mosaic genome travels alongside one parental lineage, then abruptly shifts allegiance to an alternative donor across the exchanged segment.
-To capture these shifts in linear time without constructing trees or sliding windows, \RhizAeon measures the instantaneous affinity of each query sequence against a representative panel of reference lineages at every polymorphic site.
+Recombination disturbs this stability.
+A mosaic genome merges genetic material from two or more distinct parental lineages.
+In principle, a single recombination crossover lacks intrinsic biological polarity: if a recombinant sequence combines a segment from parental lineage $A$ with a segment from parental lineage $B$, sites within the $A$-derived segment view $A$ as the recipient background and $B$ as the foreign introgression, whereas sites within the $B$-derived segment view the roles in reverse.
+For consistency across the framework, we define the \emph{home} lineage (or major parent) of a focal sequence as the reference lineage exhibiting the highest cumulative affinity across the full alignment length, and the \emph{donor} lineage (or minor parent) as the reference lineage toward which affinity shifts within a localized recombinant tract.
+As a scan progresses along a mosaic genome, the sequence travels alongside its home lineage, then abruptly shifts affinity toward a donor lineage across the recombinationally acquired tract.
+To capture these shifts in affinity without constructing trees or using sliding windows, \RhizAeon measures the instantaneous affinity of each query sequence against a representative panel of landmark reference sequences at every polymorphic site of an alignment.
 
-To evaluate affinity at each polymorphic site, the engine adapts cross-attention from transformer neural networks.
-Each focal genome serves as the query, while the reference lineages act as keys.
-At every position along the alignment, the query evaluates which reference lineage it resembles to assign local evolutionary affinity.
+To evaluate affinity at each polymorphic site, \RhizAeon adapts cross-attention from transformer neural networks.
+Each focal genome serves as the query, while the landmark reference sequences act as keys.
+At every position along the alignment, the query evaluates which landmark reference sequence it resembles to assign local evolutionary affinity.
 Rather than treating all nucleotide matches equally, continuous-time Markov substitution probabilities weight each attention score: sharing a rare derived allele commands strong attention, whereas common transitions command less.
-To prevent private mutations from creating spurious matches, the reference panel includes an unpolarized ancestral root token that absorbs alleles absent from every contemporary reference.
-A softmax operator normalizes these scores into a probability distribution that sums to one across all reference lineages at each site.
-Individual polymorphic sites fluctuate stochastically.
-Consequently, \RhizAeon avoids evaluating positions in isolation or smoothing them with fixed sliding windows, and instead subtracts each lineage's genome-wide background attention to integrate cumulative deviation along the chromosome.
+To prevent private mutations from creating spurious matches, the landmark panel includes an unpolarized ancestral root token that absorbs alleles absent from every contemporary reference.
+A softmax operator normalizes these scores into a probability distribution that sums to one across all landmark reference sequences and the root token at each site.
+Because individual polymorphic sites exhibit stochastic site-to-site variation in nucleotide substitution patterns and instantaneous attention weights, \RhizAeon avoids evaluating positions in isolation or smoothing them with fixed sliding windows.
+Instead, it subtracts each landmark reference sequence's alignment-wide mean attention to integrate cumulative deviation along the alignment.
 In non-recombinant regions, positive and negative site fluctuations cancel out and wander near zero like a random walk.
-When a sequence enters a recombinant tract, sustained attention toward the donor drives the cumulative trajectory steadily upward until donor attention ceases at the crossover junction and the curve descends.
-A single crossover forms a sharp triangular arch, whereas an inserted cassette produces a trapezoidal plateau.
+When a scan along a sequence enters a recombinant tract, sustained attention toward the donor reference drives the cumulative trajectory steadily upward until donor attention ceases at the breakpoint junction and the curve descends.
+A single breakpoint forms a sharp triangular arch, whereas an inserted cassette produces a trapezoidal plateau.
 The switch points fall at the peaks and inflection points of these cumulative attention curves to localize breakpoints to exact nucleotide coordinates.
 
 A physical force field governs the transition from site-by-site attention to continuous trajectories.
-At each polymorphic site, the attention directed toward a reference lineage acts as an attractive force that pulls the query sequence toward that lineage in metric space.
-Subtracting the sequence's genome-wide baseline attention establishes a zero-drift force field in which positive and negative pulls average to zero across the chromosome.
+At each polymorphic site, the attention directed toward a landmark reference sequence acts as an attractive force that pulls the query sequence toward that reference in metric space.
+Subtracting the sequence's alignment-wide baseline attention establishes a zero-drift force field in which positive and negative pulls average to zero across the sequence.
 Under clonal evolution, mutations arise independently at random positions.
 Instantaneous forces fluctuate in opposing directions and cancel out like thermal Brownian motion, confining the sequence trajectory within its home corridor.
 Recombination breaks this physical equilibrium.
@@ -31,39 +38,37 @@ Sustained donor attraction imparts momentum to the sequence trajectory and drive
 The physical breakpoints correspond to the exact genomic coordinates where the external directional force turns on and off.
 
 Different modes of recombination generate distinct geometric signatures within the force field.
-In a single crossover, a sequence begins in its home corridor and switches into a donor lineage for the remainder of the chromosome.
-The directional force acts persistently from the breakpoint onward and drives cumulative momentum to a solitary peak at the crossover junction before returning to zero at the chromosome terminus.
-The resulting profile forms a triangular arch whose vertex pinpoints the breakpoint.
-For a double crossover (hereafter referred to as a cassette), a sequence acquires a localized foreign tract before returning to its home lineage.
-The directional force turns on at the tract entrance and turns off at the exit to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
-When the true donor is absent from the dataset---such as an unsampled animal reservoir or an extinct lineage---closed-world heuristics invariably misidentify contemporary background taxa as parental donors.
-Directional consistency constraints and principled abstention prevent such false attribution.
-When an unsampled donor lacks close relatives in the alignment (Pure Ghost and Deep Reservoir regimes), the introgressed segment exhibits no coherent directional affinity toward any contemporary reference lineage.
-Rather than manufacturing a false pairing with an arbitrary leaf, the algorithm abstains from reporting spurious transfers and achieves zero false framing on contemporary background parents.
-When a surrogate sister lineage is present in the dataset, trajectory tracking captures the introgression and attributes the transfer to the surrogate sister clade with 98.3\% accuracy.
+In a single breakpoint recombination event, a sequence begins in its home corridor and, at the breakpoint site, switches into a donor corridor for the remainder of the recombinant sequence.
+The directional force acts persistently from the breakpoint onward and drives cumulative momentum to a solitary peak at the breakpoint junction before returning to zero at the end of the recombinant sequence.
+The resulting profile forms a triangular arch whose vertex pinpoints the breakpoint location.
+For a double breakpoint recombinant (hereafter referred to as a cassette), the directional force turns on at the 5\textquotesingle\ breakpoint and turns off at the 3\textquotesingle\ breakpoint to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
+
+When the donor lineage that provided the tract of sequence acquired by a recombinant remains unsampled, the introgressed segment exhibits a sharp loss of affinity to the home lineage without pointing toward any sampled contemporary taxon in the alignment.
+Rather than manufacturing a false pairing with an arbitrary contemporary leaf or silently discarding the signal, \RhizAeon detects the localized departure from the home lineage and explicitly flags and labels the introgressed segment as originating from an unsampled \texttt{"Ghost"} donor lineage.
+This enables investigators either to retain the event as a basal/unsampled introgression or to mask and strip the ghost-derived tract prior to downstream phylogenetic inference, while achieving zero false framing of contemporary background parents.
+When a close relative of the unsampled donor is present in the dataset (a surrogate sister lineage), trajectory tracking captures the shared derived alleles inherited from their common ancestor and attributes the transfer to the sampled surrogate sister reference (achieving 89.2\%--96.4\% surrogate donor attribution accuracy in moderate-to-high divergence cohorts; Section~\ref{subsec:specialized_scenarios}).
 
 Localizing breakpoints combines the multi-scale speed of the force field with the fine-scale precision of phylogenetic likelihood.
-In natural genomes, recombination tracts vary by orders of magnitude---from fifty-base-pair micro-cassettes to multi-kilobase exchanges.
-Fixed sliding windows fail across this span: narrow windows succumb to local mutational noise, whereas wide windows blur signals generated by short cassettes.
+In natural genomes, recombination tract lengths vary by orders of magnitude.
+Fixed sliding windows can sometimes fail across this span: narrow windows might succumb to local mutational noise, whereas wide windows might blur signals generated by short recombination tracts.
 Continuous dyadic wavelet filters eliminate this trade-off by scanning cumulative momentum across a geometric ladder of scales from fifteen to five hundred base pairs.
-Fine-scale wavelets isolate short cassettes, while broad-scale wavelets lock onto larger exchanges without distortion from localized rate fluctuations.
-The zero-crossings and extrema of these wavelet responses narrow candidate breakpoint sites from whole chromosomes down to a localized window of fifteen to thirty base pairs.
+Fine-scale wavelets isolate short recombination tracts, while broad-scale wavelets lock onto larger exchanges without distortion from localized rate fluctuations.
+The zero-crossings and extrema of these wavelet responses narrow candidate breakpoint sites from whole alignments down to a localized window of fifteen to thirty base pairs.
+
 In the second stage, profile likelihood polishing refines each candidate window to individual nucleotide coordinates.
-Because mutations are separated by variable physical distances, the physical crossover can lie anywhere between adjacent informative sites.
-Within the candidate window, a trial boundary slides nucleotide by nucleotide to evaluate the phylogenetic likelihood under the two competing parental models: sites upstream of the trial boundary are evaluated under the Home lineage model, while sites downstream are evaluated under the Donor model.
-The optimal breakpoint is placed at the exact coordinate that maximizes this joint likelihood.
+Because mutations are unevenly distributed across genomes, the identified breakpoint site can lie anywhere between adjacent informative mutation sites.
+Within the candidate window, a trial boundary slides nucleotide by nucleotide across the specific three-sequence triplet comprising the candidate recombinant sequence, its resolved home reference sequence, and its resolved donor reference sequence: sites on the home side of the trial boundary are evaluated under the pairwise substitution likelihood to the home reference, while sites on the donor side are evaluated under the substitution likelihood to the donor reference.
+The optimal breakpoint is placed at the exact coordinate that maximizes this joint triplet profile likelihood.
 Furthermore, the curvature of the likelihood surface yields rigorous confidence intervals: when parental lineages share an identical conserved stretch, the polisher reports the full uninformative plateau rather than manufacturing an artificial single-base prediction.
 
-High-throughput trajectory deconvolution scans chromosomes rapidly, but scientific rigor demands that no recombination event is certified on continuous curves alone.
 Before reporting any candidate recombination event, an orthogonal four-tier audit evaluates the raw alignment sites.
 A Poisson informative-site floor requires every candidate tract to contain at least three unambiguous informative sites where the donor allele differs from the home allele and matches the recombinant.
-Next, an autapomorphic mutation sieve eliminates rate-acceleration traps: if the mutations separating the candidate from its home lineage are private singletons absent from every other sequence in the dataset, the tract is phylogenetically uninformative and is rejected.
-For tracts passing the sieve, an orthogonal Fisher's exact test evaluates a two-by-two contingency table comparing donor- versus home-supporting sites inside the tract against the flanking genomic background.
-The mosaic odds ratio must achieve significance under family-wise error rate control across all possible sequence triplets in the cohort.
-Finally, when reciprocal transfers appear between two lineages, cycle adjudication evaluates dynamic metric velocity reversal to orient the directed reticulation graph toward the true recombinant lineage.
-Together, these four orthogonal filters maintain strict false-positive control even under extreme rate heterogeneity.
+Next, if a candidate tract contains a high density of mutations separating the query sequence from its home reference that are absent from all other sequences in the alignment, the engine evaluates whether those mutations represent a concentrated divergence block from a basal unsampled outgroup (which is retained and labeled as an unsampled \texttt{"Ghost"} donor introgression) or dispersed private substitutions (which are absorbed into the root sink and rejected).
+For tracts attributed to a sampled donor reference, an orthogonal Fisher's exact test evaluates a two-by-two contingency table across the candidate recombinant, resolved home reference, and resolved donor reference triplet: it compares the counts of polymorphic sites where the recombinant matches the donor versus the home reference inside the candidate tract against those in the flanking alignment regions (excluding monomorphic sites and sites where the home and donor references carry identical nucleotides).
+This Fisher's exact test must achieve significance under family-wise error rate control across the evaluated cohort.
+Finally, when evaluating candidate triples produces a mutual two-cycle in the candidate event graph---an algorithmic symmetry artifact where recombinant $R$ (inheriting a tract from donor $D$ in home background $H$) also causes donor $D$ to test positive as a putative recombinant between $R$ and $H$---cycle adjudication evaluates dynamic metric velocity reversal across the breakpoint junction to orient the directed candidate event graph toward the true recombinant sequence $R$ and purge the reciprocal false alarm on $D$.
+Together, these four orthogonal filters maintain strict false-positive control even under extreme mutation rate heterogeneity.
 
-In natural populations and disease outbreaks, recombinant lineages rarely circulate as isolated singletons.
-An ancestral recombination event frequently seeds an expanding transmission cluster whose descendant isolates inherit the same mosaic architecture.
-Pairwise and triplet heuristics that ignore shared descent evaluate each isolate independently and inflate detectable recombination event counts.
-Graph adjudication eliminates this inflation by clustering isolates that share concordant parental lineages and overlapping breakpoint coordinates, which consolidates the entire transmission clade into a single ancestral recombination event linked to all descendant genomes.
+While many detected recombinants in sparse empirical surveys appear as singletons, expanding viral outbreaks and bacterial clones frequently produce clusters of multiple sampled descendants that inherited the same mosaic architecture from a common recombinant ancestor.
+When multiple descendants of an ancestral recombinant are sampled within an alignment, graph adjudication clusters these co-recombinant sequences whenever they share concordant parental lineages and overlapping breakpoint coordinates, consolidating the group into a single ancestral recombination event.
+Crucially, because defining one parent as "home" (major) and the other as "donor" (minor) is arbitrary when crossover tracts span a large fraction of the alignment, \RhizAeon's ancestral consolidation evaluates both direct ($\text{Home}_A \approx \text{Home}_B, \text{Donor}_A \approx \text{Donor}_B$ with overlapping tracts) and inverted ($\text{Home}_A \approx \text{Donor}_B, \text{Donor}_A \approx \text{Home}_B$ with complementary breakpoint junctions) parental polarities so that co-recombinant isolates with swapped major/minor parent labels are properly consolidated into the same ancestral event.

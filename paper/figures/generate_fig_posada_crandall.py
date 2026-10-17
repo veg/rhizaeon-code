@@ -116,7 +116,7 @@ ax1.set_ylim(-0.15, 125)
 # Panel C: False Positive Rate under Rate Variation
 # ----------------------------------------------------
 ax2 = axes[2]
-ax2.set_title("C. Null FPR under Heterotachy", fontweight='bold', loc='left', pad=6)
+ax2.set_title("C. Null FPR under Site Rate Variation", fontweight='bold', loc='left', pad=6)
 ax2.set_xlabel(r"Gamma Rate Heterogeneity ($\alpha$)")
 ax2.set_ylabel("False Positive Rate (%)")
 
@@ -128,9 +128,9 @@ x_pos = np.arange(len(alphas))
 rhiz_fp_means = [fp_df[fp_df['alpha_rhiz'] == a]['detection_pct_rhiz'].mean() for a in alpha_vals]
 s3_fp_means = [fp_df[fp_df['alpha_rhiz'] == a]['detection_pct_3seq'].mean() for a in alpha_vals]
 
-ax2.bar(x_pos - bar_width/2, rhiz_fp_means, bar_width, label='RhizAeon (Mean 0.58%)',
+ax2.bar(x_pos - bar_width/2, rhiz_fp_means, bar_width, label=f'RhizAeon (Mean {np.mean(rhiz_fp_means):.2f}%)',
         color='#2563eb', edgecolor='#1d4ed8', alpha=0.9, zorder=3)
-ax2.bar(x_pos + bar_width/2, s3_fp_means, bar_width, label='3SEQ (Mean 0.17%)',
+ax2.bar(x_pos + bar_width/2, s3_fp_means, bar_width, label=f'3SEQ (Mean {np.mean(s3_fp_means):.2f}%)',
         color='#cbd5e1', edgecolor='#94a3b8', alpha=0.9, zorder=3)
 
 ax2.axhline(5.0, color='#dc2626', linestyle='--', linewidth=1.0, alpha=0.85,

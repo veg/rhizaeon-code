@@ -161,6 +161,64 @@ def parse_3seq_bps(bp_str: str):
             return (int(m[0]), int(m[1]))
     return (0, 0)
 
+def consolidate_3seq_rows(rows, taxa, mat, bp_tol=200):
+    N, L = mat.shape
+    name_to_idx = {t: i for i, t in enumerate(taxa)}
+    dist_mat = np.zeros((N, N), dtype=np.float64)
+    for i in range(N):
+        dist_mat[i] = np.mean(mat[i] != mat, axis=1)
+    triu = dist_mat[np.triu_indices(N, k=1)]
+    clade_rad = max(0.01, 0.35 * float(np.median(triu))) if len(triu) > 0 else 0.01
+
+    def same_clade(a, b):
+        if a == b:
+            return True
+        ia, ib = name_to_idx.get(a), name_to_idx.get(b)
+        if ia is None or ib is None:
+            return False
+        return dist_mat[ia, ib] <= clade_rad
+
+    sorted_rows = sorted(rows, key=lambda r: (r["log10p"], r["dsp"]))
+    accepted = []
+    for r in sorted_rows:
+        is_mirror = False
+        for acc in accepted:
+            overlap = min(r["u2"], acc["u2"]) - max(r["u1"], acc["u1"])
+            shared_bp = abs(r["u1"] - acc["u1"]) <= bp_tol or abs(r["u2"] - acc["u2"]) <= bp_tol or overlap > 0
+            if shared_bp:
+                cites_acc_rec = any(same_clade(r["pa"], iso) or same_clade(r["pb"], iso) for iso in acc["isolates"])
+                child_is_acc_parent = same_clade(r["child"], acc["pa"]) or same_clade(r["child"], acc["pb"])
+                if cites_acc_rec and child_is_acc_parent:
+                    is_mirror = True
+                    break
+        if is_mirror:
+            continue
+
+        merged = False
+        for acc in accepted:
+            same_child_clade = any(same_clade(r["child"], iso) for iso in acc["isolates"])
+            same_parents = (same_clade(r["pa"], acc["pa"]) and same_clade(r["pb"], acc["pb"])) or (
+                same_clade(r["pa"], acc["pb"]) and same_clade(r["pb"], acc["pa"])
+            )
+            overlap = min(r["u2"], acc["u2"]) - max(r["u1"], acc["u1"])
+            min_len = max(1, min(r["u2"] - r["u1"] + 1, acc["u2"] - acc["u1"] + 1))
+            shared_bp = (overlap >= 0.5 * min_len) or (abs(r["u1"] - acc["u1"]) <= bp_tol and abs(r["u2"] - acc["u2"]) <= bp_tol)
+            if (same_child_clade or same_parents) and shared_bp:
+                acc["isolates"].add(r["child"])
+                merged = True
+                break
+        if not merged:
+            accepted.append({
+                "pa": r["pa"],
+                "pb": r["pb"],
+                "child": r["child"],
+                "u1": r["u1"],
+                "u2": r["u2"],
+                "log10p": r["log10p"],
+                "isolates": {r["child"]},
+            })
+    return accepted
+
 def run_single_trial(args):
     regime, d_parent, K, rep, rhiz_bin, three_bin = args
     reg_code = {"pure_ghost": 1, "surrogate_sister": 2, "deep_reservoir": 3}[regime]
@@ -226,11 +284,9 @@ def run_single_trial(args):
                 is_ghost = ev.get("is_ghost_donor", False)
                 h_name = ev.get("home_name", "")
                 
-                # Check if innocent P2 was falsely framed as donor or home
                 if d_name.startswith("P2") or h_name.startswith("P2"):
                     rhiz_parent_fp_count += 1
                     
-                # Donor attribution accuracy
                 if regime in ("pure_ghost", "deep_reservoir"):
                     if is_ghost or d_name == "Ghost":
                         rhiz_correct_donor_count += 1
@@ -282,7 +338,7 @@ def run_single_trial(args):
         "time_ms": t_rhiz_ms,
     })
     
-    # ---------------- 2. 3SEQ ----------------
+    # ---------------- 2. 3SEQ (Raw & Consolidated) ----------------
     run_id = f"3seq_{pid}_{reg_code}_{int(d_parent*100)}_{K}_{rep}"
     for ext in [".3s.rec.csv", ".3s.pvalHist", ".3s.log", ".3s.skipped"]:
         p = Path(f"{run_id}{ext}")
@@ -309,13 +365,14 @@ def run_single_trial(args):
     three_jaccards = []
     three_parent_fp_count = 0
     three_correct_donor_count = 0
+    raw_rows = []
     
     if os.path.exists(rec_csv):
         try:
             with open(rec_csv) as f:
                 for line in f:
                     parts = [p.strip() for p in line.split(",")]
-                    if len(parts) >= 10:
+                    if len(parts) >= 10 and parts[0] != "P_name":
                         try:
                             p_val = float(parts[9])
                             if p_val <= 0.05:
@@ -323,21 +380,21 @@ def run_single_trial(args):
                                 child = parts[2]
                                 pa = parts[0]
                                 pb = parts[1]
+                                log10p = float(parts[8]) if parts[8] != "-inf" else -999.0
                                 
                                 if child in true_recs:
                                     three_recs_called.add(child)
                                 elif child in bg_taxa:
                                     three_bg_called.add(child)
                                     
-                                # Check if innocent P2 is framed as parent
                                 if pa.startswith("P2") or pb.startswith("P2"):
                                     three_parent_fp_count += 1
                                     
-                                # Donor attribution
                                 if regime == "surrogate_sister":
                                     if pa.startswith("Surr") or pb.startswith("Surr"):
                                         three_correct_donor_count += 1
                                         
+                                u1_3s, u2_3s = 0, 0
                                 if len(parts) >= 13:
                                     bp_str = parts[12].strip()
                                     u1_3s, u2_3s = parse_3seq_bps(bp_str)
@@ -345,6 +402,15 @@ def run_single_trial(args):
                                         j = compute_jaccard(true_tract["u1"], true_tract["u2"], u1_3s, u2_3s)
                                         if j > 0.0:
                                             three_jaccards.append(j)
+                                raw_rows.append({
+                                    "pa": pa,
+                                    "pb": pb,
+                                    "child": child,
+                                    "log10p": log10p,
+                                    "dsp": p_val,
+                                    "u1": u1_3s,
+                                    "u2": u2_3s,
+                                })
                         except Exception:
                             pass
         except Exception:
@@ -386,6 +452,60 @@ def run_single_trial(args):
         "parent_fpr": three_parent_fpr,
         "donor_acc": three_donor_acc,
         "mean_jaccard": three_mean_jaccard,
+        "time_ms": t_3seq_ms,
+    })
+
+    # Consolidated 3SEQ ("Synthesis")
+    cons_events = consolidate_3seq_rows(raw_rows, taxa, mat) if raw_rows else []
+    cons_recs_called = set()
+    cons_bg_called = set()
+    cons_jaccards = []
+    cons_parent_fp_count = 0
+    cons_correct_donor_count = 0
+    for cev in cons_events:
+        for iso in cev["isolates"]:
+            if iso in true_recs:
+                cons_recs_called.add(iso)
+            elif iso in bg_taxa:
+                cons_bg_called.add(iso)
+        if cev["pa"].startswith("P2") or cev["pb"].startswith("P2"):
+            cons_parent_fp_count += 1
+        if regime == "surrogate_sister" and (cev["pa"].startswith("Surr") or cev["pb"].startswith("Surr")):
+            cons_correct_donor_count += 1
+        if cev["u1"] > 0 and cev["u2"] > cev["u1"]:
+            j = compute_jaccard(true_tract["u1"], true_tract["u2"], cev["u1"], cev["u2"])
+            if j > 0.0:
+                cons_jaccards.append(j)
+
+    cons_recall = len(cons_recs_called) / K
+    cons_precision = (
+        len(cons_recs_called) / (len(cons_recs_called) + len(cons_bg_called))
+        if (len(cons_recs_called) + len(cons_bg_called)) > 0
+        else 1.0
+    )
+    cons_bg_fpr = len(cons_bg_called) / len(bg_taxa)
+    cons_parent_fpr = 1.0 if cons_parent_fp_count > 0 else 0.0
+    cons_donor_acc = cons_correct_donor_count / len(cons_events) if len(cons_events) > 0 else 0.0
+    cons_mean_jaccard = float(np.mean(cons_jaccards)) if cons_jaccards else 0.0
+
+    results.append({
+        "tool": "3SEQ (Consolidated)",
+        "regime": regime,
+        "d_parent": d_parent,
+        "K": K,
+        "rep": rep,
+        "total_taxa": len(taxa),
+        "expected_events": 1,
+        "unique_events": len(cons_events),
+        "raw_alerts": len(cons_recs_called) + len(cons_bg_called),
+        "unique_rec_taxa": len(cons_recs_called),
+        "recall": cons_recall,
+        "precision": cons_precision,
+        "bg_fp_count": len(cons_bg_called),
+        "bg_fpr": cons_bg_fpr,
+        "parent_fpr": cons_parent_fpr,
+        "donor_acc": cons_donor_acc,
+        "mean_jaccard": cons_mean_jaccard,
         "time_ms": t_3seq_ms,
     })
     

@@ -81,7 +81,7 @@ fig = plt.figure(figsize=(11.5, 11.0))
 gs_master = GridSpec(3, 1, figure=fig, height_ratios=[1.15, 1.05, 1.45], hspace=0.36)
 
 # Top Sub-GridSpec for Panel A (Flux + Gene Model)
-gs_a = gs_master[0].subgridspec(2, 1, height_ratios=[2.2, 0.45], hspace=0.10)
+gs_a = gs_master[0].subgridspec(2, 1, height_ratios=[2.2, 0.45], hspace=0.24)
 ax_a_flux = fig.add_subplot(gs_a[0])
 ax_a_domains = fig.add_subplot(gs_a[1])
 
@@ -116,7 +116,9 @@ ax_a_flux.set_ylabel("Breakpoint Flux $\\Phi_{\\mathrm{bp}}(u)$ ($Z$/bp)", color
 ax_a_strain.set_ylabel("Cumulative Strain $\\rho(u)$ ($Z$)", color="#0072B2", fontweight="bold", labelpad=5)
 ax_a_flux.tick_params(axis="y", labelcolor="#D55E00")
 ax_a_strain.tick_params(axis="y", labelcolor="#0072B2")
-ax_a_flux.tick_params(axis="x", labelbottom=False)
+ax_a_flux.set_xticks(np.arange(0, 1200, 200))
+ax_a_flux.set_xticklabels([f"{x} bp" for x in np.arange(0, 1200, 200)], fontsize=6.5)
+ax_a_flux.tick_params(axis="x", labelbottom=True, pad=1.5)
 
 # Key Structural Callouts with clean non-overlapping offsets
 callouts_a = [
