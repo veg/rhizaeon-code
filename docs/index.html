@@ -967,7 +967,7 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import init, { engine_version, scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js';
+    import init, { engine_version, scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js?v=0.1.0-beta.7';
 
     let wasmReady = false;
     let latestScanResult = null;
@@ -983,7 +983,7 @@
 
     async function initWasm() {
       try {
-        await init();
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.0-beta.7');
         wasmReady = true;
         const ver = typeof engine_version === 'function' ? engine_version() : '0.1.0';
         const verBadge = document.getElementById('wasmVersionBadge');
