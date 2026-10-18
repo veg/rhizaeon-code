@@ -203,7 +203,7 @@ Competing evolutionary histories are evaluated across four orthogonal statistica
     s_{\mathrm{bulk}} = \sigma_{\mathrm{res}}^2 \left(1 + \sqrt{\frac{N}{L}}\right)^2,
     \end{equation}
     where $\sigma_{\mathrm{res}}$ is the standard deviation of off-diagonal elements in $\mathbf{R}$. An empirical $\mathrm{SNR} = s_1 / s_{\mathrm{bulk}} \le 1.0$ certifies that residual strain has collapsed into the bulk noise distribution.
-    \item \emph{Synapomorphic Site Concordance Ratio (SSCR) and Polarity}: At each polymorphic site $u$ where donor $D$ and home $H$ carry distinct nucleotides ($D_u \ne H_u$), recombinant allele $R_u$ is scored as donor-concordant ($R_u = D_u$) or home-concordant ($R_u = H_u$):
+    \item \emph{Synapomorphic Site Concordance Ratio (SSCR) and Polarity}. At each polymorphic site $u$ where donor $D$ and home $H$ carry distinct nucleotides ($D_u \ne H_u$), recombinant allele $R_u$ is scored as donor-concordant ($R_u = D_u$) or home-concordant ($R_u = H_u$):
     \begin{equation}
     \mathrm{SSCR}_{\mathrm{in}} = \frac{n_{\mathrm{in}}(R = D)}{n_{\mathrm{in}}(R = D) + n_{\mathrm{in}}(R = H)}, \qquad \mathrm{SSCR}_{\mathrm{flank}} = \frac{n_{\mathrm{flank}}(R = D)}{n_{\mathrm{flank}}(R = D) + n_{\mathrm{flank}}(R = H)}.
     \end{equation}
@@ -330,7 +330,8 @@ An expanded 83-taxon alignment (30,965~bp MSA, 13,260 gap-filtered sites) incorp
 The five Laotian BANAL genomes introduce a 9~nt insertion in the Spike N-terminal domain around 78-MSA position $22{,}050$, which shifts all downstream alignment coordinates by $+9$~nt relative to the 78-taxon MSA.
 In their primary study, \citet{lytras2022exploring} reported open reading frame annotations and the 21 consensus GARD breakpoints (derived from a 22-virus subset) in both ungapped SARS-CoV-2 Wuhan-Hu-1 reference coordinates (NC\_045512.2, $29{,}903$~nt, columns \texttt{SC2\_start}/\texttt{SC2\_end} in their Supplementary Table~S3) and 78-taxon MSA coordinates (columns \texttt{al\_start}/\texttt{al\_end}).
 To prevent cross-frame coordinate discrepancies, Table~\ref{tab:supp_sarbeco_coord_conversion} provides the exact bijective conversion across all three coordinate systems: Wuhan-Hu-1 reference ($1\text{--}29{,}903$~nt), 78-taxon MSA ($1\text{--}30{,}956$~nt), and 83-taxon MSA ($1\text{--}30{,}965$~nt).
-It maps all sarbecovirus open reading frames, functional domains, recombination hotspots/coldspots, and all 21 published GARD breakpoints alongside the closest \RhizAeon continuous changepoints evaluated within each matching frame.
+The table maps all sarbecovirus open reading frames, functional domains, and recombination hotspots and coldspots.
+It also pairs all 21 published GARD breakpoints with the closest \RhizAeon continuous changepoints evaluated within each matching frame.
 
 \paragraph{\textit{Streptococcus pneumoniae} PMEN1 Whole Chromosome.}
 We analyzed the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 / PMEN1 lineage of \textit{S.~pneumoniae} (ATCC 700669, 11 representative global isolates spanning 1984--2008, \citealt{croucher2011rapid}).
