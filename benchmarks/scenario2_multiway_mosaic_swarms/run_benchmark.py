@@ -508,7 +508,7 @@ def main():
     parser.add_argument("--threads", type=int, default=min(8, cpu_count()), help="Multiprocessing workers")
     args = parser.parse_args()
     
-    rhiz_bin = "rhizaeon"
+    rhiz_bin = "/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon"
     three_bin = "/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq"
     
     if not os.path.exists(rhiz_bin):

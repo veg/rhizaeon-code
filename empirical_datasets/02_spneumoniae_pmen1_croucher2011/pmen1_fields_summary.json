@@ -7,10 +7,10 @@
     "compression_ratio": 1465.2
   },
   "performance": {
-    "load_time_sec": 0.115,
-    "snp_extract_sec": 2.227,
-    "scan_time_sec": 0.104,
-    "total_runtime_sec": 2.446
+    "load_time_sec": 0.075,
+    "snp_extract_sec": 2.135,
+    "scan_time_sec": 0.105,
+    "total_runtime_sec": 2.315
   },
   "background_stats": {
     "mean_residual": 0.0702,

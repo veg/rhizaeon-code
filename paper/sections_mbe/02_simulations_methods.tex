@@ -5,15 +5,17 @@
 \label{subsec:methods_embedding_gower}
 Let $\mathcal{S} = \{s_1, \dots, s_M\}$ denote a multiple sequence alignment of $M$ contemporary nucleotide sequences of length $L$ over alphabet $\Sigma = \{\text{A}, \text{C}, \text{G}, \text{T}\} \cup \{-\}$.
 Pairwise evolutionary distances $D_{i,j} = d(s_i, s_j)$ are computed under the Tamura-Nei (TN93) continuous-time Markov substitution model \citep{tamura1993estimation} or normalized Hamming distance with pairwise gap deletion.
-For large cohorts ($M > 64$), the algorithm avoids $O(M^2 L)$ all-to-all comparisons by selecting $N \ll M$ reference landmark genomes via sequential Farthest-Point Sampling \citep{gonzalez1985clustering} in strictly $O(N M L)$ operations.
+For large cohorts ($M > 64$), the algorithm avoids $O(M^2 L)$ all-to-all comparisons by selecting $N \ll M$ reference landmark genomes via density-calibrated Farthest-Point Sampling \citep{gonzalez1985clustering} in strictly $O(N M L)$ operations.
 Initial seed $s_{(1)}$ maximizes non-gap coverage, and each subsequent landmark $s_{(k)}$ maximizes the running minimum distance to previously selected landmarks:
 \begin{equation}
 s_{(k)} = \arg\max_{i \notin \{s_{(1)},\dots,s_{(k-1)}\}} \min_{1 \le j < k} d(s_i, s_{(j)}).
 \label{eq:methods_fps}
 \end{equation}
-Farthest points span the divergence of the cohort.
 For $M \le 64$, all sequences serve as reference channels ($N = M$).
-When $M > 64$, Two-Pass Clonal Backbone Re-Anchoring purges candidate recombinants identified in an initial screening pass from the landmark pool so that reference coordinates anchor strictly upon unadmixed parental lineages.
+Because pervasive mosaicism in viral and bacterial cohorts can perturb initial reference coordinates if recombinant segments remain unmasked in landmark sequences, \RhizAeon couples landmark embedding with a two-pass Iterative Forward Scrubbing and Backward Leave-One-In Verification architecture.
+In Pass 1 (Iterative Forward Scrubbing), candidate recombination events across the cohort are sorted in descending order of excursion amplitude $Z_{\max}$, and each detected recombinant tract $[u_1, u_2]$ in sequence $s_i$ is masked in-place with gap characters (\texttt{'-'}).
+Under Zero-Force Scrubbed Site Physics, any alignment column $u$ where either query sequence $s_i$ or reference landmark $s_j$ carries a gap character exerts strictly zero instantaneous force ($\Delta F_u(i \to j) = 0$).
+Gap-masked mosaic tracts therefore cannot distort flanking trajectory momentum, and every sequence's unadmixed backbone remains available as a clean reference landmark.
 
 From the reference distance matrix $\mathbf{D} \in \mathbb{R}^{N \times N}$, we form the element-wise squared matrix $[\mathbf{D}^{(2)}]_{i,j} = D_{i,j}^2$.
 Applying geometric centering $\mathbf{H} = \mathbf{I}_N - \frac{1}{N} \mathbf{1}_N \mathbf{1}_N^T$ yields the doubly centered Gram matrix $\mathbf{B} = -\frac{1}{2} \mathbf{H} \mathbf{D}^{(2)} \mathbf{H}$ \citep{gower1966some}.
@@ -117,12 +119,14 @@ Dyadic wavelet matched filters and running drawdown $\text{DD}_k(u) = \max_{v \l
 Evaluating channel contrast resolves overlapping candidate alerts without threshold tuning: for any candidate tract $[u_1, u_2]$, the authentic donor channel maximizes the mean in-tract attention flux while maintaining negative or baseline flux in flanking regions.
 Merging concordant intervals deduplicates candidate events across channels and yields a unified non-redundant inventory of recombination events across the sequence.
 
-\subsection{Reticulation Graph Adjudication and Ancestral Event Grouping}
+\subsection{Reticulation Graph Adjudication, Backward Leave-One-In Verification, and Ancestral Event Grouping}
 \label{subsec:methods_adjudication}
-In reciprocal triplet scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ frequently triggers misidentification of a donor sequence as a recombinant ($D$ recombinant between $C$ and $H$).
-Reciprocal scanning artifacts create mutual two-cycles in candidate reticulation graphs ($C \leftrightarrow D$).
-Cycle adjudication resolves orientation by evaluating transition contrast $\Delta_{\text{trans}} = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$, where $\Delta d_{\text{home}} = \max(0, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank}))$.
-Authentic recombinant children leave their home background within the tract ($\Delta d_{\text{home}} \gg 0$), whereas stationary clonal parents remain within their home background across the alignment ($\Delta d_{\text{home}} \approx 0$).
+In reciprocal scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ can trigger misidentification of a donor sequence as a recombinant ($D$ recombinant between $C$ and $H$) and introduce mutual two-cycles in candidate reticulation graphs ($C \leftrightarrow D$).
+In Pass 2 (Backward Leave-One-In Verification and Polarity Swap), once all candidate events from Pass 1 are masked on the scrubbed alignment backbone $\mathcal{A}_{\mathrm{scrub}}$, each candidate event $e_r = (C, H, D, [u_1, u_2])$ is restored in isolation while all other recombinant tracts across the alignment remain gap-masked.
+Re-evaluating parental affinities and polishing breakpoint coordinates $[u_1, u_2]$ in the absence of interfering mosaic signals isolates the candidate transfer against a purely clonal background.
+Simultaneously, the engine tests reciprocal polarity by comparing the transition contrast of the forward assignment ($C$ as recombinant between $H$ and $D$) against the inverted assignment ($D$ as recombinant between $H$ and $C$), where $\Delta_{\text{trans}}(C \mid H, D) = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$ and $\Delta d_{\text{home}} = \max(0, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank}))$.
+Authentic recombinant children depart their home background within the tract ($\Delta d_{\text{home}} \gg 0$), whereas stationary clonal parents remain anchored to their home background across the alignment ($\Delta d_{\text{home}} \approx 0$).
+Whenever the inverted polarity exhibits stronger transition contrast and lower flanking strain, the engine executes a Polarity Swap: it restores $C$ to the unmasked parental backbone, reassigns the recombinant event to $D$, and masks $D$'s tract $[u_1, u_2]$ with gaps before verifying subsequent events.
 
 In expanding epidemic outbreaks, multiple descendant isolates can inherit identical mosaic tracts from a common recombinant ancestor.
 Reporting each isolate as an independent recombination event inflates event counts and misrepresents evolutionary history.

@@ -425,7 +425,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run Scenario 1.1 Epidemic Clonal Expansion Benchmark")
     parser.add_argument("--replicates", type=int, default=20, help="Replicates per condition (default 20)")
     parser.add_argument("--threads", type=int, default=min(8, cpu_count()), help="Multiprocessing workers")
-    parser.add_argument("--rhiz-bin", type=str, default="rhizaeon", help="Path to rhizaeon binary")
+    parser.add_argument("--rhiz-bin", type=str, default="/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon", help="Path to rhizaeon binary")
     parser.add_argument("--three-bin", type=str, default="/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq", help="Path to 3seq binary")
     parser.add_argument("--out-dir", type=str, default="/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario1_epidemic_clonal_expansion", help="Directory for output CSVs")
     args = parser.parse_args()

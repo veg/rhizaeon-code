@@ -145,8 +145,8 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
     cs_50 = ax.contour(X, Y, smoothed_rate, levels=[0.50], colors=["#ffffff"], linewidths=[2.0], linestyles=["-"])
     cs_90 = ax.contour(X, Y, smoothed_rate, levels=[0.90], colors=["#ffd700"], linewidths=[2.2], linestyles=["-"])
 
-    cl_50 = ax.clabel(cs_50, fmt={0.50: "50% Boundary"}, fontsize=8.0, inline=True, manual=[(0.015, 0.15)], colors="#ffffff")
-    cl_90 = ax.clabel(cs_90, fmt={0.90: "90% Certified"}, fontsize=8.0, inline=True, manual=[(0.18, 0.08)], colors="#7d6608")
+    cl_50 = ax.clabel(cs_50, fmt={0.50: "50% Boundary"}, fontsize=8.0, inline=True, manual=[(0.022, 0.14)], colors="#ffffff")
+    cl_90 = ax.clabel(cs_90, fmt={0.90: "90% Certified"}, fontsize=8.0, inline=True, manual=[(0.22, 0.065)], colors="#7d6608")
     for txt in cl_50 + cl_90:
         txt.set_fontweight("bold")
 
@@ -166,17 +166,17 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
 
     # Biological Landmarks
     landmarks = [
-        {"name": "S. pneumoniae PMEN1", "d": 0.08, "r": 0.20, "marker": "s", "color": "#1b9e77", "dx": 8, "dy": 6},
-        {"name": "HIV-1 CRF01_AE", "d": 0.12, "r": 0.16, "marker": "D", "color": "#e7298a", "dx": 10, "dy": -14},
-        {"name": "Sarbecovirus Spike RBD", "d": 0.04, "r": 0.035, "marker": "^", "color": "#d95f02", "dx": 8, "dy": 6},
-        {"name": "Primate MHC (Micro-conv.)", "d": 0.05, "r": 0.07, "marker": "o", "color": "#7570b3", "dx": 8, "dy": -12},
+        {"name": "S. pneumoniae PMEN1", "d": 0.08, "r": 0.20, "marker": "s", "color": "#1b9e77", "dx": -6, "dy": 8, "ha": "center"},
+        {"name": "HIV-1 CRF01_AE", "d": 0.12, "r": 0.16, "marker": "D", "color": "#e7298a", "dx": -4, "dy": -16, "ha": "center"},
+        {"name": "Sarbecovirus Spike RBD", "d": 0.04, "r": 0.035, "marker": "^", "color": "#d95f02", "dx": 8, "dy": -4, "ha": "left"},
+        {"name": "Primate MHC (Micro-conv.)", "d": 0.05, "r": 0.07, "marker": "o", "color": "#7570b3", "dx": 4, "dy": 8, "ha": "center"},
     ]
     for lm in landmarks:
         ax.scatter(lm["d"], lm["r"], marker=lm["marker"], s=60, color=lm["color"],
                    edgecolors="white", linewidths=1.2, zorder=6)
         ax.annotate(lm["name"], xy=(lm["d"], lm["r"]), xytext=(lm["dx"], lm["dy"]), textcoords="offset points",
-                    fontsize=7.5, fontweight="bold", color="#111111",
-                    bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="#cccccc", lw=0.6, alpha=0.92), zorder=7)
+                    fontsize=7.3, fontweight="bold", color="#111111", ha=lm["ha"],
+                    bbox=dict(boxstyle="round,pad=0.22", fc="white", ec="#cccccc", lw=0.6, alpha=0.92), zorder=7)
 
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -268,8 +268,8 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
 
     cs_50 = ax.contour(X, Y, smoothed_rate, levels=[0.50], colors=["#ffffff"], linewidths=[1.8], linestyles=["-"])
     cs_90 = ax.contour(X, Y, smoothed_rate, levels=[0.90], colors=["#ffd700"], linewidths=[2.0], linestyles=["-"])
-    cl_50 = ax.clabel(cs_50, fmt={0.50: "50% Boundary"}, fontsize=7.5, inline=True, manual=[(0.015, 0.15)], colors="#ffffff")
-    cl_90 = ax.clabel(cs_90, fmt={0.90: "90% Certified"}, fontsize=7.5, inline=True, manual=[(0.18, 0.08)], colors="#7d6608")
+    cl_50 = ax.clabel(cs_50, fmt={0.50: "50% Boundary"}, fontsize=7.5, inline=True, manual=[(0.022, 0.14)], colors="#ffffff")
+    cl_90 = ax.clabel(cs_90, fmt={0.90: "90% Certified"}, fontsize=7.5, inline=True, manual=[(0.22, 0.065)], colors="#7d6608")
     for txt in cl_50 + cl_90:
         txt.set_fontweight("bold")
 
@@ -284,7 +284,7 @@ def generate_envelope_figures(csv_path: str, out_dir: str = "."):
         ax.scatter(lm["d"], lm["r"], marker=lm["marker"], s=45, color=lm["color"],
                    edgecolors="white", linewidths=1.0, zorder=6)
         ax.annotate(lm["name"], xy=(lm["d"], lm["r"]), xytext=(lm["dx"], lm["dy"]), textcoords="offset points",
-                    fontsize=6.8, fontweight="bold", color="#111111",
+                    fontsize=6.8, fontweight="bold", color="#111111", ha=lm["ha"],
                     bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="#cccccc", lw=0.5, alpha=0.90), zorder=7)
 
     ax.set_xscale("log")

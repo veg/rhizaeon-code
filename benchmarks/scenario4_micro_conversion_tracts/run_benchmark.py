@@ -441,7 +441,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run Scenario 1.4 Bacterial Micro-Conversion Benchmark")
     parser.add_argument("--replicates", type=int, default=20, help="Replicates per condition (default 20)")
     parser.add_argument("--threads", type=int, default=min(8, cpu_count()), help="Multiprocessing workers")
-    parser.add_argument("--rhiz-bin", type=str, default="rhizaeon", help="Path to rhizaeon binary")
+    parser.add_argument("--rhiz-bin", type=str, default="/Users/sergei/Projects/rhizaeon-code/target/release/rhizaeon", help="Path to rhizaeon binary")
     parser.add_argument("--three-bin", type=str, default="/Users/sergei/Projects/TOGA_MEME/recombination/benchmarks/tools/3seq/cmake-build/3seq", help="Path to 3seq binary")
     parser.add_argument("--out-dir", type=str, default="/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario4_micro_conversion_tracts", help="Directory for output CSVs")
     args = parser.parse_args()
