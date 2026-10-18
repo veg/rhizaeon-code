@@ -726,7 +726,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model">PA-FF 2.1 WASM</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -967,7 +967,7 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import init, { scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js';
+    import init, { engine_version, scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js';
 
     let wasmReady = false;
     let latestScanResult = null;
@@ -985,10 +985,15 @@
       try {
         await init();
         wasmReady = true;
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.0';
+        const verBadge = document.getElementById('wasmVersionBadge');
+        if (verBadge) {
+          verBadge.innerHTML = `PA-FF 2.1 WASM &middot; v${ver}`;
+        }
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
-        document.getElementById('systemLedText').innerText = 'System: Ready';
+        document.getElementById('systemLedText').innerText = `System: Ready (v${ver})`;
         document.getElementById('statusAlert').className = 'status-strip info';
-        document.getElementById('statusAlert').innerHTML = '<strong>WASM Engine Operational.</strong> Select an empirical station preset or drop a FASTA file.';
+        document.getElementById('statusAlert').innerHTML = `<strong>WASM Engine v${ver} Operational.</strong> Select an empirical station preset or drop a FASTA file.`;
       } catch (err) {
         console.error('WASM Init error:', err);
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-red)';
