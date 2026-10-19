@@ -1,0 +1,64 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\graphicspath{{./}}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{bm}
+\usepackage{xspace}
+\usepackage[numbers,sort&compress,round,authoryear]{natbib}
+\usepackage{authblk}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newcommand{\RhizAeon}{\texttt{RhizAeon}\xspace}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\renewcommand\Authfont{\normalsize\bfseries}
+\renewcommand\Affilfont{\small\normalfont}
+
+\title{\textbf{Clean Breaks: Attention Force Field Deconvolution of Recombination Across Sequence Manifolds}}
+
+\author[1,2,*]{Sergei L.\ Kosakovsky Pond}
+\author[1,2]{Danielle Callan}
+\author[1]{Steven Weaver}
+\author[1,2]{Hannah Verdonk}
+\author[3]{Anton Nekrutenko}
+\author[4]{Taylor K.\ Paisie}
+\author[4]{Darren P.\ Martin}
+
+\affil[1]{Institute for Genomics and Evolutionary Medicine, Temple University, Philadelphia, PA, USA}
+\affil[2]{Department of Biology, Temple University, Philadelphia, PA, USA}
+\affil[3]{Department of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA}
+\affil[4]{Institute of Infectious Disease and Molecular Medicine, University of Cape Town, Cape Town, South Africa}
+\affil[*]{Corresponding author: \href{mailto:spond@temple.edu}{spond@temple.edu}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent Homologous recombination and horizontal gene transfer assemble mosaic chromosomes across divergent lineages. Reticulate evolution violates bifurcating trees, yet existing detectors enforce a stark trade-off: phylogenetic changepoint models optimize partitioned topologies at exponential computational cost, whereas sequence triplet heuristics evaluate rapidly but suffer from severe combinatorial event overcounting. We introduce \RhizAeon, an open-source platform that deconvolves reticulate evolution through continuous trajectory mechanics across metric embeddings in linear time ($\mathcal{O}(N K L)$). Projecting aligned sequences into canonical metric coordinates and routing lineage-specific rate variation into an unpolarized root sink, the engine iteratively scrubs mosaic tracts and verifies breakpoints through Brownian-bridge statistics, dyadic matched filters, and maximum-likelihood polishing. Across canonical coalescent benchmarks and a continuous parameter sweep of 1,000,000 whole genomes, \RhizAeon bounds false-positive rates well below the $5.0\%$ nominal ceiling ($0.42\%$ on 1,200 rate-variation nulls and $0.34\%$ across 332,960 continuous sweep nulls). Leave-one-in verification and bidirectional overlap clustering collapse co-recombinant clades into single ancestral reticulations. Empirical analyses across wildlife sarbecovirus Spike chimeras, multidrug-resistant \textit{Streptococcus pneumoniae} chromosomes (2.22~Mb), and 379 primate \textit{HLA} Class~I alleles reconstruct complex whole-genome mosaicism, cassette exchanges, and micro-conversions in seconds. The core engine compiles to WebAssembly for interactive execution within standard web browsers.
+
+\vspace{6pt}
+\noindent\textbf{Keywords:} Recombination, Reticulate Evolution, Sequence Manifolds, Continuous Trajectory Tracking, Multidimensional Scaling, Foundation Models
+\end{abstract}
+
+\input{sections_mbe/00_introduction.tex}
+\input{sections_mbe/00_rhizaeon_overview.tex}
+\input{sections_mbe/01_simulations_results.tex}
+\input{sections_mbe/03_empirical_results.tex}
+\input{sections_mbe/04_discussion.tex}
+\input{sections_mbe/02_simulations_methods.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\input{sections_mbe/supplementary.tex}
+
+\end{document}
