@@ -11,27 +11,27 @@ Simulations span $L \in [300, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d_{\mathrm{
 \toprule
 Evolutionary Regime & Parameter Space & Total Trials & Detected / Rec & Power / FPR & Mean Jaccard & Median BP Error \\
 \midrule
-Strict Molecular Clock Null & $d \in [0.005, 0.35], \alpha \ge 50$ & 83,311 & 1,020 & 1.224\% FPR & 1.000 & --- \\
-Gamma Heterotachy Null & $\alpha \in [0.2, 5.0], d \in [0.005, 0.35]$ & 250,023 & 3,439 & 1.375\% FPR & 1.000 & --- \\
-Taxon-Level False Alarm & $N_{\mathrm{taxa}} = 22,744,905$ total leaves & 333,334 & 7,633 taxa & 0.034\% FPR & --- & --- \\
+Strict Molecular Clock Null & $d \in [0.005, 0.35], \alpha \ge 50$ & 83,311 & 761 & 0.913\% FPR & 1.000 & --- \\
+Gamma Heterotachy Null & $\alpha \in [0.2, 5.0], d \in [0.005, 0.35]$ & 250,023 & 2,593 & 1.037\% FPR & 1.000 & --- \\
+Taxon-Level False Alarm & $N_{\mathrm{taxa}} = 22,744,905$ total leaves & 333,334 & 5,884 taxa & 0.026\% FPR & --- & --- \\
 \midrule
 \multicolumn{7}{l}{\textit{Recombinant Partition Stratified by Informative Tract Mutations ($M_{\mathrm{tract}}$)}} \\
-Tract SNPs $M \in [0--2]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 85,564 & 599 & 0.7\% & 0.000 & 137.0 nt \\
-Tract SNPs $M \in [3--5]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 68,609 & 3,209 & 4.7\% & 0.025 & 20.0 nt \\
-Tract SNPs $M \in [6--10]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 77,568 & 20,393 & 26.3\% & 0.189 & 19.0 nt \\
-Tract SNPs $M \in [11--15]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 52,607 & 26,558 & 50.5\% & 0.385 & 19.0 nt \\
-Tract SNPs $M \in [16--25]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 71,427 & 49,928 & 69.9\% & 0.550 & 17.0 nt \\
-Tract SNPs $M \in [26--50]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 96,694 & 81,402 & 84.2\% & 0.692 & 14.0 nt \\
-Tract SNPs $M \in [51--100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 84,676 & 76,443 & 90.3\% & 0.762 & 11.0 nt \\
-Tract SNPs $M \in [>100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 129,521 & 120,984 & 93.4\% & 0.759 & 8.0 nt \\
+Tract SNPs $M \in [0--2]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 85,564 & 484 & 0.6\% & 0.000 & 42.0 nt \\
+Tract SNPs $M \in [3--5]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 68,609 & 4,801 & 7.0\% & 0.043 & 16.0 nt \\
+Tract SNPs $M \in [6--10]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 77,568 & 25,024 & 32.3\% & 0.238 & 19.0 nt \\
+Tract SNPs $M \in [11--15]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 52,607 & 29,679 & 56.4\% & 0.443 & 19.0 nt \\
+Tract SNPs $M \in [16--25]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 71,427 & 52,042 & 72.9\% & 0.592 & 16.0 nt \\
+Tract SNPs $M \in [26--50]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 96,694 & 80,562 & 83.3\% & 0.703 & 12.0 nt \\
+Tract SNPs $M \in [51--100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 84,676 & 73,443 & 86.7\% & 0.742 & 10.0 nt \\
+Tract SNPs $M \in [>100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 129,521 & 114,518 & 88.4\% & 0.728 & 7.0 nt \\
 \midrule
 \multicolumn{7}{l}{\textit{Multi-Event and Structural Topology Decomposition ($K_{\mathrm{true}} \ge 1$, Total $N = 666,666$)}} \\
-Single Event ($K_{\mathrm{true}} = 1$) & Crossover / Cassette & 366,396 & 197,409 & 53.9\% & 0.397 & 15.0 nt \\
-Dual Events ($K_{\mathrm{true}} = 2$) & Two Reticulations & 166,279 & 100,673 & 60.5\% & 0.508 & 11.0 nt \\
-Triple Events ($K_{\mathrm{true}} = 3$) & Three Reticulations & 80,391 & 49,168 & 61.2\% & 0.503 & 9.0 nt \\
-Quad Events ($K_{\mathrm{true}} = 4$) & Complex Mosaicism & 53,600 & 32,266 & 60.2\% & 0.483 & 8.0 nt \\
-Terminal Crossovers & 5' or 3' Exchange & 239,767 & 167,228 & 69.7\% & 0.518 & 11.0 nt \\
-Internal Cassettes Only & Intercalary Swap & 426,899 & 212,288 & 49.7\% & 0.403 & 13.0 nt \\
+Single Event ($K_{\mathrm{true}} = 1$) & Crossover / Cassette & 366,396 & 197,742 & 54.0\% & 0.409 & 14.0 nt \\
+Dual Events ($K_{\mathrm{true}} = 2$) & Two Reticulations & 166,279 & 101,156 & 60.8\% & 0.512 & 10.0 nt \\
+Triple Events ($K_{\mathrm{true}} = 3$) & Three Reticulations & 80,391 & 49,286 & 61.3\% & 0.510 & 8.0 nt \\
+Quad Events ($K_{\mathrm{true}} = 4$) & Complex Mosaicism & 53,600 & 32,369 & 60.4\% & 0.492 & 8.0 nt \\
+Terminal Crossovers & 5' or 3' Exchange & 239,767 & 163,424 & 68.2\% & 0.514 & 10.0 nt \\
+Internal Cassettes Only & Intercalary Swap & 426,899 & 217,129 & 50.9\% & 0.420 & 12.0 nt \\
 \bottomrule
 \end{tabular*}}
 \end{table*}

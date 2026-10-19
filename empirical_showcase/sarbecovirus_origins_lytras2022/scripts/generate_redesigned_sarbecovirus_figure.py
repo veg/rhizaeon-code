@@ -215,12 +215,12 @@ for g, r, d in zip(gard_bps, rhiz_bps, dists):
     ax_a_ticks.plot([r, g], [y_rhiz - 0.12, y_gard + 0.12], color=col, lw=0.9, ls="-" if is_concordant else ":", alpha=0.85)
 
 key_tick_callouts = [
-    (12854, 13001, "RdRp 5' (147 nt)", 0.62, 0),
-    (21643, 21621, "Spike 5' (22 nt)", 1.32, -450),
-    (22756, 22649, "NTD/RBD (107 nt)", -0.18, -500),
-    (23701, 23629, "RBD 3' (72 nt)", 1.32, -100),
-    (24461, 24484, "S2 (23 nt)", -0.18, 450),
-    (25160, 25183, "S2 exit (23 nt)", 1.32, 650)
+    (12854, 13007, "RdRp 5' (153 nt)", 0.62, 0),
+    (14633, 14603, "RdRp int (30 nt)", -0.18, 0),
+    (21643, 21623, "Spike 5' (20 nt)", 1.32, -450),
+    (22756, 22875, "NTD/RBD (119 nt)", -0.18, -300),
+    (24461, 24361, "S2 (100 nt)", 1.32, 350),
+    (28580, 28556, "ORF7b/8 (24 nt)", -0.18, 0)
 ]
 for g_val, r_val, lbl, y_pos, dx in key_tick_callouts:
     mid_x = (g_val + r_val) / 2 + dx

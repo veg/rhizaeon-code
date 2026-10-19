@@ -1,0 +1,17 @@
+=== M_TRACT BINS (MATCHED BP1_ERROR) ===
+Tract SNPs $M \in [0--2]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 85,564 & 484 & 0.6\% & 0.000 & 42.0 nt \\
+Tract SNPs $M \in [3--5]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 68,609 & 4,801 & 7.0\% & 0.043 & 16.0 nt \\
+Tract SNPs $M \in [6--10]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 77,568 & 25,024 & 32.3\% & 0.238 & 19.0 nt \\
+Tract SNPs $M \in [11--15]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 52,607 & 29,679 & 56.4\% & 0.443 & 19.0 nt \\
+Tract SNPs $M \in [16--25]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 71,427 & 52,042 & 72.9\% & 0.592 & 16.0 nt \\
+Tract SNPs $M \in [26--50]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 96,694 & 80,562 & 83.3\% & 0.703 & 12.0 nt \\
+Tract SNPs $M \in [51--100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 84,676 & 73,443 & 86.7\% & 0.742 & 10.0 nt \\
+Tract SNPs $M \in [>100]$ & $L_{\mathrm{tract}} \in [45, 0.45 L]\text{ nt}$ & 129,521 & 114,518 & 88.4\% & 0.728 & 7.0 nt \\
+M >= 500: 21064 19343 91.83% med_bp1=8.0 nt
+=== COMPLEXITY & TOPOLOGY ===
+Single Event ($K_{\mathrm{true}} = 1$) & Crossover / Cassette & 366,396 & 197,742 & 54.0\% & 0.409 & 14.0 nt \\  % event_prec=94.5%
+Dual Events ($K_{\mathrm{true}} = 2$) & Two Reticulations & 166,279 & 101,156 & 60.8\% & 0.512 & 10.0 nt \\  % event_prec=96.7%
+Triple Events ($K_{\mathrm{true}} = 3$) & Three Reticulations & 80,391 & 49,286 & 61.3\% & 0.510 & 8.0 nt \\  % event_prec=97.5%
+Quad Events ($K_{\mathrm{true}} = 4$) & Complex Mosaicism & 53,600 & 32,369 & 60.4\% & 0.492 & 8.0 nt \\  % event_prec=97.9%
+Terminal Crossovers & 5' or 3' Exchange & 239,767 & 163,424 & 68.2\% & 0.514 & 10.0 nt \\  % matched_med_j=0.941
+Internal Cassettes Only & Intercalary Swap & 426,899 & 217,129 & 50.9\% & 0.420 & 12.0 nt \\  % matched_med_j=0.909

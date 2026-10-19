@@ -17,7 +17,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.patches import Rectangle
-import seaborn as sns
+
 
 def set_biovis_style():
     """Configure matplotlib with publication-grade BioVis typography and styling."""
@@ -177,7 +177,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_b.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_b.legend(loc="lower right", frameon=True, fontsize=8.0, title="True Events")
-    sns.despine(ax=ax_b)
+    ax_b.spines["top"].set_visible(False); ax_b.spines["right"].set_visible(False)
 
     # =========================================================================
     # PANEL C: Structural Topology Sensitivity (Crossover vs Cassette)
@@ -267,7 +267,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_c.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_c.legend(loc="lower right", frameon=True, fontsize=8.0)
-    sns.despine(ax=ax_c)
+    ax_c.spines["top"].set_visible(False); ax_c.spines["right"].set_visible(False)
 
     # =========================================================================
     # PANEL D: Multi-Donor Mosaic Disambiguation
@@ -357,7 +357,7 @@ def plot_multievent_biovis(csv_path: str, out_png: str, out_pdf: str = None):
                    fontsize=10.5, fontweight="bold", loc="left", pad=10)
     ax_d.grid(True, which="both", ls=":", alpha=0.35, color="gray")
     ax_d.legend(loc="lower right", frameon=True, fontsize=7.5)
-    sns.despine(ax=ax_d)
+    ax_d.spines["top"].set_visible(False); ax_d.spines["right"].set_visible(False)
 
     # Save outputs
     plt.savefig(out_png, dpi=300, bbox_inches="tight")
