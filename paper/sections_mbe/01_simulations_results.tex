@@ -4,10 +4,10 @@
 \begin{figure*}[t!]
 \centering
 \includegraphics[width=\linewidth,keepaspectratio]{figures/fig_posada_crandall_benchmark.pdf}
-\caption{Head-to-head performance of \RhizAeon versus 3SEQ across the 3,200-trial Posada \& Crandall benchmark ($N = 10$, $L = 1{,}000$ nt).
-(A) Alignment-level detection power across population recombination parameters ($\rho = 4N_e r \in [0, 64]$) and mutational densities ($\theta = 4N_e\mu \in [10, 200]$). Both methods achieve closely matched power trajectories and reach $97.0\%\text{--}100.0\%$ at $\theta = 200$.
-(B) Inferred event cardinality ($\hat{K}$) compared against Hudson's theoretical expectation ($\mathbb{E}[R]$, black dashed line). Unconsolidated 3SEQ triplet calls inflate apparent event counts up to $\hat{K} = 17.3$, whereas \RhizAeon consolidates shared segments into calibrated historical events ($\hat{K} \approx 1.2\text{--}4.1$ at $\theta = 200, \rho \ge 4$).
-(C) Empirical false positive rate (FPR, \%) across 1,200 non-recombinant alignments under site-to-site Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$). Both methods maintain strict control below the 5\% ceiling (red dashed line), where \RhizAeon averages $0.58\%$ ($7 / 1{,}200$) and 3SEQ averages $0.17\%$ ($2 / 1{,}200$).}
+\caption{Performance of \RhizAeon and 3SEQ across the 3,200-trial \citet{posada2001evaluation} coalescent benchmark ($N = 10$, $L = 1{,}000$~nt).
+(A)~Alignment-level detection power across population recombination rates ($\rho = 4N_e r \in [0, 64]$) and mutation densities ($\theta = 4N_e\mu \in [10, 200]$).
+(B)~Inferred event cardinality ($\hat{K}$) versus Hudson's theoretical expectation ($\mathbb{E}[R]$, black dashed line), contrasting unconsolidated 3SEQ triplet counts against consolidated \RhizAeon events.
+(C)~Empirical false-positive rate (FPR, \%) across 1,200 non-recombinant alignments under site-to-site Gamma rate variation ($\alpha \in \{2.0, 0.5, 0.05\}$; red dashed line marks the 5\% nominal threshold).}
 \label{fig:posada_benchmark}
 \end{figure*}
 
@@ -39,14 +39,13 @@ We therefore implemented a faithful downstream 3SEQ consolidation pipeline---\te
 
 \begin{figure*}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_specialized_scenarios.pdf}
-\caption{Operational performance of \RhizAeon, unconsolidated \texttt{3SEQ (Raw)}, and post-processed \texttt{3SEQ (Consolidated)} across four specialized genomic and epidemiological regimes.
-Each row depicts the simulation topology (Col.~1), primary diagnostic metric (Col.~2), boundary precision (Col.~3), and inferred event cardinality ($\hat{K}$) across co-recombinant cluster sizes ($K$, Col.~4).
-(A)~Epidemic Clonal Expansion: An ancestral reticulation ($P_1, P_2 \to R_{\mathrm{anc}}$) generates a 1.5~kb cassette inherited by a cluster of $K \in \{2\text{--}15\}$ descendant isolates. While raw 3SEQ inflates triplet alerts ($\hat{K} = 9.5\text{--}55.0$), both \texttt{3SEQ (Consolidated)} ($\hat{K} = 1.00\text{--}1.10$) and \RhizAeon ($\hat{K} = 1.00\text{--}1.25$ at $d \ge 0.05$) collapse the cluster into a single ancestral event. \RhizAeon completes each scan in $2.05\text{--}6.46$~s compared to $1.06\text{--}10.87$~s for 3SEQ.
-(B)~Multi-Way Mosaic Clusters: Dual Cassette, Nested Doll, and Triple Crossover architectures ($K_{\mathrm{donor}} = 2.0$). Trajectory deconvolution recovers both parental donors ($1.90\text{--}2.00$ of $2.00$ in Dual Cassettes, and $2.00$ across all conditions at $d \ge 0.05$). By contrast, triplet scanning with or without consolidation identifies only one dominant crossover per recombinant ($1.00\text{--}1.15$ donors).
-(C)~Ghost Donor Introgression: Incomplete taxon sampling across Surrogate Sister, Pure Ghost, and Deep Reservoir regimes. When a donor is completely unsampled (Pure Ghost and Deep Reservoir across $K \in \{2, 5, 10\}$), \RhizAeon detects the introgressed tract and explicitly labels the donor as \texttt{"Ghost"} ($80.0\%\text{--}100.0\%$ recall, $90.0\%\text{--}100.0\%$ precision, and $0.0\%$ background false alarms in 10 of 12 conditions at $d \ge 0.05$). In Surrogate Sister cohorts, both \RhizAeon ($100.0\%$) and \texttt{3SEQ (Consolidated)} ($95.0\%\text{--}100.0\%$) accurately attribute the transfer to the sampled sister lineage at $d \ge 0.05$.
-(D)~Bacterial Micro-Conversions: Short replacement tracts ($L_{\mathrm{tract}} \in [50, 800]$~nt). \RhizAeon maintains $100.0\%$ precision and $0.0\%$ background false alarms across all 45 conditions and reaches $80.0\%\text{--}100.0\%$ recall at $L_{\mathrm{tract}} = 100$~nt ($d = 0.10$). At $L_{\mathrm{tract}} \ge 200$~nt ($d = 0.10$), boundary precision reaches $15\text{--}28$~nt mean error ($J = 0.88\text{--}0.98$) while eliminating raw triplet inflation ($\hat{K} = 15.8\text{--}40.0$).
-}
+\includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/fig_specialized_scenarios.pdf}
+\caption{Comparison of \RhizAeon, unconsolidated \texttt{3SEQ (Raw)}, and post-processed \texttt{3SEQ (Consolidated)} across four specialized genomic and epidemiological regimes.
+Columns display the simulated topology (Col.~1), primary diagnostic metric (Col.~2), breakpoint boundary overlap or error (Col.~3), and inferred event cardinality $\hat{K}$ across co-recombinant cluster sizes $K$ (Col.~4).
+(A)~Epidemic clonal expansion of a single ancestral 1.5~kb cassette into $K \in \{2\text{--}15\}$ sampled descendants.
+(B)~Multi-way mosaic clusters combining two distinct donors ($K_{\mathrm{donor}} = 2.0$) across Dual Cassette, Nested Doll, and Triple Crossover architectures.
+(C)~Ghost donor introgression under Surrogate Sister, Pure Ghost, and Deep Reservoir sampling regimes.
+(D)~Bacterial micro-conversions across replacement tract lengths $L_{\mathrm{tract}} \in [50, 800]$~nt.}
 \label{fig:specialized_scenarios}
 \end{figure*}
 
@@ -116,10 +115,10 @@ Post-processing in \texttt{3SEQ (Consolidated)} reduces inferred events to $\hat
 \begin{figure*}[t!]
 \centering
 \includegraphics[width=\linewidth,keepaspectratio]{figures/fig_grand_sweep_1m_phase_diagram.pdf}
-\caption{Empirical aeronautical operational flight envelope, information-theoretic observability frontier, and sub-gene breakpoint precision of \RhizAeon across 1,000,000 independent continuous simulation trials ($N = 4\text{--}250$ taxa, $L = 300\text{--}30{,}000$ nt).
-(A)~Aeronautical flight operating envelope in $(d_{\mathrm{parent}} \times L_{\mathrm{tract}}/L)$ parameter space with continuous empirical power contours. The 50\% operational boundary (white) and 90\% certified threshold (gold) demarcate the high-confidence flight corridor from the shaded Informational Stall Zone ($M_{\mathrm{tract}} < 3$ SNPs, power $0.6\%$, red diagonal hatching). Overlaid biological landmarks mark empirical recombinant architectures: \textit{Streptococcus pneumoniae} PMEN1 ($d=0.08, r=0.20$), HIV-1 CRF01\_AE ($d=0.12, r=0.16$), Sarbecovirus Spike RBD ($d=0.04, r=0.035$), and Primate MHC micro-conversion ($d=0.05, r=0.07$).
-(B)~Information-theoretic observability frontier as a function of informative mutations in the recombinant tract ($M_{\mathrm{tract}}$). Power transitions sharply from $0.6\%$ at the stall horizon ($M_{\mathrm{tract}} \le 2$ SNPs) to $56.4\%$ at $M_{\mathrm{tract}} \in [11, 15]$, $83.3\%$ at $M_{\mathrm{tract}} \in [26, 50]$, and achieves an $88.4\%$ saturation plateau for $M_{\mathrm{tract}} > 100$ SNPs ($91.83\%$ for $M_{\mathrm{tract}} \ge 500$, $N = 21{,}064$ trials). The non-recombinant null false positive rate floor is bounded well below the $5.0\%$ nominal ceiling at $1.01\%$ alignment-level ($0.026\%$ per-taxon, green horizontal span).
-(C)~Breakpoint spatial resolution error $|\hat{u} - u^*|$ across matched events as a function of tract mutations $M_{\mathrm{tract}}$. Median spatial error decreases monotonically from $16.0\text{--}19.0$~nt at $M_{\mathrm{tract}} \in [3, 15]$ down to $7.0$~nt across all $M_{\mathrm{tract}} > 100$ SNPs ($8.0$~nt at $M_{\mathrm{tract}} \ge 500$), with interquartile precision bounded within sub-gene margins.}
+\caption{Operational phase envelope, observability frontier, and breakpoint precision across 1,000,000 continuous simulation trials ($N = 4\text{--}250$ taxa, $L = 300\text{--}30{,}000$~nt).
+(A)~Detection power contours across parental divergence ($d_{\mathrm{parent}}$) and relative tract length ($L_{\mathrm{tract}}/L$), showing the 50\% (white) and 90\% (gold) boundaries, the informational stall zone ($M_{\mathrm{tract}} < 3$ SNPs, red hatching), and empirical biological landmarks.
+(B)~Detection power as a function of informative tract mutations ($M_{\mathrm{tract}}$) relative to the non-recombinant null false-positive floor ($1.01\%$ alignment-level, $0.026\%$ per-taxon, green band).
+(C)~Median and interquartile breakpoint spatial error $|\hat{u} - u^*|$ across matched events versus $M_{\mathrm{tract}}$.}
 \label{fig:grand_sweep_1m_phase_diagram}
 \end{figure*}
 
