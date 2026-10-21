@@ -85,10 +85,10 @@ fig = plt.figure(figsize=(13.5, 13.2))
 gs = gridspec.GridSpec(3, 2, height_ratios=[1.0, 0.72, 1.08], hspace=0.32, wspace=0.22)
 
 # Row 1: Panel A (spans full width)
-gs_a = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[0, :], height_ratios=[1.0, 0.16, 0.36], hspace=0.08)
+gs_a = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[0, :], height_ratios=[1.0, 0.22, 0.38], hspace=0.06)
 ax_a_flux = fig.add_subplot(gs_a[0])
 ax_a_genes = fig.add_subplot(gs_a[1], sharex=ax_a_flux)
-ax_a_ticks = fig.add_subplot(gs_a[2])
+ax_a_ticks = fig.add_subplot(gs_a[2], sharex=ax_a_flux)
 
 # Row 2: Panel B (spans full width)
 ax_b_mosaic = fig.add_subplot(gs[1, :])
@@ -148,7 +148,7 @@ for pos, label, y_frac in hotspot_calls:
 ax_a_flux.legend(loc="upper left", frameon=True, facecolor="white", edgecolor="#DDDDDD", fontsize=7.0)
 
 # =========================================================================
-# PANEL A2: Gene Annotation Track
+# PANEL A2: Gene Annotation Track (Aligned 1-to-1 with Flux & Tickmarks)
 # =========================================================================
 GENE_COLORS = {
     "ORF1ab": "#E0E0E0", "RdRp": "#B0B0B0", "Spike": "#F0E442",
@@ -158,8 +158,19 @@ GENE_COLORS = {
     "ORF8": "#CC79A7", "N": "#009E73", "ORF10": "#999999"
 }
 
+ax_a_genes.set_xlim(-200, 31200)
 ax_a_genes.set_ylim(0, 1)
 ax_a_genes.axis("off")
+
+# Vertical guide lines connecting Spike 5' start (21,796), NTD/RBD hinge (22,764), and Spike 3' end (25,701)
+for x_guide, col_guide in [(GENES["RdRp"]["aln_start"], "#777777"),
+                           (GENES["RdRp"]["aln_end"], "#777777"),
+                           (GENES["Spike"]["aln_start"], "#B45309"),
+                           (22764, "#D55E00"),
+                           (GENES["Spike"]["aln_end"], "#B45309")]:
+    ax_a_flux.axvline(x_guide, color=col_guide, ls=":", lw=0.75, alpha=0.55, zorder=1)
+    ax_a_genes.axvline(x_guide, color=col_guide, ls=":", lw=0.75, alpha=0.55, zorder=1)
+    ax_a_ticks.axvline(x_guide, color=col_guide, ls=":", lw=0.75, alpha=0.55, zorder=1)
 
 major_genes = ["ORF1ab", "Spike", "ORF3a", "E", "M", "ORF6", "ORF7a", "ORF8", "N"]
 for g_name in major_genes:
@@ -169,19 +180,28 @@ for g_name in major_genes:
     x0 = info["aln_start"]
     width = info["aln_length"]
     col = GENE_COLORS.get(g_name, "#E0E0E0")
-    rect = patches.Rectangle((x0, 0.1), width, 0.8, facecolor=col, edgecolor="#333333", lw=0.5)
+    lw_box = 1.1 if g_name == "Spike" else 0.5
+    rect = patches.Rectangle((x0, 0.12), width, 0.76, facecolor=col, edgecolor="#222222", lw=lw_box, zorder=2)
     ax_a_genes.add_patch(rect)
-    if width > 800:
-        x_lbl = x0 + width * 0.72 if g_name == "Spike" else x0 + width / 2
-        ax_a_genes.text(x_lbl, 0.5, g_name, ha="center", va="center", fontsize=7.0, fontweight="bold", color="#111111")
+    if g_name == "ORF1ab":
+        ax_a_genes.text(x0 + width * 0.32, 0.5, "ORF1a / ORF1b", ha="center", va="center", fontsize=7.0, fontweight="bold", color="#111111", zorder=5)
+    elif g_name == "Spike":
+        # Label S2 in the yellow portion of Spike and put a clear 'Spike (S)' bracket label
+        ax_a_genes.text(24600, 0.5, "Spike (S2)", ha="center", va="center", fontsize=6.6, fontweight="bold", color="#111111", zorder=5)
+    elif width > 800:
+        ax_a_genes.text(x0 + width / 2, 0.5, g_name, ha="center", va="center", fontsize=6.8, fontweight="bold", color="#111111", zorder=5)
 
 s_ntd = GENES["Spike_NTD"]
 s_rbd = GENES["Spike_RBD"]
-ax_a_genes.add_patch(patches.Rectangle((s_ntd["aln_start"], 0.1), s_ntd["aln_length"], 0.8, facecolor="#E69F00", edgecolor="#333333", lw=0.5))
-ax_a_genes.add_patch(patches.Rectangle((s_rbd["aln_start"], 0.1), s_rbd["aln_length"], 0.8, facecolor="#D55E00", edgecolor="#333333", lw=0.5))
+ax_a_genes.add_patch(patches.Rectangle((s_ntd["aln_start"], 0.12), s_ntd["aln_length"], 0.76, facecolor="#E69F00", edgecolor="#222222", lw=0.6, zorder=3))
+ax_a_genes.text(s_ntd["aln_start"] + s_ntd["aln_length"]/2, 0.5, "S1-NTD", ha="center", va="center", fontsize=6.0, fontweight="bold", color="#111111", zorder=5)
+ax_a_genes.add_patch(patches.Rectangle((s_rbd["aln_start"], 0.12), s_rbd["aln_length"], 0.76, facecolor="#D55E00", edgecolor="#222222", lw=0.6, zorder=3))
+ax_a_genes.text(s_rbd["aln_start"] + s_rbd["aln_length"]/2, 0.5, "RBD", ha="center", va="center", fontsize=5.8, fontweight="bold", color="white", zorder=5)
+
 rdrp = GENES["RdRp"]
-ax_a_genes.add_patch(patches.Rectangle((rdrp["aln_start"], 0.1), rdrp["aln_length"], 0.8, facecolor="#A0A0A0", edgecolor="#333333", lw=0.5))
-ax_a_genes.text(rdrp["aln_start"] + rdrp["aln_length"]/2, 0.5, "RdRp", ha="center", va="center", fontsize=6.5, fontweight="bold", color="#111111")
+ax_a_genes.add_patch(patches.Rectangle((rdrp["aln_start"], 0.12), rdrp["aln_length"], 0.76, facecolor="#A0A0A0", edgecolor="#222222", lw=0.6, zorder=3))
+ax_a_genes.text(rdrp["aln_start"] + rdrp["aln_length"]/2, 0.5, "RdRp (nsp12)", ha="center", va="center", fontsize=6.5, fontweight="bold", color="#111111", zorder=5)
+ax_a_genes.text(-350, 0.5, "Genome Map", ha="right", va="center", fontsize=7.2, fontweight="bold", color="#333333")
 
 # =========================================================================
 # PANEL A3: Integrated Breakpoint Concordance Tickmark Tracks (83-Taxon MSA Frame)
@@ -215,12 +235,13 @@ for g, r, d in zip(gard_bps, rhiz_bps, dists):
     ax_a_ticks.plot([r, g], [y_rhiz - 0.12, y_gard + 0.12], color=col, lw=0.9, ls="-" if is_concordant else ":", alpha=0.85)
 
 key_tick_callouts = [
-    (12854, 13007, "RdRp 5' (153 nt)", 0.62, 0),
-    (14633, 14603, "RdRp int (30 nt)", -0.18, 0),
-    (21643, 21623, "Spike 5' (20 nt)", 1.32, -450),
-    (22756, 22875, "NTD/RBD (119 nt)", -0.18, -300),
-    (24461, 24361, "S2 (100 nt)", 1.32, 350),
-    (28580, 28556, "ORF7b/8 (24 nt)", -0.18, 0)
+    (12854, 13001, "RdRp 5' (147 nt)", 0.62, 0),
+    (21643, 21621, "Spike 5' (22 nt)", 1.32, -450),
+    (22756, 22649, "NTD/RBD (107 nt)", -0.18, -350),
+    (23701, 23629, "RBD 3' (72 nt)", 1.32, -150),
+    (24461, 24484, "S1/S2 (23 nt)", -0.18, 250),
+    (25160, 25183, "S2 exit (23 nt)", 1.32, 350),
+    (28580, 28670, "ORF7b/8 (90 nt)", -0.18, 100)
 ]
 for g_val, r_val, lbl, y_pos, dx in key_tick_callouts:
     mid_x = (g_val + r_val) / 2 + dx
@@ -595,11 +616,17 @@ out_pdf = os.path.join(FIG_DIR, "sarbecovirus_recombination_landscape.pdf")
 REPO_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "..", ".."))
 paper_png = os.path.join(REPO_ROOT, "paper", "figures", "fig_sarbecovirus_recombination_landscape.png")
 paper_pdf = os.path.join(REPO_ROOT, "paper", "figures", "fig_sarbecovirus_recombination_landscape.pdf")
+overleaf_png = "/Users/sergei/Projects/rhizaeon-overleaf/figures/fig_sarbecovirus_recombination_landscape.png"
+overleaf_pdf = "/Users/sergei/Projects/rhizaeon-overleaf/figures/fig_sarbecovirus_recombination_landscape.pdf"
+artifact_png = "/Users/sergei/.gemini/antigravity-cli/brain/1dfa5602-784e-4936-ae1c-a9734d91bc95/fig_sarbecovirus_recombination_landscape.png"
 
 plt.savefig(out_png, dpi=300, bbox_inches="tight")
 plt.savefig(out_pdf, bbox_inches="tight")
 plt.savefig(paper_png, dpi=300, bbox_inches="tight")
 plt.savefig(paper_pdf, bbox_inches="tight")
+plt.savefig(overleaf_png, dpi=300, bbox_inches="tight")
+plt.savefig(overleaf_pdf, bbox_inches="tight")
+plt.savefig(artifact_png, dpi=300, bbox_inches="tight")
 plt.close()
 
 print(f"Successfully generated 4-panel publication figure:")

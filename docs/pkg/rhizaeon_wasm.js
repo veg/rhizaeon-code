@@ -56,6 +56,28 @@ export function scan_fasta(fasta_str, target_landmarks, compress_snps, tier2_str
 }
 
 /**
+ * Scans a FASTA string in a single pass and returns `{ result, html, landscape }`
+ * @param {string} fasta_str
+ * @param {string | null} [title]
+ * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
+ * @param {number | null} [tier2_stringency]
+ * @param {number | null} [tier3_stringency]
+ * @returns {any}
+ */
+export function scan_fasta_bundle(fasta_str, title, target_landmarks, compress_snps, tier2_stringency, tier3_stringency) {
+    const ptr0 = passStringToWasm0(fasta_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    var ptr1 = isLikeNone(title) ? 0 : passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len1 = WASM_VECTOR_LEN;
+    const ret = wasm.scan_fasta_bundle(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0, !isLikeNone(tier2_stringency), isLikeNone(tier2_stringency) ? 0 : tier2_stringency, !isLikeNone(tier3_stringency), isLikeNone(tier3_stringency) ? 0 : tier3_stringency);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
  * Scans a FASTA string and returns a rich visualization dossier as a JS Object payload
  * @param {string} fasta_str
  * @param {string | null} [title]

@@ -5,6 +5,7 @@ export const count_informative_sites: (a: number, b: number) => [number, number,
 export const engine_version: () => [number, number];
 export const init_panic_hook: () => void;
 export const scan_fasta: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
+export const scan_fasta_bundle: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
 export const scan_fasta_dossier: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
 export const scan_fasta_dossier_json: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];
 export const scan_fasta_html: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];

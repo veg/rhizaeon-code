@@ -19,6 +19,11 @@ export function init_panic_hook(): void;
 export function scan_fasta(fasta_str: string, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null): any;
 
 /**
+ * Scans a FASTA string in a single pass and returns `{ result, html, landscape }`
+ */
+export function scan_fasta_bundle(fasta_str: string, title?: string | null, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null): any;
+
+/**
  * Scans a FASTA string and returns a rich visualization dossier as a JS Object payload
  */
 export function scan_fasta_dossier(fasta_str: string, title?: string | null, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null): any;
@@ -46,6 +51,7 @@ export interface InitOutput {
     readonly engine_version: () => [number, number];
     readonly init_panic_hook: () => void;
     readonly scan_fasta: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
+    readonly scan_fasta_bundle: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
     readonly scan_fasta_dossier: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
     readonly scan_fasta_dossier_json: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];
     readonly scan_fasta_html: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];

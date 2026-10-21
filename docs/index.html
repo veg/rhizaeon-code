@@ -907,6 +907,23 @@
 
         <!-- Output Chamber -->
         <div id="resultsSection" style="display: none;">
+          <!-- Recombination Hotspot / Coldspot Genome Profile Card -->
+          <div class="panel" id="landscapePanel" style="padding: 18px; margin-bottom: 18px;">
+            <div class="panel-header" style="margin-bottom: 10px;">
+              <div>
+                <div class="panel-title">Genome-Wide Recombination Hotspot &amp; Coldspot Landscape</div>
+                <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 2px;">
+                  Kernel-smoothed breakpoint density flux <span style="color: var(--braun-orange); font-weight: 700;">&Phi;<sub>bp</sub>(u)</span> and normalized empirical tract-coverage strain <span style="color: #0284c7; font-weight: 700;">&rho;(u)</span>. Click any hotspot peak or coldspot basin to inspect its genomic interval.
+                </div>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">01 // HOTSPOT &amp; COLDSPOT FLUX</div>
+            </div>
+            <div style="background: var(--surface-recessed); border: 1px solid var(--border-normal); border-radius: 3px; padding: 10px;">
+              <canvas id="mainLandscapeCanvas" height="128" style="width: 100%; height: 128px; display: block; cursor: crosshair;"></canvas>
+              <div id="mainLandscapeBadges" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-family: var(--font-mono); font-size: 10.5px;"></div>
+            </div>
+          </div>
+
           <div class="panel" style="padding: 18px;">
             <div class="panel-header">
               <div class="panel-title">Reticulation Event Roster (|E| = <span id="eventCountBadge">0</span>)</div>
@@ -967,11 +984,12 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import init, { engine_version, scan_fasta, scan_fasta_html } from './pkg/rhizaeon_wasm.js?v=0.1.0-beta.9';
+    import init, { engine_version, scan_fasta, scan_fasta_html, scan_fasta_bundle } from './pkg/rhizaeon_wasm.js?v=0.1.0-beta.10';
 
     let wasmReady = false;
     let latestScanResult = null;
     let latestHtmlReport = null;
+    let latestLandscape = null;
     let snpCompressionMode = 'auto';
 
     window.setSnpMode = function(mode) {
@@ -983,7 +1001,7 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.0-beta.9');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.0-beta.10');
         wasmReady = true;
         const ver = typeof engine_version === 'function' ? engine_version() : '0.1.0';
         const verBadge = document.getElementById('wasmVersionBadge');
@@ -1111,15 +1129,24 @@
       try {
         const t0 = performance.now();
         const compressArg = snpCompressionMode === 'auto' ? undefined : (snpCompressionMode === 'on');
-        const res = scan_fasta(fasta, k, compressArg, tier2Stringency, tier3Stringency);
-        const htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+        let res, htmlDoc, landscape = null;
+        if (typeof scan_fasta_bundle === 'function') {
+          const bundle = scan_fasta_bundle(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+          res = bundle.result;
+          htmlDoc = bundle.html;
+          landscape = bundle.landscape;
+        } else {
+          res = scan_fasta(fasta, k, compressArg, tier2Stringency, tier3Stringency);
+          htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+        }
         const elapsed = performance.now() - t0;
 
         latestScanResult = res;
         window.latestScanResult = res;
         latestHtmlReport = htmlDoc;
+        latestLandscape = landscape;
 
-        renderOutput(res, elapsed, htmlDoc);
+        renderOutput(res, elapsed, htmlDoc, landscape);
       } catch (err) {
         console.error('Scan error:', err);
         document.getElementById('statusAlert').className = 'status-strip error';
@@ -1133,9 +1160,10 @@
       }
     };
 
-    function renderOutput(res, clientMs, htmlDoc) {
+    function renderOutput(res, clientMs, htmlDoc, landscape) {
       document.getElementById('kpiGrid').style.display = 'grid';
       document.getElementById('resultsSection').style.display = 'block';
+      renderMainLandscape(res, landscape);
 
       const statusEl = document.getElementById('kpiStatus');
       if (res.is_non_recombinant_h0 || res.events.length === 0) {
@@ -1215,6 +1243,156 @@
 
       const frame = document.getElementById('reportFrame');
       frame.srcdoc = htmlDoc;
+    }
+
+    function renderMainLandscape(res, landscape) {
+      const canvas = document.getElementById('mainLandscapeCanvas');
+      const badgesEl = document.getElementById('mainLandscapeBadges');
+      if (!canvas || !landscape || !landscape.positions || landscape.positions.length === 0) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const W = Math.max(540, rect.width || 760);
+      const H = 128;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, W, H);
+
+      const padL = 44, padR = 16, padT = 16, padB = 22;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+      const L = Math.max(1, res.length || landscape.positions[landscape.positions.length - 1]);
+      const xOf = (pos) => padL + ((pos - 1) / Math.max(1, L - 1)) * plotW;
+      const yOf = (val) => padT + (1.0 - Math.max(0, Math.min(1, val))) * plotH;
+
+      // Highlight coldspot basins (conserved) and hotspot peaks (enriched)
+      (landscape.coldspots || []).forEach(c => {
+        const x1 = xOf(c.start_pos), x2 = Math.max(x1 + 2, xOf(c.end_pos));
+        ctx.fillStyle = 'rgba(2, 132, 199, 0.09)';
+        ctx.fillRect(x1, padT, x2 - x1, plotH);
+        ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x1, padT, x2 - x1, plotH);
+      });
+      (landscape.hotspots || []).forEach(h => {
+        const x1 = xOf(h.start_pos), x2 = Math.max(x1 + 3, xOf(h.end_pos));
+        ctx.fillStyle = 'rgba(234, 88, 12, 0.14)';
+        ctx.fillRect(x1, padT, x2 - x1, plotH);
+        ctx.strokeStyle = 'rgba(234, 88, 12, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x1, padT, x2 - x1, plotH);
+      });
+
+      // Reference threshold dashed lines
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(234, 88, 12, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(padL, yOf(landscape.hotspot_threshold || 0.45));
+      ctx.lineTo(padL + plotW, yOf(landscape.hotspot_threshold || 0.45));
+      ctx.stroke();
+      ctx.restore();
+
+      // Plot axes & grid
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + plotH);
+      ctx.lineTo(padL + plotW, padT + plotH);
+      ctx.stroke();
+
+      const pos = landscape.positions;
+      const strain = landscape.tract_coverage_strain || [];
+      const flux = landscape.breakpoint_flux || [];
+
+      // Area & line for tract coverage strain rho(u)
+      if (strain.length === pos.length) {
+        ctx.beginPath();
+        ctx.moveTo(xOf(pos[0]), yOf(0));
+        for (let i = 0; i < pos.length; i++) ctx.lineTo(xOf(pos[i]), yOf(strain[i]));
+        ctx.lineTo(xOf(pos[pos.length - 1]), yOf(0));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(2, 132, 199, 0.14)';
+        ctx.fill();
+
+        ctx.beginPath();
+        for (let i = 0; i < pos.length; i++) {
+          if (i === 0) ctx.moveTo(xOf(pos[i]), yOf(strain[i]));
+          else ctx.lineTo(xOf(pos[i]), yOf(strain[i]));
+        }
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+
+      // Line for breakpoint density flux Phi_bp(u)
+      if (flux.length === pos.length) {
+        ctx.beginPath();
+        for (let i = 0; i < pos.length; i++) {
+          if (i === 0) ctx.moveTo(xOf(pos[i]), yOf(flux[i]));
+          else ctx.lineTo(xOf(pos[i]), yOf(flux[i]));
+        }
+        ctx.strokeStyle = '#ea580c';
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
+      }
+
+      // Axis labels
+      ctx.fillStyle = '#525252';
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText('1.0', padL - 6, padT + 6);
+      ctx.fillText('0.0', padL - 6, padT + plotH);
+      ctx.textAlign = 'center';
+      const ticks = 5;
+      for (let t = 0; t <= ticks; t++) {
+        const p = Math.round(1 + (t / ticks) * (L - 1));
+        const x = xOf(p);
+        ctx.fillText(p.toLocaleString() + ' bp', x, H - 5);
+      }
+
+      // Interactive badges
+      badgesEl.innerHTML = '';
+      (landscape.hotspots || []).forEach((h, idx) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn-neutral';
+        b.style.cssText = 'padding: 3px 8px; font-size: 10px; border-color: rgba(234,88,12,0.45); color: #c2410c; background: rgba(234,88,12,0.08);';
+        b.innerHTML = `&#9650; Hotspot #${idx + 1}: ${h.start_pos.toLocaleString()}&ndash;${h.end_pos.toLocaleString()} bp (${h.fold_enrichment.toFixed(1)}&times; flux, ${h.event_count} events)`;
+        b.onclick = () => focusIframeWindow(h.start_pos, h.end_pos);
+        badgesEl.appendChild(b);
+      });
+      (landscape.coldspots || []).forEach((c, idx) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn-neutral';
+        b.style.cssText = 'padding: 3px 8px; font-size: 10px; border-color: rgba(2,132,199,0.4); color: #0369a1; background: rgba(2,132,199,0.07);';
+        b.innerHTML = `&#9660; Coldspot #${idx + 1}: ${c.start_pos.toLocaleString()}&ndash;${c.end_pos.toLocaleString()} bp (${(c.end_pos - c.start_pos + 1).toLocaleString()} bp conserved basin)`;
+        b.onclick = () => focusIframeWindow(c.start_pos, c.end_pos);
+        badgesEl.appendChild(b);
+      });
+      if ((landscape.hotspots || []).length === 0 && (landscape.coldspots || []).length === 0) {
+        badgesEl.innerHTML = `<span style="color: var(--text-tertiary);">Uniformly clonal profile across ${L.toLocaleString()} bp (0 enriched hotspots; entire alignment is a recombination coldspot).</span>`;
+      }
+
+      canvas.onclick = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const clickX = e.clientX - r.left;
+        const bp = Math.round(1 + Math.max(0, Math.min(1, (clickX - padL) / plotW)) * (L - 1));
+        const halfSpan = Math.max(250, Math.round(L * 0.08));
+        focusIframeWindow(Math.max(1, bp - halfSpan), Math.min(L, bp + halfSpan));
+      };
+    }
+
+    function focusIframeWindow(u1, u2) {
+      const frame = document.getElementById('reportFrame');
+      if (frame && frame.contentWindow && typeof frame.contentWindow.focusGenomicInterval === 'function') {
+        frame.contentWindow.focusGenomicInterval(u1, u2);
+        frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function highlightRosterEvent(eventId, recombinant) {

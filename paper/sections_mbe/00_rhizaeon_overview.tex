@@ -1,7 +1,7 @@
 \section{The RhizAeon Framework: Principles of Operation}
 \label{sec:principles_of_operation}
 \RhizAeon models recombination through continuous trajectory mechanics and zero-drift force field dynamics in linear time ($\mathcal{O}(N K L)$ for $N$ taxa, an alignment length $L$, and a set of $K$ dynamically determined reference sequences that we refer to here as "landmark" lineages).
-By measuring instantaneous sequence affinity against reference lineages and absorbing lineage-specific rate variation into an unpolarized ancestral root sink, \RhizAeon transforms recombination detection into a physical trajectory deconvolution problem.
+By measuring instantaneous sequence affinity against landmark lineages and absorbing lineage-specific rate variation into an unpolarized ancestral root sink, \RhizAeon transforms recombination detection into a physical trajectory deconvolution problem.
 Clonal evolution produces balanced "thermal" fluctuations that cancel out as a centered Brownian bridge.
 Recombination breaks this physical equilibrium and imparts sustained directional momentum that pinpoints breakpoint sites while consolidating sets of recombination signals attributable to the "co-recombinant" descendants of ancestral recombinant sequences into single ancestral recombination events.
 
@@ -15,20 +15,18 @@ As a scan progresses along a mosaic genome, the sequence travels alongside its h
 To capture these shifts in affinity without constructing trees or using sliding windows, \RhizAeon measures the instantaneous affinity of each query sequence against a representative panel of landmark reference sequences at every polymorphic site of an alignment.
 
 To evaluate affinity at each polymorphic site, \RhizAeon adapts cross-attention from transformer neural networks.
-Each focal genome serves as the query, while the landmark reference sequences act as keys.
-At every position along the alignment, the query evaluates which landmark reference sequence it resembles to assign local evolutionary affinity.
+Each focal genome serves as the query, while the reference landmark sequences act as keys.
+At every position along the alignment, the query evaluates which landmark sequence it resembles to assign local evolutionary affinity.
 Rather than treating all nucleotide matches equally, continuous-time Markov substitution probabilities weight each attention score: sharing a rare derived allele commands strong attention, whereas common transitions command less.
-To prevent private mutations from creating spurious matches, the landmark panel includes an unpolarized ancestral root token that absorbs alleles absent from every contemporary reference.
-A softmax operator normalizes these scores into a probability distribution that sums to one across all landmark reference sequences and the root token at each site.
+To prevent private mutations from creating spurious matches, the landmark panel includes an unpolarized ancestral root token that absorbs alleles absent from every contemporary landmark sequence.
+A softmax operator normalizes these scores into a probability distribution that sums to one across all landmark sequences and the root token at each site.
 Because individual polymorphic sites exhibit stochastic site-to-site variation in nucleotide substitution patterns and instantaneous attention weights, \RhizAeon avoids evaluating positions in isolation or smoothing them with fixed sliding windows.
-Instead, it subtracts each landmark reference sequence's alignment-wide mean attention to integrate cumulative deviation along the alignment.
+Instead, it subtracts each landmark sequence's alignment-wide mean attention to integrate cumulative deviation along the alignment.
 In non-recombinant regions, positive and negative site fluctuations cancel out and wander near zero like a random walk.
 When a scan along a sequence enters a recombinant tract, sustained attention toward the donor reference drives the cumulative trajectory steadily upward until donor attention ceases at the breakpoint junction and the curve descends.
-A single breakpoint forms a sharp triangular arch, whereas an inserted cassette produces a trapezoidal plateau.
-The switch points fall at the peaks and inflection points of these cumulative attention curves to localize breakpoints to exact nucleotide coordinates.
 
 A physical force field governs the transition from site-by-site attention to continuous trajectories.
-At each polymorphic site, the attention directed toward a landmark reference sequence acts as an attractive force that pulls the query sequence toward that reference in metric space.
+At each polymorphic site, the attention directed toward a landmark sequence acts as an attractive force that pulls the query sequence toward that landmark sequence in metric space.
 Subtracting the sequence's alignment-wide baseline attention establishes a zero-drift force field in which positive and negative pulls average to zero across the sequence.
 Under clonal evolution, mutations arise independently at random positions.
 Instantaneous forces fluctuate in opposing directions and cancel out like thermal Brownian motion, confining the sequence trajectory within its home corridor.
@@ -38,10 +36,10 @@ Sustained donor attraction imparts momentum to the sequence trajectory and drive
 The physical breakpoints correspond to the exact genomic coordinates where the external directional force turns on and off.
 
 Different modes of recombination generate distinct geometric signatures within the force field.
-In a single breakpoint recombination event, a sequence begins in its home corridor and, at the breakpoint site, switches into a donor corridor for the remainder of the recombinant sequence.
+In a single breakpoint recombination event, called a crossover here, a sequence begins in its home corridor and, at the breakpoint site, switches into a donor corridor for the remainder of the recombinant sequence.
 The directional force acts persistently from the breakpoint onward and drives cumulative momentum to a solitary peak at the breakpoint junction before returning to zero at the end of the recombinant sequence.
 The resulting profile forms a triangular arch whose vertex pinpoints the breakpoint location.
-For a double breakpoint recombinant (hereafter referred to as a cassette), the directional force turns on at the 5\textquotesingle\ breakpoint and turns off at the 3\textquotesingle\ breakpoint to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
+For a double breakpoint recombinant, called a cassette here, the directional force turns on at the 5\textquotesingle\ breakpoint and turns off at the 3\textquotesingle\ breakpoint to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
 
 When the donor lineage that provided the tract of sequence acquired by a recombinant remains unsampled, the introgressed segment exhibits a sharp loss of affinity to the home lineage without pointing toward any sampled contemporary taxon in the alignment.
 Rather than manufacturing a false pairing with an arbitrary contemporary leaf or silently discarding the signal, \RhizAeon detects the localized departure from the home lineage and explicitly flags and labels the introgressed segment as originating from an unsampled \texttt{"Ghost"} donor lineage.
@@ -62,8 +60,8 @@ Sites on the home side of the trial boundary are evaluated under the pairwise su
 The optimal breakpoint is placed at the exact coordinate that maximizes this joint triplet profile likelihood.
 Furthermore, the curvature of the likelihood surface yields rigorous confidence intervals: when parental lineages share an identical conserved stretch, the polisher reports the full uninformative plateau rather than manufacturing an artificial single-base prediction.
 
-In cohorts where recombination is pervasive, an initial static selection of reference landmarks risks incorporating mosaic sequences into the reference coordinate frame, which can obscure secondary recombination tracts or invert parent and recombinant identities.
-To prevent reference contamination without discarding sequences, \RhizAeon employs a two-pass iterative forward scrubbing and backward leave-one-in verification architecture.
+In cohorts where recombination is pervasive, an initial static selection of reference landmark sequences risks incorporating mosaic sequences into the reference coordinate frame, which can obscure secondary recombination tracts or invert parent and recombinant identities.
+To prevent landmark contamination without discarding sequences, \RhizAeon employs a two-pass iterative forward scrubbing and backward leave-one-in verification architecture.
 During the forward pass, candidate recombinant segments are ranked from highest to lowest signal-to-noise ratio and iteratively scrubbed by replacing the detected recombinant tract with gap characters in the working alignment.
 Outside its gap-masked tract, every sequence remains intact and continues to serve as an uncorrupted landmark reference for the rest of the cohort.
 Within the cross-attention force field, gap-masked query sites exert zero net force ($\Delta F = 0$), preventing artificial drawdown decay across scrubbed intervals while preserving natural alignment indel distances across unmasked sites.
@@ -72,13 +70,13 @@ Each restored segment is re-evaluated for parental affinities and re-polished ac
 Restoring a segment can also reveal a reciprocal parent-recombinant polarity inversion, an algorithmic symmetry artifact where donor $D$ initially tested positive as a putative recombinant between $R$ and $H$.
 Whenever treating $R$ as the recombinant yields a sharper transition contrast and lower flanking strain, the engine swaps the assignment, scrubs the true recombinant tract in $R$, and leaves parental sequence $D$ intact.
 
-Before certifying any candidate recombination event in the backward verification pass, an orthogonal three-stage audit evaluates the raw alignment sites.
+Before candidate recombination signals receive a final certification in the backward verification pass, an orthogonal three-stage audit evaluates the raw alignment sites.
 First, a Poisson informative-site floor requires every candidate tract to contain at least three unambiguous informative sites where the donor allele differs from the home allele and matches the recombinant.
-Second, when a candidate tract contains a high density of mutations separating the query sequence from its home reference that are absent from all other sampled sequences, the engine tests their spatial distribution.
-Concentrated divergence blocks from a basal unsampled outgroup are retained and labeled as unsampled \texttt{"Ghost"} donor introgressions, whereas dispersed private substitutions are absorbed into the root sink and rejected.
-Third, for tracts attributed to a sampled donor reference, an orthogonal Fisher's exact test evaluates a two-by-two contingency table across the candidate recombinant, resolved home reference, and resolved donor reference triplet.
-This test compares the counts of polymorphic sites where the recombinant matches the donor versus the home reference inside the candidate tract against those in the flanking alignment regions (excluding monomorphic sites and positions where the home and donor references carry identical nucleotides), and must achieve significance under family-wise error rate control across the cohort.
-Together, iterative scrubbing, leave-one-in verification, and raw-site auditing maintain strict false-positive control even under extreme mutation rate heterogeneity.
+Second, when a candidate recombination tract contains a high density of mutations separating the query sequence from its home landmark sequence that are absent from all other sampled sequences, \RhizAeon tests their spatial distribution.
+Concentrated clusters of mutations from a basal unsampled outgroup are retained and labeled as unsampled \texttt{"Ghost"} donor introgressions, whereas dispersed private substitutions are absorbed into the root sink and rejected.
+Third, for candidate recombination tracts attributed to a sampled donor reference, an orthogonal Fisher's exact test evaluates a two-by-two contingency table across the triplet of sequences representing the candidate recombinant, the home landmark, and the donor landmark.
+This test compares the counts of polymorphic sites where the recombinant matches the donor versus the home landmark inside the candidate tract against those in the flanking alignment regions (excluding monomorphic sites and positions where the home and donor landmarks carry identical nucleotides), and must achieve significance under family-wise error rate control across the cohort.
+Together, iterative scrubbing, leave-one-in verification, and raw-site auditing maintain strict false-positive control even under both extreme mutation rate heterogeneity and site or locus-specific heterotachy.
 
 While many detected recombinants in sparse empirical surveys appear as singletons, expanding viral outbreaks and bacterial clones frequently produce clusters of multiple sampled descendants that inherited the same mosaic architecture from a common recombinant ancestor.
 When multiple descendants of an ancestral recombinant are sampled within an alignment, graph adjudication clusters these co-recombinant sequences whenever they share concordant parental lineages and overlapping breakpoint coordinates, consolidating the group into a single ancestral recombination event.
