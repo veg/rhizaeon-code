@@ -726,7 +726,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.1 (2026-10-22)</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -984,7 +984,9 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import init, { engine_version, scan_fasta, scan_fasta_html, scan_fasta_bundle } from './pkg/rhizaeon_wasm.js?v=0.1.0-beta.10';
+    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.1';
+    const init = wasmMod.default;
+    const { engine_version, engine_build_timestamp, scan_fasta, scan_fasta_html, scan_fasta_bundle } = wasmMod;
 
     let wasmReady = false;
     let latestScanResult = null;
@@ -1001,17 +1003,18 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.0-beta.10');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.1');
         wasmReady = true;
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.0';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.1';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-22';
         const verBadge = document.getElementById('wasmVersionBadge');
         if (verBadge) {
-          verBadge.innerHTML = `PA-FF 2.1 WASM &middot; v${ver}`;
+          verBadge.innerHTML = `PA-FF 2.1 WASM &middot; v${ver} (${ts})`;
         }
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
-        document.getElementById('systemLedText').innerText = `System: Ready (v${ver})`;
+        document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
         document.getElementById('statusAlert').className = 'status-strip info';
-        document.getElementById('statusAlert').innerHTML = `<strong>WASM Engine v${ver} Operational.</strong> Select an empirical station preset or drop a FASTA file.`;
+        document.getElementById('statusAlert').innerHTML = `<strong>WASM Engine v${ver} (${ts}) Operational.</strong> Select an empirical station preset or drop a FASTA file.`;
       } catch (err) {
         console.error('WASM Init error:', err);
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-red)';
@@ -1155,8 +1158,10 @@
         scanBtn.disabled = false;
         btnIcon.innerText = '●';
         btnText.innerText = 'Scan For Recombination';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.1';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-22';
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
-        document.getElementById('systemLedText').innerText = 'System: Ready';
+        document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
       }
     };
 
@@ -1248,7 +1253,9 @@
     function renderMainLandscape(res, landscape) {
       const canvas = document.getElementById('mainLandscapeCanvas');
       const badgesEl = document.getElementById('mainLandscapeBadges');
-      if (!canvas || !landscape || !landscape.positions || landscape.positions.length === 0) return;
+      if (!canvas || !landscape) return;
+      const pos = landscape.grid_x || landscape.positions || [];
+      if (pos.length === 0) return;
 
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
@@ -1263,13 +1270,21 @@
       const padL = 44, padR = 16, padT = 16, padB = 22;
       const plotW = W - padL - padR;
       const plotH = H - padT - padB;
-      const L = Math.max(1, res.length || landscape.positions[landscape.positions.length - 1]);
-      const xOf = (pos) => padL + ((pos - 1) / Math.max(1, L - 1)) * plotW;
-      const yOf = (val) => padT + (1.0 - Math.max(0, Math.min(1, val))) * plotH;
+      const L = Math.max(1, res.length || pos[pos.length - 1]);
+      const xOf = (p) => padL + ((p - 1) / Math.max(1, L - 1)) * plotW;
+
+      const strain = landscape.cumulative_strain || landscape.tract_coverage_strain || [];
+      const flux = landscape.flux_phi || landscape.breakpoint_flux || [];
+      const maxPhi = Math.max(1.0, ...flux, (landscape.hotspot_threshold || 0.45) * 1.15);
+      const maxRho = Math.max(1e-6, ...(strain.length ? strain : [1.0]));
+      const yOfPhi = (val) => padT + (1.0 - Math.max(0, Math.min(1, val / maxPhi))) * plotH;
+      const yOfRho = (val) => padT + (1.0 - Math.max(0, Math.min(1, val / maxRho)) * 0.90) * plotH;
 
       // Highlight coldspot basins (conserved) and hotspot peaks (enriched)
       (landscape.coldspots || []).forEach(c => {
-        const x1 = xOf(c.start_pos), x2 = Math.max(x1 + 2, xOf(c.end_pos));
+        const cStart = c.start !== undefined ? c.start : c.start_pos;
+        const cEnd = c.end !== undefined ? c.end : c.end_pos;
+        const x1 = xOf(cStart), x2 = Math.max(x1 + 2, xOf(cEnd));
         ctx.fillStyle = 'rgba(2, 132, 199, 0.09)';
         ctx.fillRect(x1, padT, x2 - x1, plotH);
         ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
@@ -1277,7 +1292,9 @@
         ctx.strokeRect(x1, padT, x2 - x1, plotH);
       });
       (landscape.hotspots || []).forEach(h => {
-        const x1 = xOf(h.start_pos), x2 = Math.max(x1 + 3, xOf(h.end_pos));
+        const hStart = h.start !== undefined ? h.start : h.start_pos;
+        const hEnd = h.end !== undefined ? h.end : h.end_pos;
+        const x1 = xOf(hStart), x2 = Math.max(x1 + 3, xOf(hEnd));
         ctx.fillStyle = 'rgba(234, 88, 12, 0.14)';
         ctx.fillRect(x1, padT, x2 - x1, plotH);
         ctx.strokeStyle = 'rgba(234, 88, 12, 0.45)';
@@ -1290,8 +1307,8 @@
       ctx.setLineDash([4, 4]);
       ctx.strokeStyle = 'rgba(234, 88, 12, 0.45)';
       ctx.beginPath();
-      ctx.moveTo(padL, yOf(landscape.hotspot_threshold || 0.45));
-      ctx.lineTo(padL + plotW, yOf(landscape.hotspot_threshold || 0.45));
+      ctx.moveTo(padL, yOfPhi(landscape.hotspot_threshold || 0.45));
+      ctx.lineTo(padL + plotW, yOfPhi(landscape.hotspot_threshold || 0.45));
       ctx.stroke();
       ctx.restore();
 
@@ -1304,24 +1321,20 @@
       ctx.lineTo(padL + plotW, padT + plotH);
       ctx.stroke();
 
-      const pos = landscape.positions;
-      const strain = landscape.tract_coverage_strain || [];
-      const flux = landscape.breakpoint_flux || [];
-
       // Area & line for tract coverage strain rho(u)
       if (strain.length === pos.length) {
         ctx.beginPath();
-        ctx.moveTo(xOf(pos[0]), yOf(0));
-        for (let i = 0; i < pos.length; i++) ctx.lineTo(xOf(pos[i]), yOf(strain[i]));
-        ctx.lineTo(xOf(pos[pos.length - 1]), yOf(0));
+        ctx.moveTo(xOf(pos[0]), padT + plotH);
+        for (let i = 0; i < pos.length; i++) ctx.lineTo(xOf(pos[i]), yOfRho(strain[i]));
+        ctx.lineTo(xOf(pos[pos.length - 1]), padT + plotH);
         ctx.closePath();
         ctx.fillStyle = 'rgba(2, 132, 199, 0.14)';
         ctx.fill();
 
         ctx.beginPath();
         for (let i = 0; i < pos.length; i++) {
-          if (i === 0) ctx.moveTo(xOf(pos[i]), yOf(strain[i]));
-          else ctx.lineTo(xOf(pos[i]), yOf(strain[i]));
+          if (i === 0) ctx.moveTo(xOf(pos[i]), yOfRho(strain[i]));
+          else ctx.lineTo(xOf(pos[i]), yOfRho(strain[i]));
         }
         ctx.strokeStyle = '#0284c7';
         ctx.lineWidth = 1.6;
@@ -1332,8 +1345,8 @@
       if (flux.length === pos.length) {
         ctx.beginPath();
         for (let i = 0; i < pos.length; i++) {
-          if (i === 0) ctx.moveTo(xOf(pos[i]), yOf(flux[i]));
-          else ctx.lineTo(xOf(pos[i]), yOf(flux[i]));
+          if (i === 0) ctx.moveTo(xOf(pos[i]), yOfPhi(flux[i]));
+          else ctx.lineTo(xOf(pos[i]), yOfPhi(flux[i]));
         }
         ctx.strokeStyle = '#ea580c';
         ctx.lineWidth = 2.0;
@@ -1344,7 +1357,7 @@
       ctx.fillStyle = '#525252';
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
-      ctx.fillText('1.0', padL - 6, padT + 6);
+      ctx.fillText(maxPhi.toFixed(1), padL - 6, padT + 6);
       ctx.fillText('0.0', padL - 6, padT + plotH);
       ctx.textAlign = 'center';
       const ticks = 5;
@@ -1357,21 +1370,26 @@
       // Interactive badges
       badgesEl.innerHTML = '';
       (landscape.hotspots || []).forEach((h, idx) => {
+        const hStart = h.start !== undefined ? h.start : h.start_pos;
+        const hEnd = h.end !== undefined ? h.end : h.end_pos;
+        const hPeak = h.peak_flux !== undefined ? h.peak_flux : (h.fold_enrichment || 1.0);
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn-neutral';
         b.style.cssText = 'padding: 3px 8px; font-size: 10px; border-color: rgba(234,88,12,0.45); color: #c2410c; background: rgba(234,88,12,0.08);';
-        b.innerHTML = `&#9650; Hotspot #${idx + 1}: ${h.start_pos.toLocaleString()}&ndash;${h.end_pos.toLocaleString()} bp (${h.fold_enrichment.toFixed(1)}&times; flux, ${h.event_count} events)`;
-        b.onclick = () => focusIframeWindow(h.start_pos, h.end_pos);
+        b.innerHTML = `&#9650; Hotspot #${idx + 1}: ${hStart.toLocaleString()}&ndash;${hEnd.toLocaleString()} bp (&Phi;<sub>peak</sub>=${hPeak.toFixed(2)}, ${h.event_count} events)`;
+        b.onclick = () => focusIframeWindow(hStart, hEnd);
         badgesEl.appendChild(b);
       });
       (landscape.coldspots || []).forEach((c, idx) => {
+        const cStart = c.start !== undefined ? c.start : c.start_pos;
+        const cEnd = c.end !== undefined ? c.end : c.end_pos;
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn-neutral';
         b.style.cssText = 'padding: 3px 8px; font-size: 10px; border-color: rgba(2,132,199,0.4); color: #0369a1; background: rgba(2,132,199,0.07);';
-        b.innerHTML = `&#9660; Coldspot #${idx + 1}: ${c.start_pos.toLocaleString()}&ndash;${c.end_pos.toLocaleString()} bp (${(c.end_pos - c.start_pos + 1).toLocaleString()} bp conserved basin)`;
-        b.onclick = () => focusIframeWindow(c.start_pos, c.end_pos);
+        b.innerHTML = `&#9660; Coldspot #${idx + 1}: ${cStart.toLocaleString()}&ndash;${cEnd.toLocaleString()} bp (${(cEnd - cStart + 1).toLocaleString()} bp conserved basin)`;
+        b.onclick = () => focusIframeWindow(cStart, cEnd);
         badgesEl.appendChild(b);
       });
       if ((landscape.hotspots || []).length === 0 && (landscape.coldspots || []).length === 0) {
@@ -1389,9 +1407,15 @@
 
     function focusIframeWindow(u1, u2) {
       const frame = document.getElementById('reportFrame');
-      if (frame && frame.contentWindow && typeof frame.contentWindow.focusGenomicInterval === 'function') {
-        frame.contentWindow.focusGenomicInterval(u1, u2);
-        frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (frame && frame.contentWindow) {
+        const pad = Math.max(120, Math.round((u2 - u1) * 0.25));
+        if (typeof frame.contentWindow.jumpTo === 'function') {
+          frame.contentWindow.jumpTo(Math.max(1, u1 - pad), u2 + pad);
+          frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (typeof frame.contentWindow.focusGenomicInterval === 'function') {
+          frame.contentWindow.focusGenomicInterval(u1, u2);
+          frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }
 

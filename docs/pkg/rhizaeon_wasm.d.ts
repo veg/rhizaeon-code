@@ -7,7 +7,12 @@
 export function count_informative_sites(fasta_str: string): number;
 
 /**
- * Returns the exact compiled RhizAeon WASM engine version string (e.g., "0.1.0-beta.5")
+ * Returns the compilation timestamp of the RhizAeon WASM engine
+ */
+export function engine_build_timestamp(): string;
+
+/**
+ * Returns the exact compiled RhizAeon WASM engine version string (e.g., "0.1.0-beta.10")
  */
 export function engine_version(): string;
 
@@ -48,6 +53,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly count_informative_sites: (a: number, b: number) => [number, number, number];
+    readonly engine_build_timestamp: () => [number, number];
     readonly engine_version: () => [number, number];
     readonly init_panic_hook: () => void;
     readonly scan_fasta: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];

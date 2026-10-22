@@ -16,7 +16,24 @@ export function count_informative_sites(fasta_str) {
 }
 
 /**
- * Returns the exact compiled RhizAeon WASM engine version string (e.g., "0.1.0-beta.5")
+ * Returns the compilation timestamp of the RhizAeon WASM engine
+ * @returns {string}
+ */
+export function engine_build_timestamp() {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const ret = wasm.engine_build_timestamp();
+        deferred1_0 = ret[0];
+        deferred1_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+}
+
+/**
+ * Returns the exact compiled RhizAeon WASM engine version string (e.g., "0.1.0-beta.10")
  * @returns {string}
  */
 export function engine_version() {

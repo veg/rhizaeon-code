@@ -11,15 +11,24 @@
 # bundle. The app code never changes — it always imports ./pkg/.
 set -euo pipefail
 
-RHIZAEON_WASM_TAG="${RHIZAEON_WASM_TAG:-rhizaeon-v0.1.0-beta.9}"
+RHIZAEON_WASM_TAG="${RHIZAEON_WASM_TAG:-rhizaeon-v0.1.1}"
 PKG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/docs/pkg"
 ASSET="rhizaeon-wasm-${RHIZAEON_WASM_TAG##*-v}-pkg.tar.gz"
 URL="https://github.com/veg/HyphAeon/releases/download/${RHIZAEON_WASM_TAG}/${ASSET}"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
 
 echo "[*] Fetching ${ASSET} from ${URL}"
-# Wipe first: a plain tar overlay would leave stale files behind when the
-# previous bundle had entries the new version no longer ships.
-rm -rf "$PKG_DIR"
-mkdir -p "$PKG_DIR"
-curl -fsSL "$URL" | tar -xz -C "$PKG_DIR"
-echo "[+] docs/pkg now serves ${RHIZAEON_WASM_TAG}"
+if curl -fsSL "$URL" | tar -xz -C "$TMP_DIR"; then
+  # Wipe first: a plain tar overlay would leave stale files behind when the
+  # previous bundle had entries the new version no longer ships.
+  rm -rf "$PKG_DIR"
+  mkdir -p "$PKG_DIR"
+  cp -R "$TMP_DIR"/. "$PKG_DIR"/
+  echo "[+] docs/pkg now serves ${RHIZAEON_WASM_TAG}"
+elif [ -f "$PKG_DIR/rhizaeon_wasm_bg.wasm" ] && [ -f "$PKG_DIR/rhizaeon_wasm.js" ]; then
+  echo "[!] Remote release ${RHIZAEON_WASM_TAG} not found; retaining committed docs/pkg bundle"
+else
+  echo "[!] ERROR: Could not fetch ${URL} and no committed docs/pkg bundle found" >&2
+  exit 1
+fi

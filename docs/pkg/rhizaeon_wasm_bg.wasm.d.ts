@@ -2,6 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const count_informative_sites: (a: number, b: number) => [number, number, number];
+export const engine_build_timestamp: () => [number, number];
 export const engine_version: () => [number, number];
 export const init_panic_hook: () => void;
 export const scan_fasta: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
