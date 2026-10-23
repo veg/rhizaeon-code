@@ -59,119 +59,96 @@ Landmark projection and tract scrubbing reduce computational complexity from $\m
 \paragraph{Physical Limits and Resolution Boundaries.}
 The resolution of trajectory deconvolution is governed by fundamental physical boundaries:
 \begin{enumerate}
-    \item \emph{Mutational Density Floor}: Recombination can only be inferred if the introgressed tract contains distinguishing polymorphic mutations between parental lineages ($n_{\mathrm{mut}} = L_{\mathrm{tract}} \cdot d_{\mathrm{parent}} \ge 1$). In low-divergence regimes ($d_{\mathrm{parent}} < 0.005$), statistical power is fundamentally bounded by mutation availability rather than algorithmic sensitivity.
-    \item \emph{Tract Length Resolution}: The dyadic scale-space matched filter operates across dyadic scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt. Replacement tracts shorter than 15~nt (single-codon swaps) cannot be reliably distinguished from multi-nucleotide mutations without prior structural constraints.
+    \item \emph{Mutational Density Floor}: Recombination can only be inferred if the introgressed tract contains distinguishing polymorphic mutations between parental lineages ($n_{\mathrm{mut}} = L_{\mathrm{tract}} \cdot d_{\mathrm{parent}} \ge 3$). In low-divergence regimes ($d_{\mathrm{parent}} < 0.005$), statistical power is fundamentally bounded by mutation availability rather than algorithmic sensitivity.
+    \item \emph{Tract Length Resolution}: The multi-scale matched filter bank operates across scales $\tau \in \{30, 60, 120, 240, 300, 360, 480, 600, 800\}$~nt alongside recursive binary segmentation on the Brownian bridge. Replacement tracts carrying fewer than three distinguishing mutations cannot be reliably distinguished from stochastic substitution clustering without prior structural constraints.
     \item \emph{Extinction / Ghost Limits}: When an introgressing donor has no sampled relatives within phylogenetic distance $d_{\mathrm{max}}$, the tract is classified as an orphan ghost introgression. Directional consistency constraints prevent false attribution to contemporary outgroups, but donor clade identification remains impossible without surrogate sampling.
 \end{enumerate}
 
 \section{Complete Algorithmic Pipeline and Mathematical Formulations}
 \label{supp:algorithms}
 
-\subsection{Lossless SNP Compression and Prefix Distance Tensor}
+\subsection{Lossless SNP Compression and Prefix Distance Queries}
 Given a multiple sequence alignment $\mathbf{M} \in \Sigma^{N \times L}$ over alphabet $\Sigma = \{A, C, G, T, -\}$, columns exhibiting zero polymorphic variation across all $N$ taxa carry zero phylogenetic information.
 Indexing out all monomorphic positions compresses alignment $\mathbf{M}$ into a segregating variant matrix $\mathbf{S} \in \Sigma^{N \times L_{\mathrm{SNP}}}$ with bijective coordinate mapping function $\psi: \{0, \dots, L_{\mathrm{SNP}}-1\} \to \{0, \dots, L-1\}$.
-For whole-genome bacterial alignments where $L_{\mathrm{SNP}} \ll L$ ($1{,}465$-fold compression in \textit{S.~pneumoniae}), SNP indexing allows all trajectory computations to execute in memory-resident cache.
-
-Across the compressed alignment, we compute the cumulative prefix difference tensor $\mathbf{\Phi} \in \mathbb{R}^{N \times N \times (L_{\mathrm{SNP}}+1)}$:
+For whole-genome bacterial alignments where $L_{\mathrm{SNP}} \ll L$ ($1{,}465$-fold compression in \textit{S.~pneumoniae}), SNP indexing allows all trajectory computations to execute in memory-resident cache in $\mathcal{O}(N K L_{\mathrm{SNP}})$ streaming operations without materializing an $\mathcal{O}(N^2 L_{\mathrm{SNP}})$ three-dimensional tensor.
+Between any query sequence $i \in \{1, \dots, N\}$ and reference landmark $k \in \{1, \dots, K\}$, cumulative pairwise mismatch prefix sums $\Phi_{ik}(u) = \sum_{c=0}^{u-1} \mathbb{I}(S_{ic} \ne S_{kc})$ enable exact $\mathcal{O}(1)$ evolutionary distance queries across any sub-interval $[u_1, u_2)$ with pairwise gap deletion and Jukes--Cantor evolutionary correction:
 \begin{equation}
-\Phi_{ij}(u) = \sum_{c=0}^{u-1} w_c \cdot \mathbb{I}(S_{ic} \ne S_{jc}),
-\end{equation}
-where $w_c$ denotes site-specific weights (e.g., transition/transversion corrections or codon degeneracy).
-For any genomic sub-interval $[u_1, u_2)$, the exact pairwise evolutionary distance between sequence $i$ and sequence $j$ is computed in $\mathcal{O}(1)$ time:
-\begin{equation}
-D_{ij}(u_1, u_2) = \frac{\Phi_{ij}(u_2) - \Phi_{ij}(u_1)}{u_2 - u_1}.
+D_{ik}(u_1, u_2) = -\frac{3}{4} \ln\left(1 - \frac{4}{3} \frac{\Phi_{ik}(u_2) - \Phi_{ik}(u_1)}{L_{\mathrm{ungapped}}(u_1, u_2)}\right).
 \end{equation}
 
-\subsection{Global Divergence Matrix and Classical MDS Basis}
-The whole-sequence evolutionary divergence matrix $\mathbf{D}_{\mathrm{glob}} \in \mathbb{R}^{N \times N}$ is evaluated across the full locus: $D_{\mathrm{glob}, ij} = \Phi_{ij}(L_{\mathrm{SNP}}) / L_{\mathrm{SNP}}$.
-We construct the centering projection matrix $\mathbf{H} = \mathbf{I}_N - \frac{1}{N}\mathbf{1}_N\mathbf{1}_N^T$ and form the Gower double-centered inner product matrix:
+\subsection{Landmark Divergence Matrix and Classical MDS Basis}
+For cohorts with $N \le 64$, all sequences serve as reference landmarks ($K = N$); for $N > 64$, $K \le 32$ representative landmarks are selected via clade-medoid seeded Farthest-Point Sampling in $\mathcal{O}(N K L_{\mathrm{SNP}})$ time.
+The landmark evolutionary divergence matrix $\mathbf{D}_{\mathrm{glob}} \in \mathbb{R}^{K \times K}$ is evaluated across the full locus.
+We construct the centering projection matrix $\mathbf{H} = \mathbf{I}_K - \frac{1}{K}\mathbf{1}_K\mathbf{1}_K^T$ and form the Gower double-centered inner product matrix:
 \begin{equation}
 \mathbf{B} = -\frac{1}{2}\mathbf{H}(\mathbf{D}_{\mathrm{glob}}^{\odot 2})\mathbf{H}.
 \end{equation}
-Spectral decomposition yields $\mathbf{B} = \mathbf{V}\mathbf{\Lambda}\mathbf{V}^T$, where eigenvalues are sorted in descending order $\lambda_1 \ge \dots \ge \lambda_N \ge 0$.
-We retain the top $k = \min(3, N-1)$ positive eigenvalues $\mathbf{\Lambda}_k = \mathrm{diag}(\lambda_1, \dots, \lambda_k)$ and corresponding orthonormal eigenvectors $\mathbf{V}_k \in \mathbb{R}^{N \times k}$.
+Spectral decomposition yields $\mathbf{B} = \mathbf{V}\mathbf{\Lambda}\mathbf{V}^T$, where eigenvalues are sorted in descending order $\lambda_1 \ge \dots \ge \lambda_K \ge 0$.
+We retain the top $d \le \min(4, K-1)$ positive eigenvalues $\mathbf{\Lambda}_d = \mathrm{diag}(\lambda_1, \dots, \lambda_d)$ and corresponding orthonormal eigenvectors $\mathbf{V}_d \in \mathbb{R}^{K \times d}$.
 The canonical basis is computed once and held fixed for the entire alignment to guarantee zero Procrustes rotational drift.
 
 \subsection{Exact Gower Out-of-Sample Continuous Trajectory Projection}
-At any genomic coordinate $u \in [0, L_{\mathrm{SNP}})$, each sequence $i$ possesses an instantaneous local distance vector $\mathbf{d}_i(u) \in \mathbb{R}^N$ to all reference taxa, evaluated over a symmetric Gaussian kernel window:
+Across a sliding window of width $W$ (default $W = 300$~nt, stride $S = 10$~nt) centered at genomic coordinate $u$, each sequence $i$ possesses an instantaneous local distance vector $\mathbf{d}_i(u) \in \mathbb{R}^K$ to the $K$ reference landmarks.
+The exact Gower out-of-sample projection maps this local distance vector into canonical Euclidean space $\mathbb{R}^d$:
 \begin{equation}
-d_i(j; u)^2 = \sum_{c=0}^{L_{\mathrm{SNP}}-1} K_\sigma(c - u) \cdot \mathbb{I}(S_{ic} \ne S_{jc}) \Big/ \sum_{c=0}^{L_{\mathrm{SNP}}-1} K_\sigma(c - u).
+\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_d^{-1/2} \mathbf{V}_d^T \left(\bar{\mathbf{d}}^2 - \mathbf{d}_i(u)^2\right),
 \end{equation}
-The exact Gower out-of-sample projection maps this local distance vector into canonical Euclidean space $\mathbb{R}^k$:
-\begin{equation}
-\mathbf{z}_i(u) = \frac{1}{2} \mathbf{\Lambda}_k^{-1/2} \mathbf{V}_k^T \left(\bar{\mathbf{d}}^2 - \mathbf{d}_i(u)^2\right),
-\end{equation}
-where $\bar{\mathbf{d}}^2 = \frac{1}{N}(\mathbf{D}_{\mathrm{glob}}^{\odot 2})\mathbf{1}_N$ is the precomputed vector of average squared global distances.
-Evaluating $\mathbf{z}_i(u)$ across all $u$ produces the continuous trajectory tensor $\mathbf{Z} \in \mathbb{R}^{N \times L_{\mathrm{SNP}} \times k}$.
+where $\bar{\mathbf{d}}^2 = \frac{1}{K}(\mathbf{D}_{\mathrm{glob}}^{\odot 2})\mathbf{1}_K$ is the precomputed vector of average squared global landmark distances.
+Evaluating $\mathbf{z}_i(u)$ across all windows $U$ produces the continuous trajectory tensor $\mathbf{Z} \in \mathbb{R}^{N \times U \times d}$.
 
 \subsection{Continuous Phylogenetic Cross-Attention with Tree-RoPE and PhyloBias}
-To track affinity dynamics against reference landmarks without heuristic window slicing, \RhizAeon employs continuous cross-attention.
-For each position $u$, sequence tokens are embedded into query ($\mathbf{q}_i(u)$), key ($\mathbf{k}_j(u)$), and value ($\mathbf{v}_j(u)$) representations in $\mathbb{R}^d$.
-Phylogenetic distance constraints are injected through two mechanisms:
+To track affinity dynamics against the $K$ reference landmarks without heuristic window slicing, \RhizAeon employs continuous phylogenetic cross-attention.
+For each polymorphic position $u$, phylogenetic distance constraints are injected into the attention logits between query sequence $i \in \{1, \dots, N\}$ and landmark $k \in \{1, \dots, K\}$ through two mechanisms:
 \begin{enumerate}
-    \item \emph{Tree-RoPE (Tree Rotary Position Embedding)}: Metric MDS coordinates $\mathbf{m}_i \in \mathbb{R}^4$ modulate query and key vectors via multidimensional Givens rotations:
-    \begin{equation}
-    \tilde{\mathbf{q}}_{i, 2m:2m+1}(u) = \mathbf{R}(\theta_{i, m}) \mathbf{q}_{i, 2m:2m+1}(u), \qquad \theta_{i, m} = \sum_{c=1}^4 m_{ic} \Theta_{mc}.
-    \end{equation}
+    \item \emph{Tree-RoPE (Tree Rotary Position Embedding)}: Leading 2D polar MDS coordinates $\mathbf{x}_k \in \mathbb{R}^2$ modulate query and key representations across $d_{\mathrm{head}}/2 = 16$ geometric frequency bands ($d_{\mathrm{head}} = 32$) via block-diagonal Givens rotations $\mathbf{R}(\bm{\theta}_k)$. Because nucleotide identity is invariant across rotational planes at matching sites, the rotated inner product evaluates analytically in closed form as a cosine sum over relative metric phase angles $(\bm{\theta}_k - \bm{\theta}_i)$ gated by nucleotide match $\mathbb{I}(S_{iu} = S_{ku})$.
     \item \emph{PhyloBias}: A log-space continuous-time Markov substitution prior penalizes attention between divergent lineages:
     \begin{equation}
-    \mathrm{PhyloBias}_{ij} = \ln\left[\epsilon_0 + (1 - \epsilon_0)\exp(-\lambda_h D_{\mathrm{glob}, ij})\right],
+    \mathrm{PhyloBias}_{ik} = \ln\left[\max\left(10^{-5}, \, \epsilon_0 + (1 - \epsilon_0)\exp(-\lambda_h D_{\mathrm{glob}, ik})\right)\right],
     \end{equation}
     where $\epsilon_0 = 0.25$ represents the equilibrium neutral substitution floor.
 \end{enumerate}
-The resulting attention tensor $\mathbf{A} \in \mathbb{R}^{L \times N \times (N+1)}$ evaluates attention from each query sequence $i$ to all reference taxa $j \in \{1, \dots, N\}$ and the root sink at index $0$:
+The resulting attention weights evaluate attention from each query sequence $i$ to all landmark references $k \in \{1, \dots, K\}$ and the unpolarized root sink at index $0$:
 \begin{equation}
-A_u(i \to j) = \frac{\exp\left(\frac{\tilde{\mathbf{q}}_i(u)^T \tilde{\mathbf{k}}_j(u)}{\sqrt{d}} + \mathrm{PhyloBias}_{ij}\right)}{\sum_{l=0}^N \exp\left(\frac{\tilde{\mathbf{q}}_i(u)^T \tilde{\mathbf{k}}_l(u)}{\sqrt{d}} + \mathrm{PhyloBias}_{il}\right)}.
+A_u(i \to k) = \frac{\exp\left(S_u(i, k)\right)}{\sum_{l=0}^K \exp\left(S_u(i, l)\right)}, \qquad S_u(i, k) = \frac{(\mathbf{R}(\bm{\theta}_i) \mathbf{q}_i(u))^T (\mathbf{R}(\bm{\theta}_k) \mathbf{k}_k(u))}{\sqrt{d_{\mathrm{head}}}} + \mathrm{PhyloBias}_{ik}.
 \end{equation}
 
-\subsection{Cumulative Attention Curves and Differential Drift}
-For each sequence $i$ and reference landmark bundle $m$, instantaneous attention is accumulated along the chromosome in $\mathcal{O}(L)$ time:
+\subsection{Zero-Drift Force Field and Differential Momentum Curves}
+Subtracting each landmark channel's alignment-wide mean baseline affinity $\bar{A}(i \to k) = \frac{1}{L}\sum_{v=1}^L A_v(i \to k)$ produces the zero-drift attention force field $F_u(i \to k) = A_u(i \to k) - \bar{A}(i \to k)$, which sums to zero across the sequence ($\sum_{u=1}^L F_u(i \to k) = 0$).
+The home landmark channel is identified as the primary recipient background exhibiting the highest alignment-wide mean affinity: $k_{\mathrm{home}}(i) = \arg\max_{1 \le k \le K} \bar{A}(i \to k)$.
+Integrating the directed force along the sequence in $\mathcal{O}(L)$ time yields the cumulative momentum curve $C_{ik}(u) = \sum_{v=1}^u F_v(i \to k)$, and the differential momentum trajectory against candidate donor $k \neq k_{\mathrm{home}}(i)$ is:
 \begin{equation}
-C_{im}(u) = \sum_{c=0}^u \alpha_{im}(c), \qquad \text{where} \quad \alpha_{im}(c) = \sum_{j \in \mathcal{B}_m} A_c(i \to j).
+Y_{ik}(u) = C_{ik}(u) - C_{i, k_{\mathrm{home}}(i)}(u).
 \end{equation}
-The home clade $\mathcal{B}_{\mathrm{home}}(i)$ is identified as the majority recipient across the full locus: $\mathcal{B}_{\mathrm{home}}(i) = \arg\max_m C_{im}(L)$.
-The differential attention curve against candidate donor $m$ is formulated as:
-\begin{equation}
-Y_{im}(u) = C_{im}(u) - C_{i, \mathrm{home}}(u).
-\end{equation}
-Under clonal evolution, sequence $i$ maintains stable affinity to its home clade and exhibits negative or stationary drift $Y_{im}(u) \le 0$.
-A recombination event from donor $m$ produces a positive velocity excursion where $\frac{d}{du} Y_{im}(u) > 0$.
+Under clonal evolution, instantaneous forces fluctuate around zero as balanced thermal noise, and $Y_{ik}(u)$ forms a centered Brownian bridge ($Y_{ik}(0) = Y_{ik}(L) = 0$).
+A recombination event from donor $k$ produces a sustained positive velocity excursion where $\frac{d}{du} Y_{ik}(u) > 0$.
 
-\subsection{Multi-Scale Dyadic Scale-Space Matched Filter and Running Drawdown}
-To detect both focal micro-conversions and macroscopic recombinant cassettes without parameter tuning, differential drift increments $\Delta Y_{im}(u) = Y_{im}(u) - Y_{im}(u-1)$ are convolved with zero-mean bipolar matched filter wavelets across dyadic scales $\tau \in \{15, 25, 50, 100, 200, 500\}$~nt:
+\subsection{Recursive Binary Segmentation, Multi-Scale Matched Filters, and Running Drawdown}
+To detect both focal micro-conversions and macroscopic recombinant cassettes without parameter tuning, \RhizAeon combines recursive binary segmentation on the Brownian bridge with prefix-sum boxcar matched filters across scales $\tau \in \{30, 60, 120, 240, 300, 360, 480, 600, 800\}$~nt and running drawdown:
 \begin{equation}
-W_\tau(u) = \sum_{s=-\tau}^\tau \Delta Y_{im}(u + s) \cdot \psi_\tau(s), \qquad \psi_\tau(s) = \frac{s}{\tau} \exp\left(-\frac{s^2}{2\tau^2}\right).
+M(u) = \max_{0 \le s \le u} Y_{ik}(s), \qquad \mathrm{DD}_k(u) = M(u) - Y_{ik}(u).
 \end{equation}
-Concurrently, macroscopic cassettes are identified via Taylor running drawdown:
-\begin{equation}
-M(u) = \max_{0 \le s \le u} Y_{im}(s), \qquad \mathrm{DD}(u) = M(u) - Y_{im}(u).
-\end{equation}
-A candidate cassette is detected when the excursion drawdown exceeds the extreme-value threshold $Z_{\mathrm{phys}} \ge Z_{\mathrm{crit}}$, where $Z_{\mathrm{crit}} = \sqrt{-0.5 \ln(\alpha / 2M)}$ by Kolmogorov supremum boundary crossing.
+A candidate excursion rejects the clonal null when $Z_{\mathrm{phys}} = \sup |Y_{ik}(u)| / (\sigma \sqrt{L}) \ge K_{\mathrm{crit}}$, where $K_{\mathrm{crit}} = \sqrt{-\frac{1}{2} \ln(\alpha / M_{\mathrm{hyp}})}$ by Kolmogorov supremum boundary crossing ($M_{\mathrm{hyp}} = 2N$ during primary screening, $2(K+1)$ during donor channel attribution, and $4N$ during post-polishing verification).
 
-\subsection{Profile Maximum-Likelihood Breakpoint Polisher}
-Candidate changepoint intervals $[u_1 - \delta, u_1 + \delta]$ and $[u_2 - \delta, u_2 + \delta]$ localized by the matched filter are polished to single-nucleotide resolution using profile maximum likelihood.
-For each candidate coordinate $b$, the alignment is cleaved into left ($[0, b)$) and right ($[b, L)$) partitions.
-The profile likelihood ratio:
-\begin{equation}
-\Delta \ln L(b) = \ln P(\mathbf{S}_{[0, b)} \mid T_{\mathrm{home}}) + \ln P(\mathbf{S}_{[b, L)} \mid T_{\mathrm{donor}}) - \ln P(\mathbf{S}_{[0, L)} \mid T_{\mathrm{home}})
-\end{equation}
-is evaluated under HKY85 substitution.
-The exact breakpoint $\hat{b}$ is localized at the maximum likelihood peak: $\hat{b} = \arg\max_b \Delta \ln L(b)$.
-Significance is certified against the Dunn-Šidák corrected family-wise threshold $\alpha_{\mathrm{FWER}} = 1 - (1 - \alpha)^{1/M}$.
+\subsection{Contingency-Table Breakpoint Polisher and Three-Stage Raw-Site Verification}
+Candidate changepoint intervals $[u_1, u_2]$ localized by the force field are polished to single-nucleotide resolution using recursive contingency-table boundary refinement (\texttt{polishing.rs}).
+Across the triplet $(s_{\mathrm{rec}}, s_{\mathrm{home}}, s_{\mathrm{donor}})$, the polisher evaluates all informative polymorphic sites ($s_{\mathrm{home}}(u) \ne s_{\mathrm{donor}}(u)$) and tests outward extensions and inward splits of the candidate segment via one-sided $2\times 2$ Fisher's exact tests ($\alpha_{\mathrm{split}} = 0.05 / L$) comparing donor-matching ($s_{\mathrm{rec}} = s_{\mathrm{donor}}$) versus home-matching ($s_{\mathrm{rec}} = s_{\mathrm{home}}$) site counts inside the segment against its flanks.
+Non-recombinant margins are trimmed to the exact bounding informative SNPs, and across conserved stretches where parental lineages carry identical nucleotides, the polisher reports the exact uninformative plateau interval $[c_{\mathrm{left}}, c_{\mathrm{right}}]$.
+Each polished candidate event must then pass a three-stage raw-site verification audit: (i)~at least three unambiguous donor-matching informative sites inside the tract; (ii)~a one-sided $2\times 2$ Fisher's exact test comparing in-tract versus flanking donor-match counts that achieves significance under the Bonferroni-corrected threshold $\alpha_{\mathrm{verify}} = \alpha / \binom{N}{3}$; and (iii)~a Buneman four-point quartet topological double-difference check confirming a genuine phylogenetic split shift.
 
 \section{Ancestral Recombination Graph (ARG) Reconstruction and Validation}
 \label{supp:arg_validation}
 
 \subsection{Ancestral Event Consolidation}
-Raw recombinant tracts detected across contemporary genomes $\mathcal{E}_{\mathrm{raw}} = \{e_1, \dots, e_M\}$ are clustered to distinguish ancestral gene transfers from recurrent hotspot activity.
-Two events $e_a$ and $e_b$ are grouped into ancestral cluster $\mathcal{C}$ if they share compatible donor clades and satisfy spatial boundary tolerance:
+Verified recombinant tracts detected across contemporary genomes $\mathcal{E}_{\mathrm{raw}} = \{e_1, \dots, e_M\}$ are clustered to distinguish shared ancestral gene transfers from independent events.
+Candidate events are compared across both direct ($\mathrm{Home}_a = \mathrm{Home}_b, \mathrm{Donor}_a = \mathrm{Donor}_b$) and inverted ($\mathrm{Home}_a = \mathrm{Donor}_b, \mathrm{Donor}_a = \mathrm{Home}_b$) parental polarities.
+Two events $e_a$ and $e_b$ with compatible parents are grouped into ancestral cluster $\mathcal{C}$ if they satisfy interval overlap or reciprocal junction proximity:
 \begin{equation}
-J(I_a, I_b) = \frac{|I_a \cap I_b|}{|I_a \cup I_b|} \ge \tau_{\mathrm{jaccard}} \quad \text{or} \quad \max(|u_{1,a} - u_{1,b}|, |u_{2,a} - u_{2,b}|) \le \Delta_{\mathrm{boundary}},
+\mathrm{IoU}(I_a, I_b) = \frac{|I_a \cap I_b|}{|I_a \cup I_b|} \ge 0.50 \quad \text{or} \quad \frac{|I_a \cap I_b|}{\min(|I_a|, |I_b|)} \ge 0.50,
 \end{equation}
-where default thresholds are $\tau_{\mathrm{jaccard}} = 0.60$ and $\Delta_{\mathrm{boundary}} = 100$~nt.
-The ancestral event coordinates are defined by median breakpoints $\bar{u}_{1} = \mathrm{median}(\{u_{1,i}\})$ and $\bar{u}_{2} = \mathrm{median}(\{u_{2,i}\})$.
-When $|\mathcal{C}| > 1$, the transfer is parameterized as a shared ancestral reticulation node ancestral to all member isolates.
-When $|\mathcal{C}| = 1$, it is parameterized as a private terminal event.
+or share a complementary crossover junction within $\Delta_{\mathrm{boundary}} = 100$~nt under inverted polarity.
+The consolidated ancestral event spans the outer envelope $[\min_i u_{1,i}, \max_i u_{2,i}]$ while retaining maximal statistical significance across member sequences.
+When $|\mathcal{C}| > 1$, the transfer is parameterized as a shared ancestral reticulation node ancestral to all member co-recombinant isolates.
+When $|\mathcal{C}| = 1$, it is parameterized as a terminal lineage event.
 
 \subsection{Structural Model Classes}
 A candidate evolutionary history $H$ is parameterized by an ordered partitioning of the alignment $[0, L)$ into $K$ intervals $\{[s_k, e_k)\}_{k=1}^K$ and an associated graph topology:
@@ -264,12 +241,12 @@ Four specialized simulation generators probed operational regimes outside the ne
 \label{supp:grand_sweep_protocol}
 
 To evaluate algorithmic performance, false positive rate calibration, and multi-event mosaic resolution across unconstrained continuous evolutionary space rather than isolated grid points, we executed a grand continuous parameter sweep of 1,000,000 independent whole-genome alignments.
-The sweep comprised $333{,}334$ non-recombinant clonal nulls and $666{,}666$ recombinant chimeras (Table~\ref{tab:grand_sweep_1m_envelope}, Figures~\ref{fig:grand_sweep_1m_phase_diagram} and \ref{fig:grand_sweep_1m_multievent}).
+The sweep comprised $333{,}334$ non-recombinant clonal nulls and $666{,}666$ recombinant chimeras (Supplementary Table~\ref{tab:grand_sweep_1m_envelope}, Figure~\ref{fig:grand_sweep_1m_phase_diagram}, and Supplementary Figure~\ref{fig:grand_sweep_1m_multievent}).
 Each trial sampled an independent parameter vector uniformly or log-uniformly across evolutionary phase space:
 \begin{itemize}
-    \item \emph{Alignment Length ($L$)}: Sampled log-uniformly from $L \sim \text{LogUniform}(300, 30{,}000)$~nt and discretized to multiples of $50$~nt ($L \in [300, 30{,}000]$~nt, median $5{,}450$~nt).
-    \item \emph{Sample Taxon Count ($N$)}: Stratified across three cohort surveillance regimes: 40\% small outbreak cohorts ($N \sim \text{Uniform}(4, 30)$ taxa), 40\% medium surveillance cohorts ($N \sim \text{Uniform}(31, 100)$ taxa), and 20\% large population cohorts ($N \sim \text{Uniform}(101, 250)$ taxa).
-    \item \emph{Parental Divergence ($d_{\mathrm{parent}}$)}: Log-uniformly distributed across $d_{\mathrm{parent}} \sim \text{LogUniform}(0.005, 0.350)$ substitutions per site.
+    \item \emph{Alignment Length ($L$)}: Sampled log-uniformly from $[300, 30{,}000]$~nt and discretized to multiples of $50$~nt ($L \in [300, 30{,}000]$~nt, median $5{,}450$~nt).
+    \item \emph{Sample Taxon Count ($N$)}: Stratified across three cohort surveillance regimes: 40\% small outbreak cohorts ($N \in [4, 30]$ taxa), 40\% medium surveillance cohorts ($N \in [31, 100]$ taxa), and 20\% large population cohorts ($N \in [101, 250]$ taxa), sampled uniformly within each tier.
+    \item \emph{Parental Divergence ($d_{\mathrm{parent}}$)}: Sampled log-uniformly across $d_{\mathrm{parent}} \in [0.005, 0.350]$ substitutions per site.
     \item \emph{Substitution Dynamics}: Continuous-time Markov substitution under the HKY85 model with transition/transversion ratio $\kappa = 2.0$ and empirical base frequencies $\bm{\pi} = [0.30, 0.20, 0.20, 0.30]$. Position-specific finite-time transition matrices $\mathbf{P}(t)$ were precomputed analytically per trial for rapid, exact simulation without transcendental overhead.
     \item \emph{Site Rate Heterogeneity and Biological Heterotachy ($\alpha$)}:
     \begin{itemize}
@@ -281,23 +258,23 @@ Each trial sampled an independent parameter vector uniformly or log-uniformly ac
     \begin{itemize}
         \item $K_{\mathrm{true}} = 0$ (33.33\% of trials, $N = 333{,}334$): Strictly non-recombinant clonal nulls to calibrate empirical false positive rates under severe rate variation.
         \item $K_{\mathrm{true}} = 1$ (36.64\% of trials, $N = 366{,}396$, 55.0\% of recombinant partition): Single reticulation event per genome.
-        \item $K_{\mathrm{true}} = 2$ (16.70\% of trials, $N = 166{,}974$, 25.0\% of recombinants): Dual independent recombination events across segmented partitions.
-        \item $K_{\mathrm{true}} = 3$ (7.99\% of trials, $N = 79{,}881$, 12.0\% of recombinants): Triple independent recombination events (multi-way mosaicism).
-        \item $K_{\mathrm{true}} = 4$ (5.34\% of trials, $N = 53{,}415$, 8.0\% of recombinants): Quadruple reticulations that include complex nested architectures.
+        \item $K_{\mathrm{true}} = 2$ (16.63\% of trials, $N = 166{,}279$, 24.9\% of recombinants): Dual independent recombination events across segmented partitions.
+        \item $K_{\mathrm{true}} = 3$ (8.04\% of trials, $N = 80{,}391$, 12.1\% of recombinants): Triple independent recombination events (multi-way mosaicism).
+        \item $K_{\mathrm{true}} = 4$ (5.36\% of trials, $N = 53{,}600$, 8.0\% of recombinants): Quadruple reticulations that include complex nested architectures.
     \end{itemize}
     \item \emph{Structural Event Topologies}:
     \begin{itemize}
-        \item \textit{5' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at genome start ($u_1 = 1$) and terminates at $u_2 \sim \text{Uniform}(50, \text{segment bound})$.
-        \item \textit{3' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at $u_1 \sim \text{Uniform}(\text{segment start}, L - 50)$ and extends to chromosome end ($u_2 = L$).
+        \item \textit{5' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at genome start ($u_1 = 1$) and terminates at $u_2$ sampled uniformly from $50$~nt to the segment bound.
+        \item \textit{3' Terminal Crossovers} (20\% of terminal events): Breakpoint initiates at $u_1$ sampled uniformly from the segment start to $L - 50$~nt and extends to chromosome end ($u_2 = L$).
         \item \textit{Intercalary Conversion Cassettes} (60\% of events): Internal tracts ($1 < u_1 < u_2 < L$) with tract length $L_{\mathrm{tract}}$ sampled log-uniformly from $30$~bp to $0.65 \times \text{segment length}$.
     \end{itemize}
     \item \emph{Multi-Donor Mosaicism ($P_1 \leftarrow P_2 + P_3$)}:
     In cohorts with $N \ge 8$ taxa ($N = 179{,}233$ trials), recombinant chimeras were generated with multiple distinct donor clades where distinct segments of the same genome were inherited from independent ancestral lineages $P_2$ and $P_3$ relative to recipient background $P_1$.
 \end{itemize}
-Simulations were implemented in native compiled Rust (\texttt{crates/rhizaeon-cli/src/bin/grand\_sweep.rs}) leveraging Rayon data parallelism.
+Simulations were implemented in native compiled Rust (\path{crates/rhizaeon-cli/src/bin/grand_sweep.rs}) leveraging Rayon data parallelism.
 The 1,000,000 trials were distributed across cluster infrastructure as a 50-task Slurm array (50 tasks $\times$ 20,000 trials, 32 CPU threads and 48 GB RAM per task across 512 distributed CPU cores).
 The benchmark maintained a sustained throughput of $\approx 380$ complete whole-genome simulations and scans per second and completed all 1,000,000 trials in 43.8 minutes.
-Outputs were aggregated, deduplicated, and verified using \texttt{scripts/simulations/merge\_sweep\_1m.py} to ensure exact, reproducible execution across the entire corpus.
+Outputs were aggregated, deduplicated, and verified using \path{scripts/simulations/merge_sweep_1m.py} to ensure exact, reproducible execution across the entire corpus.
 
 \section{Ground Truth Extraction and Bijective Bipartite Matching}
 \label{supp:bipartite_matching_full}
@@ -311,14 +288,14 @@ The background Home parent $H_i$ is defined as the majority sister across the fu
 A true reticulation event occurs when taxon $i$'s sister shifts to a distinct donor lineage $D = \sigma(i, u) \ne H_i$ across a contiguous segment $[u_1, u_2]$.
 To eliminate trivial non-divergent ancestral coalescences, ground truth events were filtered to require at least one distinguishing mutation between Home and Donor across the tract ($\sum_{u=u_1}^{u_2} \mathbb{I}(mat[H, u] \ne mat[D, u]) \ge 1$).
 
-To score inferred events against ground truth without bias, predicted events $\{\hat{E}_j\}_{j=1}^{\hat{K}}$ were paired to true events $\{E_i\}_{i=1}^{K_{\mathrm{true}}}$ via maximum-weight bijective bipartite matching using the Hungarian algorithm (\texttt{scipy.optimize.linear\_sum\_assignment}).
+To score inferred events against ground truth without bias, predicted events $\{\hat{E}_j\}_{j=1}^{\hat{K}}$ were paired to true events $\{E_i\}_{i=1}^{K_{\mathrm{true}}}$ via maximum-weight bijective bipartite matching using the Hungarian algorithm (\path{scipy.optimize.linear_sum_assignment}).
 The pairwise affinity matrix $A_{ij} \in [0, 1]$ between true event $i = (C_i, H_i, D_i, u_{1,i}, u_{2,i})$ and inferred event $j = (\hat{C}_j, \hat{H}_j, \hat{D}_j, \hat{u}_{1,j}, \hat{u}_{2,j})$ was formulated as:
 \begin{equation}
 A_{ij} = S_{\mathrm{triad}}(i, j) \cdot J_{\mathrm{SNP}}(i, j).
 \end{equation}
 Here $S_{\mathrm{triad}} = w(C_i, \hat{C}_j) \cdot \frac{1}{2}\left[w(H_i, \hat{H}_j) + w(D_i, \hat{D}_j)\right]$ weights lineage attribution using tree patristic distances with Gaussian kernel width $\sigma = \bar{D} / 2$.
 Spatial overlap $J_{\mathrm{SNP}} = |S_{\mathrm{true}} \cap S_{\mathrm{inferred}}| / |S_{\mathrm{true}} \cup S_{\mathrm{inferred}}|$ is the Jaccard index evaluated over distinguishing polymorphic sites between Home and Donor.
-Unmatched inferred events were penalized as false alarms (reducing precision $\text{PPV} = \sum \text{matched affinity} / \hat{K}$), whereas unmatched true events reduced sensitivity ($\text{TPR} = \sum \text{matched affinity} / K_{\mathrm{true}}$).
+Unmatched inferred events were penalized as false alarms (reducing precision, $\text{PPV} = \hat{K}^{-1} \sum_{\mathcal{M}} A_{ij}$), whereas unmatched true events reduced sensitivity ($\text{TPR} = K_{\mathrm{true}}^{-1} \sum_{\mathcal{M}} A_{ij}$).
 
 \section{Empirical Genomic Cohorts and Annotations}
 \label{supp:empirical_cohorts}
@@ -335,26 +312,82 @@ It also pairs all 21 published GARD breakpoints with the closest \RhizAeon conti
 
 \paragraph{\textit{Streptococcus pneumoniae} PMEN1 Whole Chromosome.}
 We analyzed the complete 2.22~Mb chromosome of the pandemic multidrug-resistant Spain23F-1 / PMEN1 lineage of \textit{S.~pneumoniae} (ATCC 700669, 11 representative global isolates spanning 1984--2008, \citealt{croucher2011rapid}).
-Lossless SNP indexing identified 1,516 segregating polymorphic sites across the 2,221,315~bp chromosome.
-Annotations follow ATCC 700669 (FM211187.1) across resistance and virulence loci: \textit{pbp2x} (nt 287,466--289,718), capsular polysaccharide locus \textit{cps} (nt 334,103--354,291), \textit{pbp1a} (nt 322,540--324,702), \textit{pbp2b} (nt 1,532,410--1,534,452), dihydrofolate reductase \textit{folA} (nt 1,623,115--1,623,600), and surface antigen adhesin \textit{pspC/cbpA} (nt 2,109,335--2,111,878).
+Lossless SNP indexing identified 1,516 segregating polymorphic sites (1,002 parsimony-informative sites) across the 2,221,315~bp chromosome.
+Annotations follow ATCC 700669 (FM211187.1) across resistance and virulence loci: the \textit{pbp2x} mosaic resistance tract (nt 285,069--305,751, spanning \textit{pbp2x} coding sequence nt 287,466--289,718), capsular polysaccharide locus \textit{cps} (nt 303,559--314,822; extended \textit{pbp2x--cps--pbp1a} recombination hotspot island nt 285,000--352,000), \textit{pbp1a} (nt 323,721--325,108), dihydrofolate reductase \textit{folA} (coding locus nt 1,532,197--1,532,703; trimethoprim resistance recombination island nt 1,620,528--1,649,446), \textit{pbp2b} (nt 1,612,429--1,614,471), and the surface antigen adhesin island \textit{pspC/cbpA} (nt 2,105,000--2,138,000, spanning \textit{pspC} coding locus nt 2,109,335--2,111,878).
 
 \paragraph{Hominoidea MHC Class I Allelic Cohort.}
-We analyzed $N = 379$ classical MHC Class~I alleles ($1{,}128$~bp coding alignment across human, chimpanzee, gorilla, and orangutan, \citealt{maccari2017ipd}).
+We analyzed $N = 379$ classical MHC Class~I alleles ($1{,}128$~bp coding alignment, 526 segregating polymorphic sites and 451 parsimony-informative sites across human, chimpanzee, gorilla, and orangutan, \citealt{maccari2017ipd}).
 Alleles were retrieved from the IPD-IMGT/HLA and IPD-MHC databases, comprising 150 \textit{HLA-A}, 150 \textit{HLA-B}, and 50 \textit{HLA-C} human alleles alongside 15 chimpanzee (\textit{Patr}), 8 gorilla (\textit{Gogo}), and 6 orangutan (\textit{Popy}) alleles.
 Exon annotations follow canonical classical HLA Class~I structure: Exon 1 (Leader peptide, nt 1--72), Exon 2 ($\alpha_1$ domain, nt 73--342), Exon 3 ($\alpha_2$ domain, nt 343--618), Exon 4 ($\alpha_3$ domain, nt 619--894), Exon 5 (Transmembrane anchor, nt 895--1,011), and Exons 6--7 (Cytoplasmic tail, nt 1,012--1,128).
 
 \clearpage
 
-\begin{table}[!ht]
+\begin{table*}[!ht]
+\centering
+\small
+\caption{Quantitative comparison of \RhizAeon and 3SEQ across the 3,200-trial \citet{posada2001evaluation} benchmark suite.
+Results are grouped by evolutionary regime: false positive evaluation under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$, $\rho = 0$, 1,200 trials), strict molecular-clock null controls ($\alpha = \infty$, $\rho = 0$, 400 trials), and recombinant coalescent trials ($\rho \in \{1, 4, 16, 64\}$, 1,600 trials).
+Columns report the population mutation parameter ($\theta$), population recombination parameter ($\rho$), binary alignment-level power or FPR (\%), mean inferred event count ($\hat{K}$), continuous bipartite event precision ($\text{PPV}$), triad lineage attribution accuracy ($S_{\mathrm{triad}}$), and execution runtime per alignment (ms).
+Whereas alignment-level power scores binary locus detection, $\text{PPV}$ weights one-to-one Hungarian-matched events by $S_{\mathrm{triad}} \times J_{\mathrm{SNP}}$ and penalizes ungrounded or over-split calls (Section~\ref{subsec:posada_benchmark}).}
+\label{tab:supp_posada_summary}
+\resizebox{\textwidth}{!}{%
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}l c rrrrr rrrrr@{}}
+\toprule
+& & \multicolumn{5}{c}{\RhizAeon (Continuous Manifold Tracking)} & \multicolumn{5}{c}{3SEQ (Discrete Triplet Scanning)} \\
+\cmidrule(lr){3-7} \cmidrule(lr){8-12}
+Evolutionary Regime & Trials & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} \\
+\midrule
+\multicolumn{12}{l}{\textit{A. Rate Heterogeneity and Clock-Like Null Suites ($\rho = 0$, Empirical False Positive Calibration, Total $N = 1{,}600$)}} \\
+$\theta = 10, \alpha \in \{0.05, 0.5, 2.0\}$ & 300 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 22.7 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 28.2 \\
+$\theta = 50, \alpha \in \{0.05, 0.5, 2.0\}$ & 300 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 16.2 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 26.6 \\
+$\theta = 100, \alpha \in \{0.05, 0.5, 2.0\}$ & 300 & 0.3\% & 0.00 & 99.7\% & 99.7\% & 15.4 & 0.3\% & 0.00 & 99.7\% & 99.7\% & 27.4 \\
+$\theta = 200, \alpha \in \{0.05, 0.5, 2.0\}$ & 300 & 2.0\% & 0.02 & 98.0\% & 98.0\% & 15.5 & 0.3\% & 0.00 & 99.7\% & 99.7\% & 29.2 \\
+\textit{All Gamma Rate-Variation Nulls} & \textit{1,200} & \textit{0.58\%} & \textit{0.01} & \textit{99.4\%} & \textit{99.4\%} & \textit{17.4} & \textit{0.17\%} & \textit{0.00} & \textit{99.8\%} & \textit{99.8\%} & \textit{27.9} \\
+$\theta = 10, \alpha = \infty$ (Clock Null) & 100 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 11.9 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 59.7 \\
+$\theta = 50, \alpha = \infty$ (Clock Null) & 100 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 13.1 & 2.0\% & 0.03 & 98.0\% & 98.0\% & 30.3 \\
+$\theta = 100, \alpha = \infty$ (Clock Null) & 100 & 1.0\% & 0.01 & 99.0\% & 99.0\% & 13.4 & 0.0\% & 0.00 & 100.0\% & 100.0\% & 33.4 \\
+$\theta = 200, \alpha = \infty$ (Clock Null) & 100 & 2.0\% & 0.03 & 98.0\% & 98.0\% & 14.4 & 1.0\% & 0.06 & 99.0\% & 99.0\% & 36.3 \\
+\textit{All Clock-Like Nulls ($\alpha = \infty$)} & \textit{400} & \textit{0.75\%} & \textit{0.01} & \textit{99.2\%} & \textit{99.2\%} & \textit{13.2} & \textit{0.75\%} & \textit{0.02} & \textit{99.2\%} & \textit{99.2\%} & \textit{39.9} \\
+\midrule
+\multicolumn{12}{l}{\textit{B. Recombinant Coalescent Suite ($\rho > 0$, Statistical Power and Lineage Attribution, Total $N = 1{,}600$)}} \\
+$\theta = 10$ (Low Divergence) & 400 & 8.0\% & 0.10 & 20.4\% & 20.9\% & 13.2 & 10.2\% & 0.26 & 19.1\% & 19.7\% & 31.3 \\
+\quad $\rho = 1$ & 100 & 3.0\% & 0.05 & 54.5\% & 54.6\% & 12.1 & 2.0\% & 0.04 & 54.0\% & 54.2\% & 41.1 \\
+\quad $\rho = 4$ & 100 & 9.0\% & 0.11 & 22.4\% & 22.9\% & 12.0 & 16.0\% & 0.40 & 20.1\% & 21.2\% & 37.3 \\
+\quad $\rho = 16$ & 100 & 18.0\% & 0.20 & 3.9\% & 5.0\% & 13.8 & 22.0\% & 0.58 & 2.1\% & 3.2\% & 23.2 \\
+\quad $\rho = 64$ & 100 & 2.0\% & 0.02 & 1.1\% & 1.2\% & 15.0 & 1.0\% & 0.03 & 0.2\% & 0.3\% & 23.7 \\
+$\theta = 50$ (Moderate Divergence) & 400 & 65.0\% & 1.27 & 37.6\% & 46.5\% & 18.6 & 76.8\% & 6.97 & 16.6\% & 29.6\% & 27.6 \\
+\quad $\rho = 1$ & 100 & 28.0\% & 0.36 & 56.8\% & 58.5\% & 14.4 & 38.0\% & 2.14 & 41.0\% & 48.5\% & 31.7 \\
+\quad $\rho = 4$ & 100 & 55.0\% & 0.79 & 27.3\% & 30.7\% & 16.7 & 73.0\% & 5.18 & 7.0\% & 17.0\% & 28.9 \\
+\quad $\rho = 16$ & 100 & 82.0\% & 1.63 & 24.7\% & 35.8\% & 20.6 & 96.0\% & 9.75 & 6.3\% & 19.1\% & 24.5 \\
+\quad $\rho = 64$ & 100 & 95.0\% & 2.29 & 41.6\% & 61.3\% & 22.6 & 100.0\% & 10.82 & 11.9\% & 33.8\% & 25.4 \\
+$\theta = 100$ (Substantial Divergence) & 400 & 73.5\% & 1.69 & 40.3\% & 49.6\% & 20.8 & 84.2\% & 10.23 & 14.2\% & 29.4\% & 31.2 \\
+\quad $\rho = 1$ & 100 & 36.0\% & 0.43 & 52.4\% & 54.1\% & 15.8 & 52.0\% & 3.84 & 34.9\% & 46.9\% & 36.7 \\
+\quad $\rho = 4$ & 100 & 73.0\% & 1.14 & 38.2\% & 44.5\% & 18.7 & 85.0\% & 8.38 & 6.3\% & 17.9\% & 31.8 \\
+\quad $\rho = 16$ & 100 & 88.0\% & 1.95 & 34.6\% & 45.7\% & 23.6 & 100.0\% & 14.17 & 5.4\% & 19.4\% & 27.8 \\
+\quad $\rho = 64$ & 100 & 97.0\% & 3.22 & 35.8\% & 54.1\% & 25.3 & 100.0\% & 14.54 & 10.3\% & 33.5\% & 28.4 \\
+$\theta = 200$ (High Divergence) & 400 & 74.5\% & 2.12 & 43.7\% & 54.0\% & 26.2 & 83.0\% & 12.12 & 16.4\% & 31.4\% & 36.8 \\
+\quad $\rho = 1$ & 100 & 32.0\% & 0.39 & 63.2\% & 65.3\% & 16.7 & 43.0\% & 4.05 & 46.5\% & 55.1\% & 39.6 \\
+\quad $\rho = 4$ & 100 & 72.0\% & 1.23 & 36.5\% & 42.5\% & 21.5 & 89.0\% & 10.92 & 4.6\% & 16.7\% & 37.0 \\
+\quad $\rho = 16$ & 100 & 97.0\% & 2.82 & 37.5\% & 51.7\% & 35.8 & 100.0\% & 17.25 & 5.6\% & 21.2\% & 37.3 \\
+\quad $\rho = 64$ & 100 & 97.0\% & 4.06 & 37.6\% & 56.4\% & 30.7 & 100.0\% & 16.26 & 8.9\% & 32.6\% & 33.3 \\
+\bottomrule
+\end{tabular}}
+\end{table*}
+
+\clearpage
+
+\begin{table*}[!ht]
 \centering
 \scriptsize
 \caption{Bijective coordinate conversion across SARS-CoV-2 Wuhan-Hu-1 reference coordinates (NC\_045512.2, $1\text{--}29{,}903$~nt), the 78-taxon multiple sequence alignment of \citet{lytras2022exploring} ($1\text{--}30{,}956$~nt), and the expanded 83-taxon multiple sequence alignment incorporating the five Laotian BANAL isolates of \citet{temmam2022bat} ($1\text{--}30{,}965$~nt).
 Part A lists major open reading frames, Spike functional domains, coldspots, hotspots, and BANAL-247 micro-conversion tracts.
 Part B lists all 21 consensus GARD breakpoints from \citet{lytras2022exploring} (Supplementary Table~S3) alongside the closest \RhizAeon changepoints and spatial deviations ($|\Delta|$, nt) evaluated strictly within the matching coordinate frame (83-taxon MSA frame vs.\ Wuhan-Hu-1 reference frame).}
 \label{tab:supp_sarbeco_coord_conversion}
-{\setlength{\tabcolsep}{2.8pt}
+\resizebox{\textwidth}{!}{%
+\setlength{\tabcolsep}{3.5pt}
 \renewcommand{\arraystretch}{0.96}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l rrr rrr@{}}
+\begin{tabular}{@{}l rrr rrr@{}}
 \toprule
 & \multicolumn{3}{c}{Genomic Coordinate Frame (nt)} & \multicolumn{3}{c}{\RhizAeon Concordance (83-Taxon Cohort)} \\
 \cmidrule(lr){2-4} \cmidrule(lr){5-7}
@@ -382,83 +415,33 @@ ORF8 accessory protein & 27,894--28,259 & 28,795--29,182 & 28,804--29,191 & --- 
 Nucleocapsid (N) & 28,274--29,533 & 29,197--30,468 & 29,206--30,477 & --- & --- & --- \\
 \midrule
 \multicolumn{7}{l}{\textit{B. Published GARD Consensus Breakpoints (\citealt{lytras2022exploring}, 22-Virus Subset) vs.\ \RhizAeon Changepoints}} \\
-GARD BP 1 (nsp2) & 1,680 & 1,732 & 1,732 & 1,730 & 1,678 & 2 / 2 \\
-GARD BP 2 (nsp3 $5'$) & 3,093 & 3,154 & 3,154 & 3,075 & 3,020 & 79 / 73 \\
-GARD BP 3 (nsp3 macrodomain) & 3,649 & 3,761 & 3,761 & 3,698 & 3,586 & 63 / 63 \\
-GARD BP 4 (nsp3 PLpro) & 4,973 & 5,193 & 5,193 & 3,698 & 3,586 & 1,495 / 1,387 \\
-GARD BP 5 (nsp3 $3'$) & 8,208 & 8,431 & 8,431 & 9,116 & 8,890 & 685 / 682 \\
-GARD BP 6 (nsp6) & 11,445 & 11,671 & 11,671 & 11,877 & 11,651 & 206 / 206 \\
-GARD BP 7 (RdRp $5'$ entry) & 12,622 & 12,854 & 12,854 & 13,007 & 12,775 & 153 / 153 \\
-GARD BP 8 (RdRp internal 1) & 14,401 & 14,633 & 14,633 & 14,603 & 14,371 & 30 / 30 \\
-GARD BP 9 (RdRp internal 2) & 15,954 & 16,186 & 16,186 & 14,603 & 14,371 & 1,583 / 1,583 \\
-GARD BP 10 (nsp13 helicase) & 16,923 & 17,155 & 17,155 & 18,638 & 18,406 & 1,483 / 1,483 \\
-GARD BP 11 (nsp15 endoribonuclease) & 19,965 & 20,197 & 20,197 & 20,318 & 20,086 & 121 / 121 \\
-GARD BP 12 (nsp15/nsp16) & 20,518 & 20,750 & 20,750 & 20,528 & 20,296 & 222 / 222 \\
-GARD BP 13 (nsp16 $3'$) & 21,198 & 21,430 & 21,430 & 21,407 & 21,175 & 23 / 23 \\
-GARD BP 14 (Spike $5'$ upstream) & 21,411 & 21,643 & 21,643 & 21,623 & 21,391 & 20 / 20 \\
-GARD BP 15 (Spike NTD/RBD hinge) & 22,460 & 22,747 & 22,756 & 22,875 & 22,579 & 119 / 119 \\
-GARD BP 16 (Spike RBD $3'$ exit) & 23,396 & 23,692 & 23,701 & 24,175 & 23,858 & 474 / 462 \\
-GARD BP 17 (Spike S2 upstream) & 24,144 & 24,452 & 24,461 & 24,361 & 24,044 & 100 / 100 \\
-GARD BP 18 (Spike S2 fusion exit) & 24,843 & 25,151 & 25,160 & 25,391 & 25,074 & 231 / 231 \\
-GARD BP 19 (Envelope / Membrane) & 26,323 & 26,638 & 26,647 & 26,149 & 25,831 & 498 / 492 \\
-GARD BP 20 (ORF7a / ORF7b)\textsuperscript{a} & 27,388 & 28,165 & 28,174 & 28,556 & 27,664 & 382 / 276 \\
-GARD BP 21 (ORF7b / ORF8) & 27,685 & 28,571 & 28,580 & 28,556 & 27,664 & 24 / 21 \\
+GARD BP 1 (nsp2) & 1,680 & 1,732 & 1,732 & 1,775 & 1,723 & 43 / 43 \\
+GARD BP 2 (nsp3 $5'$) & 3,093 & 3,154 & 3,154 & 3,203 & 3,142 & 49 / 49 \\
+GARD BP 3 (nsp3 macrodomain) & 3,649 & 3,761 & 3,761 & 3,807 & 3,695 & 46 / 46 \\
+GARD BP 4 (nsp3 PLpro) & 4,973 & 5,193 & 5,193 & 4,868 & 4,651 & 325 / 322 \\
+GARD BP 5 (nsp3 $3'$) & 8,208 & 8,431 & 8,431 & 8,483 & 8,260 & 52 / 52 \\
+GARD BP 6 (nsp6) & 11,445 & 11,671 & 11,671 & 11,030 & 10,804 & 641 / 641 \\
+GARD BP 7 (RdRp $5'$ entry) & 12,622 & 12,854 & 12,854 & 13,001 & 12,769 & 147 / 147 \\
+GARD BP 8 (RdRp internal 1) & 14,401 & 14,633 & 14,633 & 14,807 & 14,575 & 174 / 174 \\
+GARD BP 9 (RdRp internal 2) & 15,954 & 16,186 & 16,186 & 14,807 & 14,575 & 1,379 / 1,379 \\
+GARD BP 10 (nsp13 helicase) & 16,923 & 17,155 & 17,155 & 18,299 & 18,067 & 1,144 / 1,144 \\
+GARD BP 11 (nsp15 endoribonuclease) & 19,965 & 20,197 & 20,197 & 19,850 & 19,618 & 347 / 347 \\
+GARD BP 12 (nsp15/nsp16) & 20,518 & 20,750 & 20,750 & 20,651 & 20,419 & 99 / 99 \\
+GARD BP 13 (nsp16 $3'$) & 21,198 & 21,430 & 21,430 & 21,539 & 21,307 & 109 / 109 \\
+GARD BP 14 (Spike $5'$ upstream) & 21,411 & 21,643 & 21,643 & 21,621 & 21,389 & 22 / 22 \\
+GARD BP 15 (Spike NTD/RBD hinge) & 22,460 & 22,747 & 22,756 & 22,649 & 22,353 & 107 / 107 \\
+GARD BP 16 (Spike RBD $3'$ exit) & 23,396 & 23,692 & 23,701 & 23,629 & 23,324 & 72 / 72 \\
+GARD BP 17 (Spike S2 upstream) & 24,144 & 24,452 & 24,461 & 24,484 & 24,167 & 23 / 23 \\
+GARD BP 18 (Spike S2 fusion exit) & 24,843 & 25,151 & 25,160 & 25,183 & 24,866 & 23 / 23 \\
+GARD BP 19 (Envelope / Membrane) & 26,323 & 26,638 & 26,647 & 26,953 & 26,604 & 306 / 281 \\
+GARD BP 20 (ORF7a / ORF7b)\textsuperscript{a} & 27,388 & 28,165 & 28,174 & 27,718 & 27,369 & 456 / 19 \\
+GARD BP 21 (ORF7b / ORF8) & 27,685 & 28,571 & 28,580 & 28,670 & 27,775 & 90 / 90 \\
 \midrule
-\textit{Summary Concordance ($\le 150$~nt)} & --- & --- & --- & \textit{10 / 21 (47.6\%)} & \textit{10 / 21 (47.6\%)} & \textit{Median: 153.0 / 153.0} \\
+\textit{Summary Concordance ($\le 150$~nt)} & --- & --- & --- & \textit{13 / 21 (61.9\%)} & \textit{14 / 21 (66.7\%)} & \textit{Median: 107.0 / 99.0} \\
 \bottomrule
-\multicolumn{7}{l}{\parbox{\textwidth}{\vspace{2pt}\tiny \textsuperscript{a}Between 83-MSA positions $28{,}174$ (Ref $27{,}388$) and $28{,}556$ (Ref $27{,}664$), SARS-CoV-2 Wuhan-Hu-1 contains accessory ORF7a/ORF7b indels relative to bat sarbecovirus sequences, so the two breakpoints are separated by $276$~nt in ungapped Wuhan-Hu-1 reference coordinates versus $382$~nt in gapped MSA coordinates.}}
-\end{tabular*}}
-\end{table}
-
-\clearpage
-
-\begin{table}[!ht]
-\centering
-\small
-\caption{Quantitative comparison of \RhizAeon and 3SEQ across the 3,200-trial Posada \& Crandall (2001) benchmark suite.
-Results are grouped by evolutionary regime: false positive evaluation under Gamma rate heterogeneity ($\alpha \in \{2.0, 0.5, 0.05\}$, $\rho = 0$, 1,200 trials), clock-like null controls ($\rho = 0$, 400 trials), and recombinant coalescent trials ($\rho \in \{1, 4, 16, 64\}$, 1,600 trials).
-Columns report the population mutation parameter ($\theta$), population recombination parameter ($\rho$), binary alignment-level power or FPR (\%), mean inferred event count ($\hat{K}$), continuous bipartite event precision ($\text{PPV}$), triad lineage attribution accuracy ($S_{\mathrm{triad}}$), and execution runtime per alignment (ms).
-Whereas alignment-level power scores binary locus detection, $\text{PPV}$ weights one-to-one Hungarian-matched events by $S_{\mathrm{triad}} \times J_{\mathrm{SNP}}$ and penalizes ungrounded or over-split calls (Section~\ref{subsec:posada_benchmark}).}
-% [DARIA adjudicated: (1) Added explicit explanation of why continuous bipartite event-level PPV is lower than binary alignment-level power in both the Table S3 caption and main text Section 3.1; (2) Noted suggestion regarding additional domain-specific simulators/tools (GARD, RDP5, ClonalFrameML, fastGEAR, RIPPLES), which are benchmarked on their native empirical cohorts in Section 4 and Table 1 while 3SEQ serves as the fast CLI-automatable exact triplet baseline across the 5,480-alignment simulation suites.]
-\label{tab:supp_posada_summary}
-{\setlength{\tabcolsep}{4.5pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l c rrrrr rrrrr@{}}
-\toprule
-& & \multicolumn{5}{c}{\RhizAeon (Continuous Manifold Tracking)} & \multicolumn{5}{c}{3SEQ (Discrete Triplet Scanning)} \\
-\cmidrule(lr){3-7} \cmidrule(lr){8-12}
-Evolutionary Regime & Trials & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} & \shortstack{Power /\\FPR (\%)} & $\hat{K}$ & Precision & $S_{\mathrm{triad}}$ & \shortstack{Time\\(ms)} \\
-\midrule
-\multicolumn{12}{l}{\textit{A. Rate Heterogeneity Null Suite ($\rho = 0$, Empirical False Positive Calibration)}} \\
-$\theta = 10, \alpha \in [0.05, 2.0]$ & 300 & 0.0\% & 0.00 & 100.0\% & 1.00 & 22.7 & 0.0\% & 0.00 & 100.0\% & 1.00 & 28.2 \\
-$\theta = 50, \alpha \in [0.05, 2.0]$ & 300 & 0.0\% & 0.00 & 100.0\% & 1.00 & 16.2 & 0.0\% & 0.00 & 100.0\% & 1.00 & 26.6 \\
-$\theta = 100, \alpha \in [0.05, 2.0]$ & 300 & 0.3\% & 0.00 & 99.7\% & 1.00 & 15.4 & 0.3\% & 0.00 & 99.7\% & 1.00 & 27.4 \\
-$\theta = 200, \alpha \in [0.05, 2.0]$ & 300 & 2.0\% & 0.02 & 98.0\% & 0.98 & 15.5 & 0.3\% & 0.00 & 99.7\% & 1.00 & 29.2 \\
-\textit{All Rate-Variation Nulls} & \textit{1,200} & \textit{0.58\%} & \textit{0.01} & \textit{99.4\%} & \textit{0.99} & \textit{17.4} & \textit{0.17\%} & \textit{0.00} & \textit{99.8\%} & \textit{1.00} & \textit{27.9} \\
-\midrule
-\multicolumn{12}{l}{\textit{B. Recombinant Coalescent Suite ($\rho > 0$, Statistical Power and Lineage Attribution)}} \\
-$\theta = 10$ (Low Divergence) & 400 & 8.0\% & 0.10 & 20.4\% & 20.9\% & 13.2 & 10.2\% & 0.26 & 19.1\% & 19.7\% & 31.3 \\
-\quad $\rho = 1$ & 100 & 3.0\% & 0.05 & 54.5\% & 54.6\% & 12.1 & 2.0\% & 0.04 & 54.0\% & 54.2\% & 41.1 \\
-\quad $\rho = 4$ & 100 & 9.0\% & 0.11 & 22.4\% & 22.9\% & 12.0 & 16.0\% & 0.40 & 20.1\% & 21.2\% & 37.3 \\
-\quad $\rho = 16$ & 100 & 18.0\% & 0.20 & 3.9\% & 5.0\% & 13.8 & 22.0\% & 0.58 & 2.1\% & 3.2\% & 23.2 \\
-\quad $\rho = 64$ & 100 & 2.0\% & 0.02 & 1.1\% & 1.2\% & 15.0 & 1.0\% & 0.03 & 0.2\% & 0.3\% & 23.7 \\
-$\theta = 50$ (Moderate Divergence) & 400 & 65.0\% & 1.27 & 37.6\% & 46.5\% & 18.6 & 76.8\% & 6.97 & 16.6\% & 29.6\% & 27.6 \\
-\quad $\rho = 1$ & 100 & 28.0\% & 0.36 & 56.8\% & 58.5\% & 14.4 & 38.0\% & 2.14 & 41.0\% & 48.5\% & 31.7 \\
-\quad $\rho = 4$ & 100 & 55.0\% & 0.79 & 27.3\% & 30.7\% & 16.7 & 73.0\% & 5.18 & 7.0\% & 17.0\% & 28.9 \\
-\quad $\rho = 16$ & 100 & 82.0\% & 1.63 & 24.7\% & 35.8\% & 20.6 & 96.0\% & 9.75 & 6.3\% & 19.1\% & 24.5 \\
-\quad $\rho = 64$ & 100 & 95.0\% & 2.29 & 41.6\% & 61.3\% & 22.6 & 100.0\% & 10.82 & 11.9\% & 33.8\% & 25.4 \\
-$\theta = 100$ (Substantial Divergence) & 400 & 73.5\% & 1.69 & 40.3\% & 49.6\% & 20.8 & 84.2\% & 10.23 & 14.2\% & 29.4\% & 31.2 \\
-\quad $\rho = 1$ & 100 & 36.0\% & 0.43 & 52.4\% & 54.1\% & 15.8 & 52.0\% & 3.84 & 34.9\% & 46.9\% & 36.7 \\
-\quad $\rho = 4$ & 100 & 73.0\% & 1.14 & 38.2\% & 44.5\% & 18.7 & 85.0\% & 8.38 & 6.3\% & 17.9\% & 31.8 \\
-\quad $\rho = 16$ & 100 & 88.0\% & 1.95 & 34.6\% & 45.7\% & 23.6 & 100.0\% & 14.17 & 5.4\% & 19.4\% & 27.8 \\
-\quad $\rho = 64$ & 100 & 97.0\% & 3.22 & 35.8\% & 54.1\% & 25.3 & 100.0\% & 14.54 & 10.3\% & 33.5\% & 28.4 \\
-$\theta = 200$ (High Divergence) & 400 & 74.5\% & 2.12 & 43.7\% & 54.0\% & 26.2 & 83.0\% & 12.12 & 16.4\% & 31.4\% & 36.8 \\
-\quad $\rho = 1$ & 100 & 32.0\% & 0.39 & 63.2\% & 65.3\% & 16.7 & 43.0\% & 4.05 & 46.5\% & 55.1\% & 39.6 \\
-\quad $\rho = 4$ & 100 & 72.0\% & 1.23 & 36.5\% & 42.5\% & 21.5 & 89.0\% & 10.92 & 4.6\% & 16.7\% & 37.0 \\
-\quad $\rho = 16$ & 100 & 97.0\% & 2.82 & 37.5\% & 51.7\% & 35.8 & 100.0\% & 17.25 & 5.6\% & 21.2\% & 37.3 \\
-\quad $\rho = 64$ & 100 & 97.0\% & 4.06 & 37.6\% & 56.4\% & 30.7 & 100.0\% & 16.26 & 8.9\% & 32.6\% & 33.3 \\
-\bottomrule
-\end{tabular*}}
-\end{table}
+\multicolumn{7}{l}{\parbox{\textwidth}{\vspace{2pt}\tiny \textsuperscript{a}Between 83-MSA positions $27{,}718$ (Ref $27{,}369$) and $28{,}174$ (Ref $27{,}388$), SARS-CoV-2 Wuhan-Hu-1 contains accessory ORF7a/ORF7b deletions relative to bat sarbecovirus sequences, so the two breakpoints are separated by $19$~nt in ungapped Wuhan-Hu-1 reference coordinates versus $456$~nt in gapped MSA coordinates.}}
+\end{tabular}}
+\end{table*}
 
 \clearpage
 \input{sections_mbe/tab_grand_sweep_1m_envelope.tex}
