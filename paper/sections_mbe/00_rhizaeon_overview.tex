@@ -6,7 +6,7 @@ Clonal evolution produces balanced ``thermal'' fluctuations that cancel out as a
 Recombination breaks this physical equilibrium and imparts sustained directional momentum that pinpoints breakpoint sites while consolidating sets of recombination signals attributable to the ``co-recombinant'' descendants of ancestral recombinant sequences into single ancestral recombination events.
 
 Continuous trajectory tracking across sequence manifolds differentiates recombination signals from signals of clonal divergence without a discrete tree search.
-Scanning along an alignment from 5\textquotesingle\ to 3\textquotesingle, a non-recombinant genome maintains a stable genetic identity: its closest relatives remain constant and trace parallel paths through sequence space.
+Scanning along an alignment from $5'$ to $3'$, a non-recombinant genome maintains a stable genetic identity: its closest relatives remain constant and trace parallel paths through sequence space.
 Recombination disturbs this stability.
 A mosaic genome merges genetic material from two or more distinct parental lineages.
 In principle, a single recombination crossover lacks intrinsic biological polarity. If a recombinant sequence combines a segment from parental lineage $A$ with a segment from parental lineage $B$, sites within the $A$-derived segment view $A$ as the recipient background and $B$ as the foreign introgression, whereas sites within the $B$-derived segment view the roles in reverse.
@@ -36,10 +36,10 @@ Sustained donor attraction imparts momentum to the sequence trajectory and drive
 The physical breakpoints correspond to the exact genomic coordinates where the external directional force turns on and off.
 
 Different modes of recombination generate distinct geometric signatures within the force field.
-In a single breakpoint recombination event, called a crossover here, a sequence begins in its home corridor and, at the breakpoint site, switches into a donor corridor for the remainder of the recombinant sequence.
+In a single-breakpoint recombination event, called a crossover here, a sequence begins in its home corridor and, at the breakpoint site, switches into a donor corridor for the remainder of the recombinant sequence.
 The directional force acts persistently from the breakpoint onward and drives cumulative momentum to a solitary peak at the breakpoint junction before returning to zero at the end of the recombinant sequence.
 The resulting profile forms a triangular arch whose vertex pinpoints the breakpoint location.
-For a double breakpoint recombinant, called a cassette here, the directional force turns on at the 5\textquotesingle\ breakpoint and turns off at the 3\textquotesingle\ breakpoint to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
+For a double-breakpoint recombinant, called a cassette here, the directional force turns on at the $5'$ breakpoint and turns off at the $3'$ breakpoint to form a trapezoidal plateau: a steep upward climb at the first breakpoint, a sustained plateau across the cassette, and a steep descent at the second breakpoint.
 
 When the donor lineage that provided the tract of sequence acquired by a recombinant remains unsampled, the introgressed segment exhibits a sharp loss of affinity to the home lineage without pointing toward any sampled contemporary taxon in the alignment.
 Rather than manufacturing a false pairing with an arbitrary contemporary leaf or silently discarding the signal, \RhizAeon detects the localized departure from the home lineage and explicitly flags and labels the introgressed segment as originating from an unsampled \texttt{"Ghost"} donor lineage.
@@ -75,7 +75,7 @@ Second, when a candidate recombination tract contains a high density of mutation
 Concentrated clusters of mutations from a basal unsampled outgroup are retained and labeled as unsampled \texttt{"Ghost"} donor introgressions, whereas dispersed private substitutions are absorbed into the root sink and rejected.
 Third, for candidate recombination tracts attributed to a sampled donor reference, an orthogonal Fisher's exact test evaluates a two-by-two contingency table across the triplet of sequences representing the candidate recombinant, the home landmark, and the donor landmark.
 This test compares the counts of polymorphic sites where the recombinant matches the donor versus the home landmark inside the candidate tract against those in the flanking alignment regions (excluding monomorphic sites and positions where the home and donor landmarks carry identical nucleotides), and must achieve significance under family-wise error rate control across the cohort.
-Together, iterative scrubbing, leave-one-in verification, and raw-site auditing maintain strict false-positive control even under both extreme mutation rate heterogeneity and site or locus-specific heterotachy.
+Together, iterative scrubbing, leave-one-in verification, and raw-site auditing maintain strict false-positive control even under both extreme mutation rate heterogeneity and site- or locus-specific heterotachy.
 
 While many detected recombinants in sparse empirical surveys appear as singletons, expanding viral outbreaks and bacterial clones frequently produce clusters of multiple sampled descendants that inherited the same mosaic architecture from a common recombinant ancestor.
 When multiple descendants of an ancestral recombinant are sampled within an alignment, graph adjudication clusters these co-recombinant sequences whenever they share concordant parental lineages and overlapping breakpoint coordinates, consolidating the group into a single ancestral recombination event.

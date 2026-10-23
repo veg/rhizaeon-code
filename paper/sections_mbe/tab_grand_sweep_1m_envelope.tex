@@ -1,10 +1,9 @@
 % LaTeX table summarizing the 1,000,000-trial Grand Continuous Simulation Sweep
-% Strict compliance: zero synthetic mockery, zero bold formatting in data cells
 \begin{table*}[t!]
 \centering
 \footnotesize
 \caption{Empirical operational phase envelope of \RhizAeon across 1,000,000 independent continuous simulation trials.
-Simulations span $L \in [300, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d_{\mathrm{parent}} \in [0.005, 0.35]$~subs/site, and continuous Gamma rate variation $\alpha \in [0.2, 5.0]$ alongside strict molecular clock controls ($\alpha \ge 50$). Multi-event topologies include true nulls ($K=0$), 5'/3' terminal crossovers, intercalary conversion cassettes ($K=1$), and multi-donor / multi-event mosaicism ($K \in \{2, 3, 4\}$). Breakpoint errors report median absolute error (nt) among detected recombinant tracts.}
+Simulations span $L \in [1{,}000, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d_{\mathrm{parent}} \in [0.005, 0.25]$~subs/site, and continuous Gamma rate variation $\alpha \in [0.05, 5.0]$ alongside strict molecular clock controls ($\alpha \ge 50$). Multi-event topologies include true nulls ($K_{\mathrm{true}}=0$), $5'$/$3'$ terminal crossovers, intercalary conversion cassettes ($K_{\mathrm{true}}=1$), and multi-donor / multi-event mosaicism ($K_{\mathrm{true}} \in \{2, 3, 4\}$). Breakpoint errors report median absolute error (nt) among detected recombinant tracts.}
 \label{tab:grand_sweep_1m_envelope}
 \resizebox{\textwidth}{!}{%
 \setlength{\tabcolsep}{4.0pt}
@@ -12,26 +11,26 @@ Simulations span $L \in [300, 30{,}000]$~nt, $N \in [4, 250]$~taxa, $d_{\mathrm{
 \toprule
 Evolutionary Regime & Parameter Space & Total Trials & Detected / Rec & Power / FPR & Mean Jaccard & Median BP Error \\
 \midrule
-Strict Molecular Clock Null & $d \in [0.005, 0.35], \alpha \ge 50$ & 83,311 & 761 & 0.913\% FPR & --- & --- \\
-Gamma Heterotachy Null & $\alpha \in [0.2, 5.0], d \in [0.005, 0.35]$ & 250,023 & 2,593 & 1.037\% FPR & --- & --- \\
+Strict Molecular Clock Null & $d_{\mathrm{parent}} \in [0.005, 0.25], \alpha \ge 50$ & 83,311 & 761 & 0.913\% FPR & --- & --- \\
+Gamma Heterotachy Null & $\alpha \in [0.05, 5.0], d_{\mathrm{parent}} \in [0.005, 0.25]$ & 250,023 & 2,593 & 1.037\% FPR & --- & --- \\
 Taxon-Level False Alarm & $N_{\mathrm{taxa}} = 22{,}744{,}905$ total leaves & 333,334 & 5,884 taxa & 0.026\% FPR & --- & --- \\
 \midrule
 \multicolumn{7}{l}{\textit{Recombinant Partition Stratified by Informative Tract Mutations ($M_{\mathrm{tract}}$)}} \\
-Tract SNPs $M \in [0\text{--}2]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 85,564 & 484 & 0.6\% & 0.000 & 42.0 nt \\
-Tract SNPs $M \in [3\text{--}5]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 68,609 & 4,801 & 7.0\% & 0.043 & 16.0 nt \\
-Tract SNPs $M \in [6\text{--}10]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 77,568 & 25,024 & 32.3\% & 0.238 & 19.0 nt \\
-Tract SNPs $M \in [11\text{--}15]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 52,607 & 29,679 & 56.4\% & 0.443 & 19.0 nt \\
-Tract SNPs $M \in [16\text{--}25]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 71,427 & 52,042 & 72.9\% & 0.592 & 16.0 nt \\
-Tract SNPs $M \in [26\text{--}50]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 96,694 & 80,562 & 83.3\% & 0.703 & 12.0 nt \\
-Tract SNPs $M \in [51\text{--}100]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 84,676 & 73,443 & 86.7\% & 0.742 & 10.0 nt \\
-Tract SNPs $M > 100$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 129,521 & 114,518 & 88.4\% & 0.728 & 7.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [0\text{--}2]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 85,564 & 484 & 0.6\% & 0.000 & 42.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [3\text{--}5]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 68,609 & 4,801 & 7.0\% & 0.043 & 16.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [6\text{--}10]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 77,568 & 25,024 & 32.3\% & 0.238 & 19.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [11\text{--}15]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 52,607 & 29,679 & 56.4\% & 0.443 & 19.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [16\text{--}25]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 71,427 & 52,042 & 72.9\% & 0.592 & 16.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [26\text{--}50]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 96,694 & 80,562 & 83.3\% & 0.703 & 12.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} \in [51\text{--}100]$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 84,676 & 73,443 & 86.7\% & 0.742 & 10.0 nt \\
+Tract SNPs $M_{\mathrm{tract}} > 100$ & $L_{\mathrm{tract}} \in [30, 0.65 L]\text{ nt}$ & 129,521 & 114,518 & 88.4\% & 0.728 & 7.0 nt \\
 \midrule
 \multicolumn{7}{l}{\textit{Multi-Event and Structural Topology Decomposition ($K_{\mathrm{true}} \ge 1$, Total $N = 666{,}666$)}} \\
 Single Event ($K_{\mathrm{true}} = 1$) & Crossover / Cassette & 366,396 & 197,742 & 54.0\% & 0.409 & 14.0 nt \\
 Dual Events ($K_{\mathrm{true}} = 2$) & Two Reticulations & 166,279 & 101,156 & 60.8\% & 0.512 & 10.0 nt \\
 Triple Events ($K_{\mathrm{true}} = 3$) & Three Reticulations & 80,391 & 49,286 & 61.3\% & 0.510 & 8.0 nt \\
 Quad Events ($K_{\mathrm{true}} = 4$) & Complex Mosaicism & 53,600 & 32,369 & 60.4\% & 0.492 & 8.0 nt \\
-Terminal Crossovers & 5' or 3' Exchange & 239,767 & 163,424 & 68.2\% & 0.514 & 10.0 nt \\
+Terminal Crossovers & $5'$ or $3'$ Exchange & 239,767 & 163,424 & 68.2\% & 0.514 & 10.0 nt \\
 Internal Cassettes Only & Intercalary Swap & 426,899 & 217,129 & 50.9\% & 0.420 & 12.0 nt \\
 \bottomrule
 \end{tabular}}
