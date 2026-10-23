@@ -1,23 +1,25 @@
 {
   "title": "RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis (Replication Package, Benchmark Datasets, and Source Code v0.1.1)",
-  "description": "<p>Complete replication package, empirical genomic alignments, simulation benchmark datasets (including the 1,000,000-trial Grand Continuous Parameter Sweep, the 3,200-trial Posada &amp; Crandall 2001 coalescent benchmark, and 2,280 specialized epidemiological/evolutionary benchmark alignments), figure reproduction scripts, WebAssembly application, and Rust source code (v0.1.1) for the manuscript: <em>RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis</em>.</p>",
+  "description": "<p>Complete replication package, empirical genomic alignments, simulation benchmark datasets (including the 1,000,000-trial Grand Continuous Parameter Sweep, the 3,200-trial Posada &amp; Crandall 2001 coalescent benchmark, and 2,280 specialized epidemiological/evolutionary benchmark alignments), figure reproduction scripts, WebAssembly application, and Rust source code (v0.1.1) for the manuscript: <em>RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis</em>.</p><p>Funding: This work was supported in part by the National Institutes of Health (AI183870, GM151683) and the National Science Foundation (2419522).</p>",
   "upload_type": "software",
   "version": "0.1.1",
   "license": "MIT",
-  "Access_right": "open",
+  "access_right": "open",
   "creators": [
     {
       "name": "Kosakovsky Pond, Sergei L.",
       "affiliation": "Institute for Genomics and Evolutionary Medicine & Department of Biology, Temple University, Philadelphia, PA, USA",
-      "orcid": "0000-0003-3175-5388"
+      "orcid": "0000-0003-4817-4029"
     },
     {
       "name": "Callan, Danielle",
-      "affiliation": "Institute for Genomics and Evolutionary Medicine & Department of Biology, Temple University, Philadelphia, PA, USA"
+      "affiliation": "Institute for Genomics and Evolutionary Medicine & Department of Biology, Temple University, Philadelphia, PA, USA",
+      "orcid": "0000-0003-1967-4403"
     },
     {
       "name": "Weaver, Steven",
-      "affiliation": "Institute for Genomics and Evolutionary Medicine, Temple University, Philadelphia, PA, USA"
+      "affiliation": "Institute for Genomics and Evolutionary Medicine, Temple University, Philadelphia, PA, USA",
+      "orcid": "0000-0002-6931-7191"
     },
     {
       "name": "Verdonk, Hannah",
@@ -25,7 +27,8 @@
     },
     {
       "name": "Zehr, Jordan",
-      "affiliation": "Institute for Genomics and Evolutionary Medicine & Department of Biology, Temple University, Philadelphia, PA, USA"
+      "affiliation": "Institute for Genomics and Evolutionary Medicine & Department of Biology, Temple University, Philadelphia, PA, USA",
+      "orcid": "0000-0003-2099-4172"
     },
     {
       "name": "Lytras, Spyros",
@@ -35,7 +38,7 @@
     {
       "name": "Nekrutenko, Anton",
       "affiliation": "Department of Biochemistry and Molecular Biology, The Pennsylvania State University, University Park, PA, USA",
-      "orcid": "0000-0002-5987-0720"
+      "orcid": "0000-0002-5987-8032"
     },
     {
       "name": "Paisie, Taylor K.",
@@ -69,6 +72,16 @@
       "identifier": "https://github.com/veg/HyphAeon",
       "relation": "isSupplementTo",
       "scheme": "url"
+    },
+    {
+      "identifier": "https://veg.github.io/rhizaeon-code/",
+      "relation": "isSupplementTo",
+      "scheme": "url"
     }
+  ],
+  "grants": [
+    {"id": "01cwqze88::1U24AI183870-01"},
+    {"id": "01cwqze88::1R01GM151683-01"},
+    {"id": "021nxhr62::2419522"}
   ]
 }
