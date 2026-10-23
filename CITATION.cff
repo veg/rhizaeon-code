@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use RhizAeon or its benchmark datasets, please cite it using the metadata below."
+title: "RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis"
+version: "0.1.1"
+date-released: 2026-10-23
+license: MIT
+repository-code: "https://github.com/veg/HyphAeon"
+repository-artifact: "https://github.com/veg/rhizaeon-code"
+url: "https://veg.github.io/rhizaeon-code/"
+authors:
+  - family-names: "Kosakovsky Pond"
+    given-names: "Sergei L."
+    affiliation: "Institute for Genomics and Evolutionary Medicine, Temple University"
+    orcid: "https://orcid.org/0000-0003-3175-5388"
+  - family-names: "Callan"
+    given-names: "Danielle"
+    affiliation: "Institute for Genomics and Evolutionary Medicine, Temple University"
+  - family-names: "Weaver"
+    given-names: "Steven"
+    affiliation: "Institute for Genomics and Evolutionary Medicine, Temple University"
+  - family-names: "Verdonk"
+    given-names: "Hannah"
+    affiliation: "Institute for Genomics and Evolutionary Medicine, Temple University"
+  - family-names: "Zehr"
+    given-names: "Jordan"
+    affiliation: "Institute for Genomics and Evolutionary Medicine, Temple University"
+  - family-names: "Lytras"
+    given-names: "Spyros"
+    affiliation: "Institut Pasteur, Paris, France"
+    orcid: "https://orcid.org/0000-0003-4235-8049"
+  - family-names: "Nekrutenko"
+    given-names: "Anton"
+    affiliation: "The Pennsylvania State University"
+    orcid: "https://orcid.org/0000-0002-5987-0720"
+  - family-names: "Paisie"
+    given-names: "Taylor K."
+    affiliation: "University of Cape Town"
+  - family-names: "Martin"
+    given-names: "Darren P."
+    affiliation: "University of Cape Town"
+    orcid: "https://orcid.org/0000-0002-8785-0870"
+keywords:
+  - Recombination
+  - Reticulate Evolution
+  - Sequence Manifolds
+  - Continuous Trajectory Tracking
+  - Multidimensional Scaling
+  - Ancestral Recombination Graph
