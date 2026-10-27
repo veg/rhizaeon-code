@@ -14,7 +14,7 @@ For consistency across the framework, we define the \emph{home} lineage (or majo
 As a scan progresses along a mosaic genome, the sequence travels alongside its home lineage, then abruptly shifts affinity toward a donor lineage across the recombinationally acquired tract.
 To capture these shifts in affinity without constructing trees or using sliding windows, \RhizAeon measures the instantaneous affinity of each query sequence against a representative panel of landmark reference sequences at every polymorphic site of an alignment.
 
-To evaluate affinity at each polymorphic site, \RhizAeon adapts cross-attention from transformer neural networks.
+To evaluate affinity at each polymorphic site, \RhizAeon adapts the mathematical form of cross-attention from transformer neural networks as a deterministic, closed-form analytical operator that requires no neural network training or learned parameters.
 Each focal genome serves as the query, while the reference landmark sequences act as keys.
 At every position along the alignment, the query evaluates which landmark sequence it resembles to assign local evolutionary affinity.
 Rather than treating all nucleotide matches equally, continuous-time Markov substitution probabilities weight each attention score: sharing a rare derived allele commands strong attention, whereas common transitions command less.
@@ -60,8 +60,8 @@ The polisher recursively tests outward extensions and inward splits of the candi
 When parental lineages share an identical conserved stretch across the junction, the polisher reports the full uninformative nucleotide plateau $[c_{\mathrm{left}}, c_{\mathrm{right}}]$ between the bounding informative sites rather than manufacturing an artificial single-base prediction.
 
 In cohorts where recombination is pervasive, an initial static selection of reference landmark sequences risks incorporating mosaic sequences into the reference coordinate frame, which can obscure secondary recombination tracts or invert parent and recombinant identities.
-To prevent landmark contamination without discarding sequences, \RhizAeon employs a two-pass iterative forward scrubbing and backward leave-one-in verification architecture.
-During the forward pass, candidate recombinant segments are ranked from highest to lowest signal-to-noise ratio and iteratively scrubbed by replacing the detected recombinant tract with gap characters in the working alignment.
+To prevent landmark contamination without discarding sequences, \RhizAeon employs a three-pass architecture combining initial screening and graph adjudication (Pass~1), iterative forward scrubbing (Pass~2), and backward leave-one-in verification (Pass~3).
+During the forward scrubbing pass, candidate recombinant segments are ranked from highest to lowest signal-to-noise ratio and iteratively scrubbed by replacing the detected recombinant tract with gap characters in the working alignment.
 Outside its gap-masked tract, every sequence remains intact and continues to serve as an uncorrupted landmark reference for the rest of the cohort.
 Within the cross-attention force field, gap-masked query sites exert zero net force ($\Delta F = 0$), preventing artificial drawdown decay across scrubbed intervals while preserving natural alignment indel distances across unmasked sites.
 Once the forward pass converges to a recombination-depleted landmark alignment free of trajectory perturbations, a backward leave-one-in verification pass restores each candidate recombinant segment one at a time in isolation while keeping all other recombinant tracts masked.

@@ -55,14 +55,14 @@ RhizAeon replaces combinatorial triplet scanning with continuous metric manifold
    \theta_{i, d} = \sum_{c=1}^4 m_{i, c} \cdot \Theta_{d, c}
    $$
 
-2. **PhyloBias Prior (`prior.rs`):** Log-space continuous-time substitution prior with background pseudocount $\epsilon_0 = 0.05$:
+2. **PhyloBias Prior (`prior.rs`):** Log-space continuous-time substitution prior with equilibrium nucleotide frequency $\epsilon_0 = 0.25$ and Jukes--Cantor rate $\lambda_h = 4/3$:
 
    $$
    P_{ij} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h \cdot D_{\text{glob}}[i, j])
    $$
 
    $$
-   \text{PhyloBias}_{ij} = \ln(\max(10^{-5}, P_{ij}))
+   \text{PhyloBias}_{ij} = \ln(\max(10^{-15}, P_{ij}))
    $$
 
 3. **Continuous Attention Weights (`attention.rs`):** Softmax is computed over all $N+1$ nodes (Index 0 = `[ROOT]`, Indices $1, \dots, N$ = Leaves):

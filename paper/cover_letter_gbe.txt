@@ -1,0 +1,32 @@
+October 27, 2026
+
+Professor Laura A. Katz
+Editor-in-Chief, Genome Biology and Evolution
+
+Dear Laura,
+
+Please find enclosed our manuscript titled "RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis" by Sergei L. Kosakovsky Pond, Danielle Callan, Steven Weaver, Hannah Verdonk, Jordan Zehr, Spyros Lytras, Anton Nekrutenko, Taylor K. Paisie, Maciej F. Boni, and Darren P. Martin, which we are submitting for consideration as a Research Article / Methods contribution in Genome Biology and Evolution. (We initially sent this to MBE over the weekend and received a rapid editorial triage pass; given its focus on genome-scale reticulate evolution across viruses, bacteria, and eukaryotes, GBE is a natural home.)
+
+Homologous recombination, gene conversion, and horizontal transfer pervade genomes across the tree of life, yet classical recombination detection frameworks face a fundamental computational wall on modern genomic datasets: whole-alignment phylogeny-partitioning methods such as GARD scale as O(L^B N^3) and triplet-scanning methods such as 3SEQ and RDP scale as O(N^3 L). As alignment lengths reach megabase bacterial chromosomes and taxon counts grow to hundreds or thousands of genomes, existing tools either become computationally intractable or suffer severe false-positive inflation under lineage-specific rate heterogeneity, epidemic clonal expansions, and unsampled ("ghost") donor introgressions.
+
+Here we introduce RhizAeon, a deterministic, closed-form mathematical framework (requiring no neural network training or learned parameters) that reformulates recombination analysis as continuous trajectory tracking and zero-drift force-field deconvolution across metric sequence embeddings in strictly linear time, O(NKL), for N sequences of length L against K reference landmarks. Specifically:
+
+1. Metric Reference Landmarks & Unpolarized Root Sink: By anchoring an unpolarized ancestral root sink at the origin of a Gower multidimensional scaling subspace, private terminal-branch mutations and episodic rate bursts (such as APOBEC hypermutation or locus-specific heterotachy) route into the root sink rather than contemporary leaves, holding false-positive rates at 0.58% across 1,200 coalescent rate-heterogeneity nulls and 1.01% across 333,334 clonal genomes in a 1,000,000-genome parameter sweep.
+2. Multi-Scale Force-Field Deconvolution & Iterative Scrubbing: Combining Brownian-bridge functional central limit theory, multi-scale wavelet matched filtering (30–800 bp), recursive contingency-table boundary polishing, and two-pass forward-scrubbing / leave-one-in backward verification, RhizAeon resolves transfers ranging from 50–100 bp bacterial micro-conversions to 70 kb cassettes, detects unsampled ("ghost") donor introgressions (89.2% F1), deconvolves 3-parent nested mosaics (90.0% accuracy), and consolidates recombinant clades into single ancestral events (98.8% exact cardinality).
+3. Multi-Kingdom Empirical Genome Analyses & Zero-Install Browser Ecosystem: Implemented in Rust/Python and compiled to WebAssembly for client-side execution in any web browser (https://veg.github.io/rhizaeon-code/), RhizAeon maps 83 whole sarbecovirus genomes (31 kb) in 2.6 seconds, 11 whole Streptococcus pneumoniae PMEN1 chromosomes (2.22 Mb; scaling to 240 chromosomes in 36.1 seconds) in 0.2 seconds, and 379 primate MHC/HLA Class I alleles in 1.1 seconds, recovering published drug-resistance, antigenic, and receptor-binding transfers alongside previously uncharacterized deep-branch introgressions.
+
+AI Disclosure Statement (in accordance with SMBE/OUP policy):
+During the preparation of this work, the authors used AI-assisted coding and editing tools (Google Gemini and Anthropic Claude) to accelerate the Rust and WebAssembly software implementation, benchmark pipeline engineering, and manuscript copy-editing. All mathematical formulations, algorithmic specifications, statistical tests, simulation benchmarks, and biological interpretations were conceived, audited, and verified by the human authors, who take full responsibility for the integrity and accuracy of the manuscript and software. This disclosure is also included in the Methods and Acknowledgments sections of the manuscript.
+
+All source code, empirical alignments, and simulation suites are openly available under the MIT license at https://github.com/veg/HyphAeon and https://github.com/veg/rhizaeon-code, and permanently archived on Zenodo (https://doi.org/10.5281/zenodo.23600798). A preprint is posted on bioRxiv (https://doi.org/10.64898/2026.10.19.760237v1). This manuscript is original, has not been published elsewhere, and is not under consideration by any other journal. All authors have approved the manuscript and its submission to Genome Biology and Evolution.
+
+Thank you very much for your time and consideration.
+
+Sincerely,
+
+Sergei L. Kosakovsky Pond, PhD
+Professor of Biology
+Director, Institute for Genomics and Evolutionary Medicine (iGEM)
+Temple University
+Philadelphia, PA 19122, USA
+spond@temple.edu

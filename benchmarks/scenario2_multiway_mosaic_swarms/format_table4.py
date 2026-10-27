@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 def main():
-    p = Path("/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario2_multiway_mosaic_swarms/multiway_summary.csv")
+    p = Path(__file__).resolve().parent / "multiway_summary.csv"
     if not p.exists():
         print("Summary CSV not found.")
         return

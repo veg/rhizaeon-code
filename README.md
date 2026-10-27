@@ -180,10 +180,10 @@ $$
 \theta_{i, d} = \sum_{c=1}^4 m_{i, c} \cdot \Theta_{d, c}
 $$
 
-and integrates a continuous-time Markov substitution prior with background pseudocount $\epsilon_0 = 0.05$:
+and integrates a continuous-time Markov substitution prior with equilibrium nucleotide frequency $\epsilon_0 = 0.25$ and Jukes--Cantor rate $\lambda_h = 4/3$:
 
 $$
-P_{ij} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h \cdot D_{\text{glob}}(i, j)), \quad \text{PhyloBias}_{ij} = \ln(\max(10^{-5}, P_{ij}))
+P_{ij} = \epsilon_0 + (1 - \epsilon_0) \exp(-\lambda_h \cdot D_{\text{glob}}(i, j)), \quad \text{PhyloBias}_{ij} = \ln(\max(10^{-15}, P_{ij}))
 $$
 
 Continuous cross-attention Softmax is evaluated over all $N+1$ nodes:

@@ -8,7 +8,7 @@ This directory contains the three authentic empirical datasets and reproduction 
    - **Benchmark Comparison:** Direct head-to-head comparison against 21 whole-genome Genetic Algorithm for Recombination Detection (GARD) breakpoints from Lytras et al. (2022) *Genome Biology and Evolution*.
 
 2. **`02_spneumoniae_pmen1_croucher2011/`** — **Whole-Chromosome Antimicrobial Resistance & Capsule Switching in *Streptococcus pneumoniae* PMEN1**
-   - **Scale:** $N = 250$ clinical isolates, $L = 2{,}221{,}315$ bp whole-chromosome alignment.
+   - **Scale:** $N = 11$ representative global clinical isolates ($L = 2{,}221{,}315$ bp whole-chromosome alignment; plus 240-isolate whole-genome scaling benchmark).
    - **Biological Focus:** Macro-scale bacterial horizontal gene transfer, penicillin-binding protein transpeptidase domain replacements (*pbp2x*, *pbp1a*), trimethoprim resistance (*folA*), and the serotype 23F $\to$ 19A capsular polysaccharide (*cps*) vaccine-escape switch.
    - **Benchmark Comparison:** Direct concordance against 52 published recombination boundaries inferred by Gubbins (Croucher et al. 2011 *Science*, 2015 *Nucleic Acids Research*).
 
@@ -33,7 +33,7 @@ empirical_datasets/
 │   ├── generate_figure.py                   # Generates 5-panel Fig. 3 landscape
 │   └── README.md                            # Detailed documentation and walkthrough
 ├── 02_spneumoniae_pmen1_croucher2011/       # S. pneumoniae 2.22 Mb whole chromosomes
-│   ├── PMEN1.aln.gz                         # Gzipped 250-isolate whole-chromosome alignment
+│   ├── PMEN1.aln.gz                         # Gzipped 11-isolate whole-chromosome alignment
 │   ├── Spn23f.gff                           # ATCC 700669 reference genome annotation
 │   ├── gubbins_predictions.gff              # Published Gubbins recombination boundaries
 │   ├── pmen1_metadata.csv                   # Clinical isolate metadata and collection dates

@@ -12,8 +12,8 @@ s_{(k)} = \arg\max_{i \notin \{s_{(1)},\dots,s_{(k-1)}\}} \min_{1 \le j < k} d(s
 \label{eq:methods_fps}
 \end{equation}
 For $N \le 64$, all sequences serve as landmark channels ($K = N$).
-Because pervasive mosaicism in viral and bacterial cohorts can perturb initial reference coordinates if recombinant segments remain unmasked in landmark sequences, \RhizAeon couples landmark embedding with a two-pass Iterative Forward Scrubbing and Backward Leave-One-In Verification architecture.
-In Pass 1 (Iterative Forward Scrubbing), candidate recombination events across the cohort are sorted in descending order of excursion amplitude $Z_{\max}$, and each detected recombinant tract $[u_1, u_2]$ in sequence $s_i$ is masked in-place with gap characters (\texttt{-}).
+Because pervasive mosaicism in viral and bacterial cohorts can perturb initial reference coordinates if recombinant segments remain unmasked in landmark sequences, \RhizAeon couples clonal-medoid landmark embedding with a three-pass screening, Iterative Forward Scrubbing, and Backward Leave-One-In Verification architecture.
+Following initial whole-cohort screening and graph adjudication (Pass~1), Pass~2 (Iterative Forward Scrubbing) sorts candidate recombination events across the cohort in descending order of excursion amplitude $Z_{\max}$, and each detected dominant or nested recombinant tract $[u_1, u_2]$ in sequence $s_i$ is masked in-place with gap characters (\texttt{-}).
 Under Zero-Force Scrubbed Site Physics, any alignment column $u$ where either the query sequence $s_i$ or the landmark sequence $s_j$ carries a gap character exerts strictly zero instantaneous force ($\Delta F_u(i \to j) = 0$).
 Gap-masked mosaic tracts therefore cannot distort flanking trajectory momentum, and every sequence's unadmixed backbone remains available as a clean reference landmark.
 
@@ -30,7 +30,7 @@ Gower interpolation solves $\min_{\mathbf{z} \in \mathbb{R}^d} \sum_{j=1}^K (\|\
 \label{eq:methods_gower}
 \end{equation}
 where $\bar{\mathbf{d}}^2 = \frac{1}{K} \mathbf{D}^{\odot 2} \mathbf{1}_K$.
-Evaluating \eqref{eq:methods_gower} across sequence coordinates builds the trajectory tensor $\mathbf{Z} \in \mathbb{R}^{N \times U \times d}$ while preserving rigid metric geometry without the need for Procrustes alignments.
+Evaluating \eqref{eq:methods_gower} across sequence coordinates builds the trajectory tensor $\mathbf{Z} \in \mathbb{R}^{N \times U \times d}$ while preserving rigid metric geometry without the need for Procrustes alignments during discrete tract calling (for cohort-wide topological strain profiling across dense bacterial chromosomes and multigene allelic panels, \RhizAeon also provides a complementary bilateral sliding-window Procrustes MDS flux scanner over segregating SNP windows that outputs continuous breakpoint flux $\Phi_{\mathrm{bp}}(u)$ and cumulative strain $\rho(u)$).
 
 \subsection{Continuous Phylogenetic Cross-Attention and the Unpolarized Root Sink}
 \label{subsec:methods_attention_root}
@@ -95,18 +95,18 @@ Trajectories satisfying $Z_{\mathrm{phys}} = \sup |B(u)| / (\sigma \sqrt{L}) \ge
 To isolate both macroscopic crossovers/cassettes and short micro-conversion tracts ($< 200$~nt) across megabase sequences, \RhizAeon combines Recursive Binary Segmentation on the Brownian bridge with a multi-scale matched filter bank.
 Recursive binary segmentation identifies the dominant excursion peak $u^* = \arg\max_{u \in [a, b]} |Y_{i,k}(u) - \text{line}_{[a,b]}(u)|$ and recursively subdivides intervals whenever the local bridge excursion exceeds $K_{\text{crit}}$.
 Concurrently, convolving trajectory increments $\Delta Y_{i,k}(u)$ via $\mathcal{O}(1)$ prefix sums across boxcar matched-filter scales $\tau \in \{30, 60, 120, 240, 300, 360, 480, 600, 800\}$~nt and evaluating running drawdown $\text{DD}_k(u) = \max_{v \le u} Y_{i,k}(v) - Y_{i,k}(u)$ isolates localized step transitions and tract exit boundaries.
-To separate single terminal crossovers from intercalary recombination cassettes, we evaluate the outer-to-inner energy density ratio $\mathcal{E}_{\text{ratio}}$ across flanking versus internal segments: cassettes return cleanly to baseline on both flanks ($\mathcal{E}_{\text{ratio}} < 0.15$), whereas terminal crossovers maintain elevated offset energy ($\mathcal{E}_{\text{ratio}} \ge 0.50$).
+To separate single terminal crossovers from intercalary recombination cassettes, the engine evaluates alignment boundary abutment ($u_1 = 1$, $u_2 = L$, or zero flanking informative sites) and checks whether flanking velocity vectors reverse direction ($\cos\theta \le 0.20$, complementing the outer-to-inner energy density ratio $\mathcal{E}_{\text{ratio}}$ across flanking versus internal segments).
 
 Following changepoint localization, contingency-table boundary refinement (\texttt{polishing.rs}) polishes breakpoint coordinates down to single-nucleotide resolution.
 Across the triplet $(s_{\text{rec}}, s_{\text{home}}, s_{\text{donor}})$, the polisher extracts all informative polymorphic sites where $s_{\text{home}}(u) \neq s_{\text{donor}}(u)$ and recursively tests outward extensions and inward splits of each candidate interval $[u_1, u_2]$ using one-sided $2\times 2$ Fisher's exact contingency tables ($\alpha_{\mathrm{split}} = 0.05 / L$) comparing donor-matching ($s_{\text{rec}} = s_{\text{donor}}$) versus home-matching ($s_{\text{rec}} = s_{\text{home}}$) site counts inside the segment against its flanks.
 Non-recombinant flanking margins are trimmed to the exact bounding informative SNPs, and across conserved stretches where parental lineages carry identical nucleotides, the polisher reports the exact uninformative plateau interval $[c_{\text{left}}, c_{\text{right}}]$.
-Continuous gap bridging iteratively coalesces adjacent donor fragments sharing the same parent whenever the intervening non-informative span is $\le 300$~nt and net in-tract affinity remains positive.
+Continuous gap bridging iteratively coalesces adjacent donor fragments sharing the same parent whenever the intervening non-informative span is $\le 150$~nt (scaled by the SNP compression ratio) and net in-tract affinity remains positive.
 Finally, each polished candidate event must pass a three-stage raw-site verification audit: (i)~a minimum of three unambiguous donor-matching informative sites inside the tract; (ii)~a one-sided $2\times 2$ Fisher's exact test comparing in-tract versus flanking donor-match counts that achieves significance under a Bonferroni-corrected threshold $\alpha_{\mathrm{verify}} = \alpha / \binom{N}{3}$ ($P_{\mathrm{Fisher}} \le 0.05 / \binom{N}{3}$); and (iii)~a Buneman four-point quartet topological double-difference check \citep{buneman1974note} confirming that the transfer induces a genuine phylogenetic split shift rather than uniform lineage-specific rate acceleration.
 
 \subsection{Reticulation Graph Adjudication, Backward Leave-One-In Verification, and Ancestral Event Grouping}
 \label{subsec:methods_adjudication}
 In reciprocal scans, recombinant isolate $C$ inheriting sequence from donor $D$ into home $H$ can trigger misidentification of a donor sequence as a recombinant ($D$ recombinant between $C$ and $H$) and introduce mutual two-cycles in candidate reticulation graphs ($C \leftrightarrow D$).
-In Pass 2 (Backward Leave-One-In Verification and Polarity Swap), once all candidate events from Pass 1 are masked on the scrubbed alignment backbone $\mathcal{A}_{\mathrm{scrub}}$, each candidate event $e_r = (C, H, D, [u_1, u_2])$ is restored in isolation while all other recombinant tracts across the alignment remain gap-masked.
+In Pass 3 (Backward Leave-One-In Verification and Polarity Swap), once all candidate events from Passes 1--2 are masked on the scrubbed alignment backbone $\mathcal{A}_{\mathrm{scrub}}$, each candidate event $e_r = (C, H, D, [u_1, u_2])$ is restored in isolation while all other recombinant tracts across the alignment remain gap-masked.
 Re-evaluating parental affinities and polishing breakpoint coordinates $[u_1, u_2]$ in the absence of interfering mosaic signals isolates the candidate transfer against a purely clonal background.
 Simultaneously, \RhizAeon tests reciprocal polarity by comparing the transition contrast of the forward assignment ($C$ as recombinant between $H$ and $D$) against the inverted assignment ($D$ as recombinant between $H$ and $C$), where $\Delta_{\text{trans}}(C \mid H, D) = \Delta d_{\text{home}} + \Delta d_{\text{donor}}$ and $\Delta d_{\text{home}} = \max(0, d(C, H \mid \text{tract}) - d(C, H \mid \text{flank}))$.
 Authentic recombinant children depart their home background within the tract ($\Delta d_{\text{home}} \gg 0$), whereas stationary clonal parents remain anchored to their home background across the alignment ($\Delta d_{\text{home}} \approx 0$).
@@ -132,7 +132,7 @@ Simulations covered sequence divergence $\theta \in \{10, 50, 100, 200\}$, recom
 We also compared \RhizAeon against both raw 3SEQ triplet outputs and a post-processed 3SEQ consolidation pipeline (\texttt{3SEQ (Consolidated)}), which selects the minimum-$p$ triplet per query sequence, filters reciprocal parent-child inversions via directional transition contrast, and merges overlapping co-recombinant intervals ($\ge 50\%$ overlap).
 Four specialized scenario suites were simulated under HKY85 substitution dynamics ($\kappa = 2.5, \pi = [0.3, 0.2, 0.2, 0.3]$) across 2,280 alignments:
 \begin{enumerate}
-\item \emph{Epidemic Clonal Expansion}: Recombinant ancestors sprouting $K_{\mathrm{desc}} \in \{2, 5, 8, 10, 15\}$ descendants with post-recombination transmission drift ($d_{\mathrm{swarm}} = 0.001$, alongside parental terminal branch length $\delta = 0.002$) and 40 parental background isolates ($N = 42\text{--}55$, $L = 5{,}000$~nt, 300 alignments).
+\item \emph{Epidemic Clonal Expansion}: Recombinant ancestors sprouting $K_{\mathrm{desc}} \in \{2, 5, 8, 10, 15\}$ descendants with post-recombination transmission drift ($d_{\mathrm{swarm}} = \delta = 0.002$, and $0.005$ in the $N = 50\text{--}1{,}500$ large-cohort scaling suite) and 40 parental background isolates ($N = 42\text{--}55$, $L = 5{,}000$~nt, 300 alignments).
 \item \emph{Multi-Way Mosaic Clusters}: Dual-cassette transfers ($L = 6{,}000$~nt, cassettes at nt 1,200--2,400 and 3,600--4,800), nested Russian doll introgressions ($L = 6{,}000$~nt, outer cassette nt 1,500--4,500, inner cassette nt 2,500--3,500), and triple crossover cascades ($L = 6{,}000$~nt, breakpoints at nt 2,000 and 4,000) with $K_{\mathrm{desc}} \in \{1, 5, 10\}$ descendants across $d_{\mathrm{parent}} \in \{0.02, 0.05, 0.10\}$ ($N = 46\text{--}55$, 540 alignments).
 \item \emph{Ghost Donor Introgression}: Pure unsampled donor, surrogate sister clade, and deep reservoir donor regimes across cluster sizes $K_{\mathrm{desc}} \in \{2, 5, 10\}$ ($N = 32\text{--}50$, $L = 5{,}000$~nt, 540 alignments).
 \item \emph{Micro-Conversion Resolution}: Conversion tracts spanning $L_{\text{tract}} \in \{50, 100, 200, 400, 800\}$~nt (centered at coordinate 2,500) across three divergence tiers ($N = 32\text{--}40$, $L = 5{,}000$~nt, 900 alignments).
@@ -160,7 +160,7 @@ Empirical evaluations analyzed three natural evolutionary cohorts:
 \item \emph{Primate Immunogenomics}: 379 classical primate MHC Class~I alleles (\textit{HLA-A}, \textit{HLA-B}, \textit{HLA-C}, and non-human hominoid orthologs, 1,128~nt, \citealt{maccari2017ipd}).
 \end{enumerate}
 
-\RhizAeon is implemented in native Rust with Rayon multicore parallelization and PyO3 Python bindings (\texttt{pip install rhizaeon}).
+\RhizAeon is implemented in native Rust with Rayon multicore parallelization and PyO3 Python bindings (\texttt{pip install rhizaeon}); AI-assisted coding tools (Google Gemini and Anthropic Claude) were used under human mathematical specification and unit-test verification to accelerate the Rust/WebAssembly implementation and benchmark automation scripts.
 The algorithmic core compiles to WebAssembly (WASM) so surveillance pipelines execute client-side within standard web browsers without remote server transmission.
 Interactive dashboards render synchronized signal inspectors, genome-wide recombination hotspot/coldspot profiles, 2D metric subspace projections, and midpoint-rooted phylogenetic trees within the browser interface.
 All raw multiple sequence FASTA alignments, empirical cohort datasets, and simulation benchmark suites are distributed within the project repository under \texttt{empirical\_datasets/} and \texttt{benchmarks/}.
@@ -177,3 +177,6 @@ The \RhizAeon Rust source code, command-line interface, and Python bindings are 
 
 \section*{Funding}
 This work was supported in part by the National Institutes of Health (R01GM151683 and U24AI183870) and the National Science Foundation (2419522).
+
+\section*{Acknowledgments}
+During the preparation of this work, the authors used AI-assisted coding and editing tools (Google Gemini and Anthropic Claude) to accelerate the Rust and WebAssembly software implementation, benchmark pipeline engineering, and manuscript copy-editing. All mathematical formulations, algorithmic specifications, statistical tests, simulation benchmarks, and biological interpretations were conceived, audited, and verified by the authors, who take full responsibility for the content of the manuscript and software.

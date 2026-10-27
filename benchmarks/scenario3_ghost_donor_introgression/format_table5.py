@@ -8,7 +8,7 @@ import pandas as pd
 from pathlib import Path
 
 def main():
-    p = Path("/Users/sergei/Projects/rhizaeon-code/benchmarks/scenario3_ghost_donor_introgression/ghost_summary.csv")
+    p = Path(__file__).resolve().parent / "ghost_summary.csv"
     if not p.exists():
         print("Summary CSV not found.")
         return

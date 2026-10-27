@@ -13,7 +13,8 @@ import csv
 import numpy as np
 from Bio import AlignIO
 
-PROJECT_ROOT = "/Users/sergei/Projects/rhizaeon-code"
+from pathlib import Path
+PROJECT_ROOT = str(Path(__file__).resolve().parents[2])
 sys.path.insert(0, PROJECT_ROOT)
 
 from tools.history_validation.history_engine import (

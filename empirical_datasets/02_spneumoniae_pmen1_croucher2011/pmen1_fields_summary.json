@@ -1,6 +1,6 @@
 {
   "alignment": {
-    "path": "/Users/sergei/Projects/rhizaeon-code/empirical_datasets/02_spneumoniae_pmen1_croucher2011/PMEN1.aln.gz",
+    "path": "empirical_datasets/02_spneumoniae_pmen1_croucher2011/PMEN1.aln.gz",
     "num_taxa": 11,
     "length_bp": 2221315,
     "informative_snps": 1516,
