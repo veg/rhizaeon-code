@@ -1,0 +1,45 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\begin{document}
+
+October 27, 2026
+
+\textbf{Professor Laura A.\ Katz}\\
+Editor-in-Chief, \textit{Genome Biology and Evolution}
+
+Dear Laura,
+
+Please find enclosed our manuscript titled \textbf{``RhizAeon: Fast, Accurate, Flexible and Scalable Recombination Analysis''} by Sergei L.\ Kosakovsky Pond, Danielle Callan, Steven Weaver, Hannah Verdonk, Jordan Zehr, Spyros Lytras, Taylor K.\ Paisie, Maciej F.\ Boni, Anton Nekrutenko, and Darren P.\ Martin, which we are submitting for consideration as a Research Article / Methods contribution in \textit{Genome Biology and Evolution}. (We initially sent this to MBE over the weekend and received a rapid editorial triage pass; given its focus on genome-scale reticulate evolution across viruses, bacteria, and eukaryotes, GBE is a natural home.)
+
+Homologous recombination, gene conversion, and horizontal transfer pervade genomes across the tree of life, yet classical recombination detection frameworks face a fundamental computational wall on modern genomic datasets: whole-alignment phylogeny-partitioning methods such as GARD scale as $\mathcal{O}(L^B N^3)$ and triplet-scanning methods such as 3SEQ and RDP scale as $\mathcal{O}(N^3 L)$. As alignment lengths reach megabase bacterial chromosomes and taxon counts grow to hundreds or thousands of genomes, existing tools either become computationally intractable or suffer severe false-positive inflation under lineage-specific rate heterogeneity, epidemic clonal expansions, and unsampled (``ghost'') donor introgressions.
+
+Here we introduce \texttt{RhizAeon}, a deterministic, closed-form mathematical framework (requiring no neural network training or learned parameters) that reformulates recombination analysis as continuous trajectory tracking and zero-drift force-field deconvolution across metric sequence embeddings in strictly linear time, $\mathcal{O}(NKL)$, for $N$ sequences of length $L$ against $K$ reference landmarks. Specifically:
+\begin{enumerate}
+\item \textbf{Metric Reference Landmarks \& Unpolarized Root Sink:} By anchoring an unpolarized ancestral root sink at the origin of a Gower multidimensional scaling subspace, private terminal-branch mutations and episodic rate bursts (such as APOBEC hypermutation or locus-specific heterotachy) route into the root sink rather than contemporary leaves, holding false-positive rates at 0.58\% across 1,200 coalescent rate-heterogeneity nulls and 1.01\% across 333,334 clonal genomes in a 1,000,000-genome parameter sweep.
+\item \textbf{Multi-Scale Force-Field Deconvolution \& Iterative Scrubbing:} Combining Brownian-bridge functional central limit theory, multi-scale wavelet matched filtering (30--800~bp), recursive contingency-table boundary polishing, and two-pass forward-scrubbing / leave-one-in backward verification, \texttt{RhizAeon} resolves transfers ranging from 50--100~bp bacterial micro-conversions to 70~kb cassettes, detects unsampled (``ghost'') donor introgressions, deconvolves multi-parent nested mosaics, and consolidates recombinant clades into single ancestral events.
+\item \textbf{Multi-Kingdom Empirical Genome Analyses \& Zero-Install Browser Ecosystem:} Implemented in Rust/Python and compiled to WebAssembly for client-side execution in any web browser (\url{https://veg.github.io/rhizaeon-code/}), \texttt{RhizAeon} maps 83 whole sarbecovirus genomes (31~kb) in 25.0~seconds (2.6~seconds CLI core), 11 whole \textit{Streptococcus pneumoniae} PMEN1 chromosomes (2.22~Mb) in 2.3~seconds, and 379 primate MHC/HLA Class~I alleles in 7.9~seconds, recovering published drug-resistance, antigenic, and receptor-binding transfers alongside previously uncharacterized deep-branch introgressions.
+\end{enumerate}
+
+\textbf{AI Disclosure Statement (in accordance with SMBE/OUP policy):}
+During the preparation of this work, the authors used AI-assisted coding and agentic execution harnesses (Google Gemini and Anthropic Claude) to accelerate the Rust and WebAssembly software implementation, automate simulation benchmarking and empirical data analysis pipelines, author the Python plotting scripts used to generate all manuscript figures, and assist with manuscript copy-editing. All figures and tables are produced programmatically by deterministic scripts included in the open-source reproducibility package (\url{https://github.com/veg/rhizaeon-code}; Zenodo DOI: \href{https://doi.org/10.5281/zenodo.23600798}{10.5281/zenodo.23600798}). All mathematical formulations, algorithmic specifications, statistical tests, simulation designs, and biological interpretations were conceived, audited, and verified by the human authors, who take full responsibility for the integrity and accuracy of the manuscript and software. This disclosure is also included in the Methods and Acknowledgments sections of the manuscript.
+
+All source code and a complete, self-contained reproducibility package (comprising all empirical alignments, simulation generators, benchmark evaluation harnesses, empirical analysis outputs, and figure-generation scripts) are openly available under the MIT license at \url{https://github.com/veg/HyphAeon} and \url{https://github.com/veg/rhizaeon-code}, and permanently archived on Zenodo (\url{https://doi.org/10.5281/zenodo.23600798}). A preprint is posted on bioRxiv (\url{https://doi.org/10.64898/2026.10.19.760237v1}). This manuscript is original, has not been published elsewhere, and is not under consideration by any other journal. All authors have approved the manuscript and its submission to \textit{Genome Biology and Evolution}.
+
+Thank you very much for your time and consideration.
+
+Sincerely,
+
+\textbf{Sergei L.\ Kosakovsky Pond, PhD}\\
+Professor of Biology\\
+Director, Institute for Genomics and Evolutionary Medicine (iGEM)\\
+Temple University, Philadelphia, PA 19122, USA\\
+\href{mailto:spond@temple.edu}{spond@temple.edu}
+
+\end{document}
