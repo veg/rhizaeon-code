@@ -332,7 +332,8 @@
 
     .dropzone-bay:hover, .dropzone-bay.dragover {
       background: #ffffff;
-      border-color: var(--text-primary);
+      border-color: var(--braun-orange);
+      box-shadow: 0 0 0 2px rgba(255, 79, 0, 0.16);
     }
 
     .dropzone-text {
@@ -363,12 +364,23 @@
       resize: vertical;
       margin-bottom: 16px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
     }
 
     textarea:focus {
       background: #ffffff;
       border-color: var(--text-primary);
+    }
+
+    textarea.dragover {
+      background: #ffffff;
+      border-color: var(--braun-orange);
+      box-shadow: 0 0 0 2px rgba(255, 79, 0, 0.16);
+    }
+
+    .panel.dragover-near {
+      border-color: var(--braun-orange);
+      box-shadow: 0 0 0 2px rgba(255, 79, 0, 0.14);
     }
 
     /* Linear Sliders / Rotary emulation */
@@ -503,9 +515,73 @@
 
     .btn-braun-primary:disabled {
       background-color: var(--border-strong);
-      box-shadow: none;
+      background-image: linear-gradient(90deg, var(--braun-orange) var(--scan-progress, 0%), var(--border-strong) var(--scan-progress, 0%));
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
       cursor: not-allowed;
-      opacity: 0.6;
+      opacity: 1;
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+      transition: background-image 0.1s linear;
+    }
+
+    /* Save Alignment Dropdown */
+    .save-aln-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .save-aln-menu {
+      display: none;
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 6px);
+      width: 350px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+      z-index: 200;
+      padding: 6px;
+    }
+
+    .save-aln-menu.open {
+      display: block;
+    }
+
+    .save-aln-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.1s ease;
+    }
+
+    .save-aln-item + .save-aln-item {
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .save-aln-item:hover {
+      background: var(--surface-hover);
+    }
+
+    .save-aln-item-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .save-aln-item-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.35;
     }
 
     /* Instrument Status Banner */
@@ -726,7 +802,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.1 (2026-10-22)</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.2 (2026-10-28)</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -747,7 +823,7 @@
     <div class="workspace-grid">
       <!-- Input Control Deck -->
       <div>
-        <div class="panel">
+        <div class="panel" id="inputPanel">
           <div class="panel-header">
             <div class="panel-title">Alignment Ingestion</div>
             <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">01 // INPUT</div>
@@ -779,7 +855,7 @@
           <!-- File Target -->
           <div class="dropzone-bay" id="dropZone" onclick="document.getElementById('fileInput').click()">
             <div class="dropzone-text">Drop FASTA File Here</div>
-            <div class="dropzone-sub">or click to open local file system (.fasta, .fas, .fa, .txt)</div>
+            <div class="dropzone-sub">or drop into / around the sequence box below, or click to browse (.fasta, .fas, .fa, .txt)</div>
             <input type="file" id="fileInput" accept=".fasta,.fas,.fa,.fna,.txt" style="display: none">
           </div>
 
@@ -954,7 +1030,7 @@
 
             <!-- Action Controls -->
             <div class="action-deck">
-              <div style="display: flex; gap: 8px;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button class="btn-neutral" onclick="downloadHtmlReport()">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   Export HTML Dossier
@@ -963,6 +1039,26 @@
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   Export JSON Matrix
                 </button>
+                <div class="save-aln-dropdown" id="saveAlnDropdown">
+                  <button type="button" class="btn-neutral" id="saveAlnTriggerBtn" onclick="toggleSaveAlnMenu(event)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Save Alignment &#9662;
+                  </button>
+                  <div class="save-aln-menu" id="saveAlnMenu">
+                    <button type="button" class="save-aln-item" onclick="saveAlignmentExport('masked')">
+                      <div class="save-aln-item-title">1. Recombinant Regions Removed (Masked 'N')</div>
+                      <div class="save-aln-item-desc">Replaces detected recombinant tracts in recombinant sequences with 'N' symbols.</div>
+                    </button>
+                    <button type="button" class="save-aln-item" onclick="saveAlignmentExport('deconstructed')">
+                      <div class="save-aln-item-title">2. Recombinant Sequences Deconstructed</div>
+                      <div class="save-aln-item-desc">Splits recombinants into backbone ('N'-masked tracts) + separate 'N'-padded sequences per recombinant tract.</div>
+                    </button>
+                    <button type="button" class="save-aln-item" onclick="saveAlignmentExport('split')">
+                      <div class="save-aln-item-title">3. Split Alignment at Breakpoint Sites</div>
+                      <div class="save-aln-item-desc">Partitions alignment at all detected breakpoint coordinates into separate regional FASTA files.</div>
+                    </button>
+                  </div>
+                </div>
               </div>
               <button class="btn-neutral" onclick="openFullscreenReport()">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
@@ -984,15 +1080,23 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.1';
+    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.2';
     const init = wasmMod.default;
-    const { engine_version, engine_build_timestamp, scan_fasta, scan_fasta_html, scan_fasta_bundle } = wasmMod;
+    const {
+      engine_version,
+      engine_build_timestamp,
+      scan_fasta,
+      scan_fasta_html,
+      scan_fasta_bundle,
+      scan_fasta_bundle_with_progress
+    } = wasmMod;
 
     let wasmReady = false;
     let latestScanResult = null;
     let latestHtmlReport = null;
     let latestLandscape = null;
     let snpCompressionMode = 'auto';
+    let lastIngestedFilename = 'alignment';
 
     window.setSnpMode = function(mode) {
       snpCompressionMode = mode;
@@ -1003,10 +1107,10 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.1');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.2');
         wasmReady = true;
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.1';
-        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-22';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.2';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
         const verBadge = document.getElementById('wasmVersionBadge');
         if (verBadge) {
           verBadge.innerHTML = `PA-FF 2.1 WASM &middot; v${ver} (${ts})`;
@@ -1051,6 +1155,7 @@
         const resp = await fetch(urls[key]);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const fasta = await resp.text();
+        lastIngestedFilename = urls[key].split('/').pop().replace(/\.[^.]+$/, '');
         document.getElementById('fastaInput').value = fasta;
         document.getElementById('statusAlert').className = 'status-strip success';
         document.getElementById('statusAlert').innerHTML = `<strong>Loaded ${labels[key]}.</strong> Length: ${fasta.length.toLocaleString()} characters. Ready to execute.`;
@@ -1061,21 +1166,73 @@
     };
 
     const dropZone = document.getElementById('dropZone');
+    const fastaInputEl = document.getElementById('fastaInput');
+    const inputPanelEl = document.getElementById('inputPanel');
     const fileInput = document.getElementById('fileInput');
 
-    dropZone.addEventListener('dragover', (e) => {
+    function hasDraggedFiles(e) {
+      if (!e.dataTransfer) return false;
+      if (e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) return true;
+      return e.dataTransfer.files && e.dataTransfer.files.length > 0;
+    }
+
+    function clearDragHighlights() {
+      dropZone.classList.remove('dragover');
+      if (fastaInputEl) fastaInputEl.classList.remove('dragover');
+      if (inputPanelEl) inputPanelEl.classList.remove('dragover-near');
+    }
+
+    // Issue #26: Allow dropping FASTA files into #dropZone, into #fastaInput (immediately below),
+    // and slightly outside these boxes (anywhere in the input panel or window).
+    [dropZone, fastaInputEl, inputPanelEl].forEach((target) => {
+      if (!target) return;
+      target.addEventListener('dragover', (e) => {
+        if (!hasDraggedFiles(e)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'copy';
+        dropZone.classList.add('dragover');
+        if (fastaInputEl) fastaInputEl.classList.add('dragover');
+        if (inputPanelEl) inputPanelEl.classList.add('dragover-near');
+      });
+
+      target.addEventListener('dragleave', (e) => {
+        if (!target.contains(e.relatedTarget)) {
+          clearDragHighlights();
+        }
+      });
+
+      target.addEventListener('drop', (e) => {
+        if (!hasDraggedFiles(e)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        clearDragHighlights();
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          loadFile(e.dataTransfer.files[0]);
+        }
+      });
+    });
+
+    // Window-level safety net so files dropped slightly outside the input panel still ingest cleanly
+    window.addEventListener('dragover', (e) => {
+      if (!hasDraggedFiles(e)) return;
       e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
       dropZone.classList.add('dragover');
+      if (fastaInputEl) fastaInputEl.classList.add('dragover');
     });
 
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('dragover');
+    window.addEventListener('dragleave', (e) => {
+      if (!e.relatedTarget || e.relatedTarget.nodeName === 'HTML') {
+        clearDragHighlights();
+      }
     });
 
-    dropZone.addEventListener('drop', (e) => {
+    window.addEventListener('drop', (e) => {
+      if (!hasDraggedFiles(e)) return;
       e.preventDefault();
-      dropZone.classList.remove('dragover');
-      if (e.dataTransfer.files.length > 0) {
+      clearDragHighlights();
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         loadFile(e.dataTransfer.files[0]);
       }
     });
@@ -1088,6 +1245,7 @@
 
     function loadFile(file) {
       document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+      lastIngestedFilename = (file.name || 'alignment').replace(/\.[^.]+$/, '') || 'alignment';
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('fastaInput').value = e.target.result;
@@ -1095,6 +1253,82 @@
         document.getElementById('statusAlert').innerHTML = `<strong>Ingested File:</strong> ${file.name} (${e.target.result.length.toLocaleString()} characters). Ready to scan.`;
       };
       reader.readAsText(file);
+    }
+
+    function updateScanButtonProgress(scanBtn, btnText, pct, stageMsg) {
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      scanBtn.style.setProperty('--scan-progress', `${clamped}%`);
+      btnText.innerText = `Adjudicating Manifold Flux... ${clamped}%`;
+      if (stageMsg) {
+        document.getElementById('statusAlert').innerHTML = `<span class="spinner" style="border-top-color:var(--text-primary); border-color:rgba(0,0,0,0.15)"></span> <strong>[${clamped}%]</strong> ${stageMsg}`;
+      }
+    }
+
+    function runScanInWorker(fasta, title, k, compressArg, tier2Stringency, tier3Stringency, onProgress) {
+      return new Promise((resolve, reject) => {
+        const jsUrl = new URL('./pkg/rhizaeon_wasm.js?v=0.1.2', window.location.href).href;
+        const wasmUrl = new URL('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.2', window.location.href).href;
+        const workerCode = `
+          import init, { scan_fasta_bundle_with_progress, scan_fasta_bundle } from ${JSON.stringify(jsUrl)};
+          self.onmessage = async (ev) => {
+            try {
+              const { fasta, title, k, compressArg, tier2Stringency, tier3Stringency } = ev.data;
+              await init(${JSON.stringify(wasmUrl)});
+              let bundle;
+              if (typeof scan_fasta_bundle_with_progress === 'function') {
+                bundle = scan_fasta_bundle_with_progress(
+                  fasta,
+                  title,
+                  k,
+                  compressArg,
+                  tier2Stringency,
+                  tier3Stringency,
+                  (frac, msg) => {
+                    self.postMessage({ type: 'progress', frac, msg });
+                  }
+                );
+              } else {
+                bundle = scan_fasta_bundle(fasta, title, k, compressArg, tier2Stringency, tier3Stringency);
+              }
+              self.postMessage({ type: 'done', bundle });
+            } catch (err) {
+              self.postMessage({ type: 'error', message: err && err.message ? err.message : String(err) });
+            }
+          };
+        `;
+        let worker;
+        let blobUrl;
+        try {
+          const blob = new Blob([workerCode], { type: 'application/javascript' });
+          blobUrl = URL.createObjectURL(blob);
+          worker = new Worker(blobUrl, { type: 'module' });
+        } catch (err) {
+          if (blobUrl) URL.revokeObjectURL(blobUrl);
+          reject(err);
+          return;
+        }
+        worker.onmessage = (ev) => {
+          const d = ev.data;
+          if (!d) return;
+          if (d.type === 'progress') {
+            onProgress(d.frac, d.msg);
+          } else if (d.type === 'done') {
+            worker.terminate();
+            URL.revokeObjectURL(blobUrl);
+            resolve(d.bundle);
+          } else if (d.type === 'error') {
+            worker.terminate();
+            URL.revokeObjectURL(blobUrl);
+            reject(new Error(d.message));
+          }
+        };
+        worker.onerror = (err) => {
+          worker.terminate();
+          URL.revokeObjectURL(blobUrl);
+          reject(err);
+        };
+        worker.postMessage({ fasta, title, k, compressArg, tier2Stringency, tier3Stringency });
+      });
     }
 
     window.runScanner = async function() {
@@ -1119,29 +1353,78 @@
 
       scanBtn.disabled = true;
       btnIcon.innerHTML = '<span class="spinner"></span>';
-      btnText.innerText = 'Adjudicating Manifold Flux...';
+      let currentPct = 4;
+      let latestStageMsg = 'Parsing FASTA alignment...';
+      updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
 
       document.getElementById('systemLed').style.backgroundColor = 'var(--braun-orange)';
       document.getElementById('systemLedText').innerText = 'System: Active';
-
       document.getElementById('statusAlert').className = 'status-strip info';
-      document.getElementById('statusAlert').innerHTML = '<span class="spinner" style="border-top-color:var(--text-primary); border-color:rgba(0,0,0,0.15)"></span> Deconvolving continuous trajectory tensors and Due Diligence cycles...';
 
-      await new Promise(r => setTimeout(r, 40));
+      // Smooth sub-stage creep timer so even very large single-stage computations show continuous left-to-right progress
+      const creepTimer = setInterval(() => {
+        if (currentPct < 94) {
+          currentPct = Math.min(94, currentPct + Math.max(0.4, (95 - currentPct) * 0.04));
+          updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
+        }
+      }, 90);
+
+      await new Promise(r => setTimeout(r, 25));
 
       try {
         const t0 = performance.now();
         const compressArg = snpCompressionMode === 'auto' ? undefined : (snpCompressionMode === 'on');
         let res, htmlDoc, landscape = null;
-        if (typeof scan_fasta_bundle === 'function') {
-          const bundle = scan_fasta_bundle(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+
+        try {
+          const bundle = await runScanInWorker(
+            fasta,
+            "RhizAeon Continuous Trajectory Dossier",
+            k,
+            compressArg,
+            tier2Stringency,
+            tier3Stringency,
+            (frac, msg) => {
+              const stagePct = Math.round((frac || 0) * 100);
+              if (stagePct >= currentPct) currentPct = stagePct;
+              if (msg) latestStageMsg = msg;
+              updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
+            }
+          );
           res = bundle.result;
           htmlDoc = bundle.html;
           landscape = bundle.landscape;
-        } else {
-          res = scan_fasta(fasta, k, compressArg, tier2Stringency, tier3Stringency);
-          htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+        } catch (_workerFallbackErr) {
+          if (typeof scan_fasta_bundle_with_progress === 'function') {
+            const bundle = scan_fasta_bundle_with_progress(
+              fasta,
+              "RhizAeon Continuous Trajectory Dossier",
+              k,
+              compressArg,
+              tier2Stringency,
+              tier3Stringency,
+              (frac, msg) => {
+                const stagePct = Math.round((frac || 0) * 100);
+                if (stagePct >= currentPct) currentPct = stagePct;
+                if (msg) latestStageMsg = msg;
+                updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
+              }
+            );
+            res = bundle.result;
+            htmlDoc = bundle.html;
+            landscape = bundle.landscape;
+          } else if (typeof scan_fasta_bundle === 'function') {
+            const bundle = scan_fasta_bundle(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+            res = bundle.result;
+            htmlDoc = bundle.html;
+            landscape = bundle.landscape;
+          } else {
+            res = scan_fasta(fasta, k, compressArg, tier2Stringency, tier3Stringency);
+            htmlDoc = scan_fasta_html(fasta, "RhizAeon Continuous Trajectory Dossier", k, compressArg, tier2Stringency, tier3Stringency);
+          }
         }
+
+        updateScanButtonProgress(scanBtn, btnText, 100, 'Complete');
         const elapsed = performance.now() - t0;
 
         latestScanResult = res;
@@ -1155,11 +1438,13 @@
         document.getElementById('statusAlert').className = 'status-strip error';
         document.getElementById('statusAlert').innerText = 'Execution Fault: ' + (err.message || err);
       } finally {
+        clearInterval(creepTimer);
         scanBtn.disabled = false;
+        scanBtn.style.removeProperty('--scan-progress');
         btnIcon.innerText = '●';
         btnText.innerText = 'Scan For Recombination';
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.1';
-        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-22';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.2';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
         document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
       }
@@ -1470,6 +1755,178 @@
       const win = window.open('', '_blank');
       win.document.write(latestHtmlReport);
       win.document.close();
+    };
+
+    window.toggleSaveAlnMenu = function(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('saveAlnMenu');
+      if (menu) menu.classList.toggle('open');
+    };
+
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('saveAlnDropdown');
+      const menu = document.getElementById('saveAlnMenu');
+      if (menu && dropdown && !dropdown.contains(e.target)) {
+        menu.classList.remove('open');
+      }
+    });
+
+    function parseInputFastaRecords(rawFasta) {
+      const lines = (rawFasta || '').split(/\r?\n/);
+      const records = [];
+      let curHeader = null;
+      let curChunks = [];
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        if (line.startsWith('>')) {
+          if (curHeader !== null) {
+            const token = curHeader.split(/\s+/)[0] || 'taxon';
+            records.push({ header: curHeader, token, seq: curChunks.join('') });
+          }
+          curHeader = line.slice(1).trim();
+          curChunks = [];
+        } else if (curHeader !== null) {
+          curChunks.push(line.replace(/\s+/g, ''));
+        }
+      }
+      if (curHeader !== null) {
+        const token = curHeader.split(/\s+/)[0] || 'taxon';
+        records.push({ header: curHeader, token, seq: curChunks.join('') });
+      }
+      return records;
+    }
+
+    function triggerFastaDownload(filename, content) {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+
+    window.saveAlignmentExport = function(mode) {
+      const menu = document.getElementById('saveAlnMenu');
+      if (menu) menu.classList.remove('open');
+
+      const rawFasta = document.getElementById('fastaInput').value.trim();
+      const records = parseInputFastaRecords(rawFasta);
+      if (!records.length || !latestScanResult) {
+        alert('Please run a recombination scan on a valid FASTA alignment before exporting.');
+        return;
+      }
+
+      const L = records[0].seq.length;
+      const events = latestScanResult.events || [];
+      const base = (lastIngestedFilename || 'alignment').replace(/[^a-zA-Z0-9._-]+/g, '_');
+
+      // Map taxon name/token -> list of recombinant intervals [u1, u2] (1-based inclusive)
+      const tractsByTaxon = new Map();
+      for (const ev of events) {
+        const u1 = Math.max(1, Math.min(L, ev.u1));
+        const u2 = Math.max(u1, Math.min(L, ev.u2));
+        const isos = (ev.isolates && ev.isolates.length > 0)
+          ? ev.isolates
+          : (ev.candidate_name ? [ev.candidate_name] : []);
+        for (const iso of isos) {
+          if (!tractsByTaxon.has(iso)) tractsByTaxon.set(iso, []);
+          tractsByTaxon.get(iso).push({
+            u1,
+            u2,
+            eventId: ev.event_id,
+            donor: ev.donor_name || 'Donor',
+            home: ev.home_name || 'Home'
+          });
+        }
+      }
+
+      const getTractsForRecord = (rec) => {
+        return tractsByTaxon.get(rec.header) || tractsByTaxon.get(rec.token) || [];
+      };
+
+      if (mode === 'masked') {
+        // Option 1: Save input alignment with recombinant regions removed (replaced with 'N')
+        const outLines = [];
+        for (const rec of records) {
+          const tracts = getTractsForRecord(rec);
+          if (!tracts.length) {
+            outLines.push(`>${rec.header}\n${rec.seq}`);
+          } else {
+            const chars = rec.seq.split('');
+            for (const t of tracts) {
+              for (let p = t.u1 - 1; p <= t.u2 - 1 && p < chars.length; p++) {
+                chars[p] = 'N';
+              }
+            }
+            outLines.push(`>${rec.header}\n${chars.join('')}`);
+          }
+        }
+        triggerFastaDownload(`${base}_recombinant_regions_removed.fasta`, outLines.join('\n') + '\n');
+      } else if (mode === 'deconstructed') {
+        // Option 2: Recombinant sequences deconstructed into substituent parts:
+        // backbone with 'N' in recombinant regions + new sequence for each recombinant tract padded with 'N'
+        const outLines = [];
+        for (const rec of records) {
+          const tracts = getTractsForRecord(rec).slice().sort((a, b) => a.u1 - b.u1 || a.u2 - b.u2);
+          if (!tracts.length) {
+            outLines.push(`>${rec.header}\n${rec.seq}`);
+          } else {
+            const backbone = rec.seq.split('');
+            for (const t of tracts) {
+              for (let p = t.u1 - 1; p <= t.u2 - 1 && p < backbone.length; p++) {
+                backbone[p] = 'N';
+              }
+            }
+            outLines.push(`>${rec.token}_backbone\n${backbone.join('')}`);
+            tracts.forEach((t, idx) => {
+              const tractChars = new Array(rec.seq.length).fill('N');
+              for (let p = t.u1 - 1; p <= t.u2 - 1 && p < rec.seq.length; p++) {
+                tractChars[p] = rec.seq[p];
+              }
+              outLines.push(`>${rec.token}_recomb_tract_${idx + 1}_${t.u1}_${t.u2}\n${tractChars.join('')}`);
+            });
+          }
+        }
+        triggerFastaDownload(`${base}_deconstructed_substituent_parts.fasta`, outLines.join('\n') + '\n');
+      } else if (mode === 'split') {
+        // Option 3: Alignments split at recombination breakpoint sites
+        // B unique interior breakpoint cutpoints demarcate B + 1 contiguous alignment regions [start, end]
+        const cutSet = new Set();
+        for (const ev of events) {
+          const u1 = Math.max(1, Math.min(L, ev.u1));
+          const u2 = Math.max(u1, Math.min(L, ev.u2));
+          if (u1 > 1) cutSet.add(u1 - 1);
+          if (u2 < L) cutSet.add(u2);
+        }
+        const cuts = Array.from(cutSet).filter(c => c >= 1 && c < L).sort((a, b) => a - b);
+        const regions = [];
+        let prev = 1;
+        for (const c of cuts) {
+          if (c >= prev) {
+            regions.push([prev, c]);
+            prev = c + 1;
+          }
+        }
+        if (prev <= L) {
+          regions.push([prev, L]);
+        }
+
+        regions.forEach((reg, idx) => {
+          const [rStart, rEnd] = reg;
+          const regLines = records.map(rec => `>${rec.header}\n${rec.seq.slice(rStart - 1, rEnd)}`);
+          const padIdx = String(idx + 1).padStart(2, '0');
+          setTimeout(() => {
+            triggerFastaDownload(
+              `${base}_region_${padIdx}_${rStart}_${rEnd}.fasta`,
+              regLines.join('\n') + '\n'
+            );
+          }, idx * 140);
+        });
+      }
     };
   </script>
 </body>

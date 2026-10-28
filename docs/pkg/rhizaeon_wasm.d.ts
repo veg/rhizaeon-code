@@ -29,6 +29,11 @@ export function scan_fasta(fasta_str: string, target_landmarks?: number | null, 
 export function scan_fasta_bundle(fasta_str: string, title?: string | null, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null): any;
 
 /**
+ * Scans a FASTA string with a JavaScript progress callback `(fraction, stage_label)` and returns `{ result, html, landscape }`
+ */
+export function scan_fasta_bundle_with_progress(fasta_str: string, title?: string | null, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null, progress_cb?: Function | null): any;
+
+/**
  * Scans a FASTA string and returns a rich visualization dossier as a JS Object payload
  */
 export function scan_fasta_dossier(fasta_str: string, title?: string | null, target_landmarks?: number | null, compress_snps?: boolean | null, tier2_stringency?: number | null, tier3_stringency?: number | null): any;
@@ -58,16 +63,17 @@ export interface InitOutput {
     readonly init_panic_hook: () => void;
     readonly scan_fasta: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
     readonly scan_fasta_bundle: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
+    readonly scan_fasta_bundle_with_progress: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => [number, number, number];
     readonly scan_fasta_dossier: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number];
     readonly scan_fasta_dossier_json: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];
     readonly scan_fasta_html: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number, number, number];
     readonly scan_fasta_json: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number, number];
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-    readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __wbindgen_exn_store: (a: number) => void;
     readonly __externref_table_alloc: () => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;
+    readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __externref_table_dealloc: (a: number) => void;
     readonly __wbindgen_start: () => void;
 }

@@ -95,6 +95,29 @@ export function scan_fasta_bundle(fasta_str, title, target_landmarks, compress_s
 }
 
 /**
+ * Scans a FASTA string with a JavaScript progress callback `(fraction, stage_label)` and returns `{ result, html, landscape }`
+ * @param {string} fasta_str
+ * @param {string | null} [title]
+ * @param {number | null} [target_landmarks]
+ * @param {boolean | null} [compress_snps]
+ * @param {number | null} [tier2_stringency]
+ * @param {number | null} [tier3_stringency]
+ * @param {Function | null} [progress_cb]
+ * @returns {any}
+ */
+export function scan_fasta_bundle_with_progress(fasta_str, title, target_landmarks, compress_snps, tier2_stringency, tier3_stringency, progress_cb) {
+    const ptr0 = passStringToWasm0(fasta_str, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    var ptr1 = isLikeNone(title) ? 0 : passStringToWasm0(title, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len1 = WASM_VECTOR_LEN;
+    const ret = wasm.scan_fasta_bundle_with_progress(ptr0, len0, ptr1, len1, isLikeNone(target_landmarks) ? Number.MAX_SAFE_INTEGER : (target_landmarks) >>> 0, isLikeNone(compress_snps) ? 0xFFFFFF : compress_snps ? 1 : 0, !isLikeNone(tier2_stringency), isLikeNone(tier2_stringency) ? 0 : tier2_stringency, !isLikeNone(tier3_stringency), isLikeNone(tier3_stringency) ? 0 : tier3_stringency, isLikeNone(progress_cb) ? 0 : addToExternrefTable0(progress_cb));
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
  * Scans a FASTA string and returns a rich visualization dossier as a JS Object payload
  * @param {string} fasta_str
  * @param {string | null} [title]
@@ -232,6 +255,10 @@ function __wbg_get_imports() {
         __wbg___wbindgen_throw_41e9ee4f547fc59a: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
+        __wbg_call_1875a20c43a36133: function() { return handleError(function (arg0, arg1, arg2, arg3) {
+            const ret = arg0.call(arg1, arg2, arg3);
+            return ret;
+        }, arguments); },
         __wbg_error_757e9472f8410341: function(arg0, arg1) {
             let deferred0_0;
             let deferred0_1;
