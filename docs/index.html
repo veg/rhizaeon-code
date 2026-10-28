@@ -802,7 +802,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.2 (2026-10-28)</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.3 (2026-10-28)</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -854,9 +854,9 @@
 
           <!-- File Target -->
           <div class="dropzone-bay" id="dropZone" onclick="document.getElementById('fileInput').click()">
-            <div class="dropzone-text">Drop FASTA File Here</div>
-            <div class="dropzone-sub">or drop into / around the sequence box below, or click to browse (.fasta, .fas, .fa, .txt)</div>
-            <input type="file" id="fileInput" accept=".fasta,.fas,.fa,.fna,.txt" style="display: none">
+            <div class="dropzone-text">Drop FASTA or Saved Analysis Here</div>
+            <div class="dropzone-sub">or drop into / around the sequence box below, or click to browse (.fasta, .fas, .fa, .txt, .rhizaeon.json, .json)</div>
+            <input type="file" id="fileInput" accept=".fasta,.fas,.fa,.fna,.txt,.json,.rhizaeon,application/json" style="display: none">
           </div>
 
           <!-- Text Input Bay -->
@@ -1002,7 +1002,7 @@
 
           <div class="panel" style="padding: 18px;">
             <div class="panel-header">
-              <div class="panel-title">Reticulation Event Roster (|E| = <span id="eventCountBadge">0</span>)</div>
+              <div class="panel-title">Recombination Event Roster (|E| = <span id="eventCountBadge">0</span>)</div>
               <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);">02 // VERIFIED EVENTS</div>
             </div>
 
@@ -1031,6 +1031,10 @@
             <!-- Action Controls -->
             <div class="action-deck">
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn-neutral" id="saveFullAnalysisBtn" onclick="saveFullAnalysis()" style="border-color: var(--braun-orange); color: var(--braun-orange); font-weight: 600;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Save Full Analysis
+                </button>
                 <button class="btn-neutral" onclick="downloadHtmlReport()">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   Export HTML Dossier
@@ -1080,7 +1084,7 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.2';
+    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.3';
     const init = wasmMod.default;
     const {
       engine_version,
@@ -1107,9 +1111,9 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.2');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.3');
         wasmReady = true;
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.2';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.3';
         const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
         const verBadge = document.getElementById('wasmVersionBadge');
         if (verBadge) {
@@ -1118,7 +1122,7 @@
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
         document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
         document.getElementById('statusAlert').className = 'status-strip info';
-        document.getElementById('statusAlert').innerHTML = `<strong>WASM Engine v${ver} (${ts}) Operational.</strong> Select an empirical station preset or drop a FASTA file.`;
+        document.getElementById('statusAlert').innerHTML = `<strong>WASM Engine v${ver} (${ts}) Operational.</strong> Select an empirical station preset or drop a FASTA / saved analysis file.`;
       } catch (err) {
         console.error('WASM Init error:', err);
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-red)';
@@ -1243,14 +1247,131 @@
       }
     });
 
+    function synthesizeResultFromDossier(dossier) {
+      if (!dossier || typeof dossier !== 'object') return null;
+      const meta = dossier.metadata || {};
+      const bps = Array.isArray(dossier.breakpoints) ? dossier.breakpoints : [];
+      const eventsMap = new Map();
+      for (const bp of bps) {
+        const eid = bp.event_id || 1;
+        if (!eventsMap.has(eid)) {
+          const u1 = typeof bp.tract_start === 'number' ? bp.tract_start : bp.ci_left;
+          const u2 = typeof bp.tract_end === 'number' ? bp.tract_end : bp.ci_right;
+          eventsMap.set(eid, {
+            event_id: eid,
+            candidate_name: bp.recombinant || (bp.isolates && bp.isolates[0]) || 'Unknown',
+            isolates: Array.isArray(bp.isolates) && bp.isolates.length ? bp.isolates : (bp.recombinant ? [bp.recombinant] : []),
+            home_name: bp.parent_1 || 'Home',
+            donor_name: bp.parent_2 || 'Donor',
+            is_crossover: !String(bp.breakpoint_id || '').includes('('),
+            u1: u1 || 1,
+            u2: u2 || 1,
+            tract_length: Math.max(1, (u2 || 1) - (u1 || 1) + 1),
+            p_fisher: Math.exp(-(bp.log_likelihood_gain || 0)),
+            z_phys: bp.kinetic_z || 0
+          });
+        }
+      }
+      const events = Array.from(eventsMap.values()).sort((a, b) => a.event_id - b.event_id);
+      return {
+        num_taxa: meta.taxa_count || (Array.isArray(dossier.taxa) ? dossier.taxa.length : 0),
+        length: meta.alignment_length || 0,
+        informative_sites: meta.informative_sites || (dossier.signals && Array.isArray(dossier.signals.informative_snps) ? dossier.signals.informative_snps.length : 0),
+        is_non_recombinant_h0: events.length === 0,
+        run_time_ms: meta.execution_time_ms || 0,
+        events
+      };
+    }
+
+    function tryLoadSavedAnalysis(rawText, sourceName) {
+      const trimmed = (rawText || '').trim();
+      if (!trimmed.startsWith('{')) return false;
+      let parsed;
+      try {
+        parsed = JSON.parse(trimmed);
+      } catch (_err) {
+        return false;
+      }
+      if (!parsed || typeof parsed !== 'object') return false;
+      const isRhizaeonAnalysis = Boolean(
+        parsed.rhizaeon_analysis_format ||
+        (parsed.result && parsed.html) ||
+        (parsed.dossier && parsed.html)
+      );
+      if (!isRhizaeonAnalysis) return false;
+
+      const res = parsed.result || synthesizeResultFromDossier(parsed.dossier);
+      const htmlDoc = parsed.html || '';
+      const landscape = parsed.landscape || (parsed.dossier && parsed.dossier.landscape) || null;
+      if (!res || !htmlDoc) return false;
+
+      const cleanBase = (parsed.filename || sourceName || 'saved_analysis')
+        .replace(/\.(rhizaeon\.json|rhizaeon|json)$/i, '')
+        .replace(/\.[^.]+$/, '') || 'saved_analysis';
+      lastIngestedFilename = cleanBase;
+
+      if (typeof parsed.fasta === 'string' && parsed.fasta.trim().length > 0) {
+        document.getElementById('fastaInput').value = parsed.fasta;
+      } else if (parsed.dossier && parsed.dossier.sequences && Array.isArray(parsed.dossier.taxa)) {
+        const reconstructed = parsed.dossier.taxa
+          .filter(t => parsed.dossier.sequences[t])
+          .map(t => `>${t}\n${parsed.dossier.sequences[t]}`)
+          .join('\n');
+        if (reconstructed) {
+          document.getElementById('fastaInput').value = reconstructed;
+        }
+      }
+
+      if (parsed.parameters && typeof parsed.parameters === 'object') {
+        if (parsed.parameters.landmarks_k !== undefined) {
+          const kEl = document.getElementById('landmarksK');
+          if (kEl) {
+            kEl.value = parsed.parameters.landmarks_k;
+            document.getElementById('kVal').innerText = String(parsed.parameters.landmarks_k);
+          }
+        }
+        if (parsed.parameters.tier2_stringency !== undefined) {
+          const t2El = document.getElementById('tier2Stringency');
+          if (t2El) {
+            t2El.value = parsed.parameters.tier2_stringency;
+            document.getElementById('t2Val').innerText = parseFloat(parsed.parameters.tier2_stringency).toFixed(2) + 'x';
+          }
+        }
+        if (parsed.parameters.tier3_stringency !== undefined) {
+          const t3El = document.getElementById('tier3Stringency');
+          if (t3El) {
+            t3El.value = parsed.parameters.tier3_stringency;
+            document.getElementById('t3Val').innerText = parseFloat(parsed.parameters.tier3_stringency).toFixed(2) + 'x';
+          }
+        }
+        if (parsed.parameters.snp_compression_mode) {
+          window.setSnpMode(parsed.parameters.snp_compression_mode);
+        }
+      }
+
+      latestScanResult = res;
+      window.latestScanResult = res;
+      latestHtmlReport = htmlDoc;
+      latestLandscape = landscape;
+
+      renderOutput(res, res.run_time_ms || 0, htmlDoc, landscape, sourceName || cleanBase);
+      return true;
+    }
+
     function loadFile(file) {
       document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-      lastIngestedFilename = (file.name || 'alignment').replace(/\.[^.]+$/, '') || 'alignment';
+      lastIngestedFilename = (file.name || 'alignment')
+        .replace(/\.(rhizaeon\.json|rhizaeon|json)$/i, '')
+        .replace(/\.[^.]+$/, '') || 'alignment';
       const reader = new FileReader();
       reader.onload = (e) => {
-        document.getElementById('fastaInput').value = e.target.result;
+        const content = e.target.result || '';
+        if (tryLoadSavedAnalysis(content, file.name)) {
+          return;
+        }
+        document.getElementById('fastaInput').value = content;
         document.getElementById('statusAlert').className = 'status-strip success';
-        document.getElementById('statusAlert').innerHTML = `<strong>Ingested File:</strong> ${file.name} (${e.target.result.length.toLocaleString()} characters). Ready to scan.`;
+        document.getElementById('statusAlert').innerHTML = `<strong>Ingested File:</strong> ${file.name} (${content.length.toLocaleString()} characters). Ready to scan.`;
       };
       reader.readAsText(file);
     }
@@ -1266,8 +1387,8 @@
 
     function runScanInWorker(fasta, title, k, compressArg, tier2Stringency, tier3Stringency, onProgress) {
       return new Promise((resolve, reject) => {
-        const jsUrl = new URL('./pkg/rhizaeon_wasm.js?v=0.1.2', window.location.href).href;
-        const wasmUrl = new URL('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.2', window.location.href).href;
+        const jsUrl = new URL('./pkg/rhizaeon_wasm.js?v=0.1.3', window.location.href).href;
+        const wasmUrl = new URL('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.3', window.location.href).href;
         const workerCode = `
           import init, { scan_fasta_bundle_with_progress, scan_fasta_bundle } from ${JSON.stringify(jsUrl)};
           self.onmessage = async (ev) => {
@@ -1332,15 +1453,19 @@
     }
 
     window.runScanner = async function() {
+      const fasta = document.getElementById('fastaInput').value.trim();
+      if (fasta.startsWith('{') && tryLoadSavedAnalysis(fasta, 'Saved Analysis')) {
+        return;
+      }
+
       if (!wasmReady) {
         alert('WebAssembly engine initializing. Please allow 1-2 seconds.');
         return;
       }
 
-      const fasta = document.getElementById('fastaInput').value.trim();
       if (!fasta || !fasta.startsWith('>')) {
         document.getElementById('statusAlert').className = 'status-strip error';
-        document.getElementById('statusAlert').innerText = 'Invalid format. Input alignment must be in FASTA format starting with ">".';
+        document.getElementById('statusAlert').innerText = 'Invalid format. Input must be a FASTA alignment starting with ">" or a saved RhizAeon analysis file.';
         return;
       }
 
@@ -1353,21 +1478,13 @@
 
       scanBtn.disabled = true;
       btnIcon.innerHTML = '<span class="spinner"></span>';
-      let currentPct = 4;
+      let currentPct = 2;
       let latestStageMsg = 'Parsing FASTA alignment...';
       updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
 
       document.getElementById('systemLed').style.backgroundColor = 'var(--braun-orange)';
       document.getElementById('systemLedText').innerText = 'System: Active';
       document.getElementById('statusAlert').className = 'status-strip info';
-
-      // Smooth sub-stage creep timer so even very large single-stage computations show continuous left-to-right progress
-      const creepTimer = setInterval(() => {
-        if (currentPct < 94) {
-          currentPct = Math.min(94, currentPct + Math.max(0.4, (95 - currentPct) * 0.04));
-          updateScanButtonProgress(scanBtn, btnText, currentPct, latestStageMsg);
-        }
-      }, 90);
 
       await new Promise(r => setTimeout(r, 25));
 
@@ -1438,34 +1555,36 @@
         document.getElementById('statusAlert').className = 'status-strip error';
         document.getElementById('statusAlert').innerText = 'Execution Fault: ' + (err.message || err);
       } finally {
-        clearInterval(creepTimer);
         scanBtn.disabled = false;
         scanBtn.style.removeProperty('--scan-progress');
         btnIcon.innerText = '●';
         btnText.innerText = 'Scan For Recombination';
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.2';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.3';
         const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
         document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
       }
     };
 
-    function renderOutput(res, clientMs, htmlDoc, landscape) {
+    function renderOutput(res, clientMs, htmlDoc, landscape, loadedFromFile) {
       document.getElementById('kpiGrid').style.display = 'grid';
       document.getElementById('resultsSection').style.display = 'block';
       renderMainLandscape(res, landscape);
 
       const statusEl = document.getElementById('kpiStatus');
+      const prefixLabel = loadedFromFile
+        ? `Loaded Saved Analysis (${loadedFromFile})`
+        : `Scan Complete (${clientMs.toFixed(1)} ms)`;
       if (res.is_non_recombinant_h0 || res.events.length === 0) {
         statusEl.innerText = 'CLONAL H₀';
         statusEl.className = 'dial-val';
         document.getElementById('statusAlert').className = 'status-strip success';
-        document.getElementById('statusAlert').innerHTML = `<strong>Scan Complete (${clientMs.toFixed(1)} ms).</strong> Null hypothesis H₀ accepted. The cohort is strictly clonal with zero reticulations.`;
+        document.getElementById('statusAlert').innerHTML = `<strong>${prefixLabel}.</strong> Null hypothesis H₀ accepted. The cohort is strictly clonal with zero reticulations.`;
       } else {
         statusEl.innerText = `${res.events.length} EVENTS`;
         statusEl.className = 'dial-val accent';
         document.getElementById('statusAlert').className = 'status-strip alert';
-        document.getElementById('statusAlert').innerHTML = `<strong>Scan Complete (${clientMs.toFixed(1)} ms).</strong> Recombinant reticulation swarm verified. Detected ${res.events.length} distinct event(s).`;
+        document.getElementById('statusAlert').innerHTML = `<strong>${prefixLabel}.</strong> Recombinant reticulation swarm verified. Detected ${res.events.length} distinct event(s).`;
       }
 
       document.getElementById('kpiTaxa').innerText = res.num_taxa.toLocaleString();
@@ -1490,7 +1609,7 @@
 
       if (res.events.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-tertiary); padding: 24px;">No recombination events detected (Null Hypothesis H₀ accepted).</td>`;
+        tr.innerHTML = `<td colspan="9" style="text-align: center; color: var(--text-tertiary); padding: 24px;">No recombination events detected (Null Hypothesis H₀ accepted).</td>`;
         tbody.appendChild(tr);
       } else {
         for (const ev of res.events) {
@@ -1524,7 +1643,12 @@
                 const bId = ev.is_crossover ? `BP_${ev.event_id}` : `BP_${ev.event_id} (5')`;
                 frame.contentWindow.inspectEvent(bId, ev.isolates[0], ev.home_name, ev.donor_name, Math.max(1, ev.u1 - 45), Math.min(res.length, ev.u2 + 45), ev.event_id);
               }
-              frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              const matrixEl = frame.contentDocument && frame.contentDocument.getElementById('matrix-container');
+              if (matrixEl) {
+                matrixEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                frame.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
             }
           };
           tbody.appendChild(tr);
@@ -1722,7 +1846,13 @@
       rows.forEach(r => r.classList.remove('selected-event-row'));
       if (targetRow) {
         targetRow.classList.add('selected-event-row');
-        targetRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const chamber = targetRow.closest('.table-chamber');
+        if (chamber && chamber.scrollHeight > chamber.clientHeight) {
+          const cRect = chamber.getBoundingClientRect();
+          const rRect = targetRow.getBoundingClientRect();
+          const relTop = (rRect.top - cRect.top) + chamber.scrollTop;
+          chamber.scrollTop = Math.max(0, Math.round(relTop - chamber.clientHeight / 2 + rRect.height / 2));
+        }
       }
     }
 
@@ -1731,6 +1861,42 @@
         highlightRosterEvent(e.data.eventId, e.data.recombinant);
       }
     });
+
+    window.saveFullAnalysis = function() {
+      if (!latestScanResult || !latestHtmlReport) {
+        alert('Please complete or load a RhizAeon analysis before saving.');
+        return;
+      }
+      const ver = typeof engine_version === 'function' ? engine_version() : '0.1.3';
+      const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
+      const base = (lastIngestedFilename || 'alignment').replace(/[^a-zA-Z0-9._-]+/g, '_');
+      const bundle = {
+        rhizaeon_analysis_format: '1.0',
+        engine_version: ver,
+        engine_build_timestamp: ts,
+        saved_at: new Date().toISOString(),
+        filename: lastIngestedFilename || 'alignment',
+        parameters: {
+          landmarks_k: parseInt(document.getElementById('landmarksK').value, 10) || 16,
+          tier2_stringency: parseFloat(document.getElementById('tier2Stringency').value) || 1.0,
+          tier3_stringency: parseFloat(document.getElementById('tier3Stringency').value) || 1.0,
+          snp_compression_mode: snpCompressionMode
+        },
+        fasta: document.getElementById('fastaInput').value || '',
+        result: latestScanResult,
+        landscape: latestLandscape,
+        html: latestHtmlReport
+      };
+      const blob = new Blob([JSON.stringify(bundle)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${base}.rhizaeon.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    };
 
     window.downloadHtmlReport = function() {
       if (!latestHtmlReport) return;
