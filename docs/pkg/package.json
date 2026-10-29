@@ -6,7 +6,7 @@
     "Antigravity AI Engine"
   ],
   "description": "WebAssembly client-side engine for RhizAeon PA-FF (v2.1)",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "files": [
     "rhizaeon_wasm_bg.wasm",
     "rhizaeon_wasm.js",

@@ -802,7 +802,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.5 (2026-10-29)</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.6 (2026-10-29)</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -1084,7 +1084,7 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.5';
+    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.6';
     const init = wasmMod.default;
     const {
       engine_version,
@@ -1102,6 +1102,7 @@
     let snpCompressionMode = 'auto';
     let lastIngestedFilename = 'alignment';
     let fullFastaBuffer = null;
+    let activeReportBlobUrl = null;
 
     function setFastaContent(text) {
       const str = text || '';
@@ -1135,9 +1136,9 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.5');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.6');
         wasmReady = true;
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.5';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.6';
         const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-29';
         const verBadge = document.getElementById('wasmVersionBadge');
         if (verBadge) {
@@ -1685,7 +1686,18 @@
       }
 
       const frame = document.getElementById('reportFrame');
-      frame.srcdoc = htmlDoc;
+      if (activeReportBlobUrl) {
+        URL.revokeObjectURL(activeReportBlobUrl);
+        activeReportBlobUrl = null;
+      }
+      if (htmlDoc && htmlDoc.length > 500000 && typeof Blob !== 'undefined' && typeof URL !== 'undefined' && URL.createObjectURL) {
+        frame.removeAttribute('srcdoc');
+        activeReportBlobUrl = URL.createObjectURL(new Blob([htmlDoc], { type: 'text/html;charset=utf-8' }));
+        frame.src = activeReportBlobUrl;
+      } else {
+        frame.removeAttribute('src');
+        frame.srcdoc = htmlDoc;
+      }
     }
 
     function renderMainLandscape(res, landscape) {
