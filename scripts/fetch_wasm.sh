@@ -11,7 +11,7 @@
 # bundle. The app code never changes — it always imports ./pkg/.
 set -euo pipefail
 
-RHIZAEON_WASM_TAG="${RHIZAEON_WASM_TAG:-rhizaeon-v0.1.4}"
+RHIZAEON_WASM_TAG="${RHIZAEON_WASM_TAG:-rhizaeon-v0.1.5}"
 PKG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/docs/pkg"
 ASSET="rhizaeon-wasm-${RHIZAEON_WASM_TAG##*-v}-pkg.tar.gz"
 URL="https://github.com/veg/HyphAeon/releases/download/${RHIZAEON_WASM_TAG}/${ASSET}"

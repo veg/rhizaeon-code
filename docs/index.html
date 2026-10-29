@@ -802,7 +802,7 @@
         <div class="brand-block">
           <div class="brand-title">
             RHIZAEON
-            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.4 (2026-10-28)</span>
+            <span class="brand-model" id="wasmVersionBadge">PA-FF 2.1 WASM &middot; v0.1.5 (2026-10-29)</span>
           </div>
           <div class="brand-sub">Continuous Metric Manifold Recombination Scanner &middot; Braun Industrial System</div>
         </div>
@@ -1084,7 +1084,7 @@
 
   <!-- WASM Engine Client Logic -->
   <script type="module">
-    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.4';
+    import * as wasmMod from './pkg/rhizaeon_wasm.js?v=0.1.5';
     const init = wasmMod.default;
     const {
       engine_version,
@@ -1101,6 +1101,30 @@
     let latestLandscape = null;
     let snpCompressionMode = 'auto';
     let lastIngestedFilename = 'alignment';
+    let fullFastaBuffer = null;
+
+    function setFastaContent(text) {
+      const str = text || '';
+      const el = document.getElementById('fastaInput');
+      if (str.length > 500000) {
+        fullFastaBuffer = str;
+        if (el) {
+          el.value = str.slice(0, 120000) + `\n... [Large alignment preview: ${str.length.toLocaleString()} characters buffered in memory for full scan]`;
+        }
+      } else {
+        fullFastaBuffer = null;
+        if (el) {
+          el.value = str;
+        }
+      }
+    }
+
+    function getFullFastaInput() {
+      if (fullFastaBuffer !== null) return fullFastaBuffer;
+      const el = document.getElementById('fastaInput');
+      return el ? el.value : '';
+    }
+    window.getFullFastaInput = getFullFastaInput;
 
     window.setSnpMode = function(mode) {
       snpCompressionMode = mode;
@@ -1111,10 +1135,10 @@
 
     async function initWasm() {
       try {
-        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.4');
+        await init('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.5');
         wasmReady = true;
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.4';
-        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.5';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-29';
         const verBadge = document.getElementById('wasmVersionBadge');
         if (verBadge) {
           verBadge.innerHTML = `PA-FF 2.1 WASM &middot; v${ver} (${ts})`;
@@ -1160,7 +1184,7 @@
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const fasta = await resp.text();
         lastIngestedFilename = urls[key].split('/').pop().replace(/\.[^.]+$/, '');
-        document.getElementById('fastaInput').value = fasta;
+        setFastaContent(fasta);
         document.getElementById('statusAlert').className = 'status-strip success';
         document.getElementById('statusAlert').innerHTML = `<strong>Loaded ${labels[key]}.</strong> Length: ${fasta.length.toLocaleString()} characters. Ready to execute.`;
       } catch (e) {
@@ -1173,6 +1197,11 @@
     const fastaInputEl = document.getElementById('fastaInput');
     const inputPanelEl = document.getElementById('inputPanel');
     const fileInput = document.getElementById('fileInput');
+    if (fastaInputEl) {
+      fastaInputEl.addEventListener('input', () => {
+        fullFastaBuffer = null;
+      });
+    }
 
     function hasDraggedFiles(e) {
       if (!e.dataTransfer) return false;
@@ -1311,14 +1340,14 @@
       lastIngestedFilename = cleanBase;
 
       if (typeof parsed.fasta === 'string' && parsed.fasta.trim().length > 0) {
-        document.getElementById('fastaInput').value = parsed.fasta;
+        setFastaContent(parsed.fasta);
       } else if (parsed.dossier && parsed.dossier.sequences && Array.isArray(parsed.dossier.taxa)) {
         const reconstructed = parsed.dossier.taxa
           .filter(t => parsed.dossier.sequences[t])
           .map(t => `>${t}\n${parsed.dossier.sequences[t]}`)
           .join('\n');
         if (reconstructed) {
-          document.getElementById('fastaInput').value = reconstructed;
+          setFastaContent(reconstructed);
         }
       }
 
@@ -1369,7 +1398,7 @@
         if (tryLoadSavedAnalysis(content, file.name)) {
           return;
         }
-        document.getElementById('fastaInput').value = content;
+        setFastaContent(content);
         document.getElementById('statusAlert').className = 'status-strip success';
         document.getElementById('statusAlert').innerHTML = `<strong>Ingested File:</strong> ${file.name} (${content.length.toLocaleString()} characters). Ready to scan.`;
       };
@@ -1387,8 +1416,8 @@
 
     function runScanInWorker(fasta, title, k, compressArg, tier2Stringency, tier3Stringency, onProgress) {
       return new Promise((resolve, reject) => {
-        const jsUrl = new URL('./pkg/rhizaeon_wasm.js?v=0.1.4', window.location.href).href;
-        const wasmUrl = new URL('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.4', window.location.href).href;
+        const jsUrl = new URL('./pkg/rhizaeon_wasm.js?v=0.1.5', window.location.href).href;
+        const wasmUrl = new URL('./pkg/rhizaeon_wasm_bg.wasm?v=0.1.5', window.location.href).href;
         const workerCode = `
           import init, { scan_fasta_bundle_with_progress, scan_fasta_bundle } from ${JSON.stringify(jsUrl)};
           self.onmessage = async (ev) => {
@@ -1453,7 +1482,7 @@
     }
 
     window.runScanner = async function() {
-      const fasta = document.getElementById('fastaInput').value.trim();
+      const fasta = getFullFastaInput().trim();
       if (fasta.startsWith('{') && tryLoadSavedAnalysis(fasta, 'Saved Analysis')) {
         return;
       }
@@ -1559,8 +1588,8 @@
         scanBtn.style.removeProperty('--scan-progress');
         btnIcon.innerText = '●';
         btnText.innerText = 'Scan For Recombination';
-        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.4';
-        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
+        const ver = typeof engine_version === 'function' ? engine_version() : '0.1.5';
+        const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-29';
         document.getElementById('systemLed').style.backgroundColor = 'var(--status-green)';
         document.getElementById('systemLedText').innerText = `System: Ready (v${ver} · ${ts})`;
       }
@@ -1867,9 +1896,10 @@
         alert('Please complete or load a RhizAeon analysis before saving.');
         return;
       }
-      const ver = typeof engine_version === 'function' ? engine_version() : '0.1.4';
-      const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-28';
+      const ver = typeof engine_version === 'function' ? engine_version() : '0.1.5';
+      const ts = typeof engine_build_timestamp === 'function' ? engine_build_timestamp() : '2026-10-29';
       const base = (lastIngestedFilename || 'alignment').replace(/[^a-zA-Z0-9._-]+/g, '_');
+      const fullFasta = getFullFastaInput() || '';
       const bundle = {
         rhizaeon_analysis_format: '1.0',
         engine_version: ver,
@@ -1882,7 +1912,7 @@
           tier3_stringency: parseFloat(document.getElementById('tier3Stringency').value) || 1.0,
           snp_compression_mode: snpCompressionMode
         },
-        fasta: document.getElementById('fastaInput').value || '',
+        fasta: fullFasta.length <= 50000000 ? fullFasta : '',
         result: latestScanResult,
         landscape: latestLandscape,
         html: latestHtmlReport
@@ -1979,7 +2009,7 @@
       const menu = document.getElementById('saveAlnMenu');
       if (menu) menu.classList.remove('open');
 
-      const rawFasta = document.getElementById('fastaInput').value.trim();
+      const rawFasta = getFullFastaInput().trim();
       const records = parseInputFastaRecords(rawFasta);
       if (!records.length || !latestScanResult) {
         alert('Please run a recombination scan on a valid FASTA alignment before exporting.');
